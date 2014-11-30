@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="utility">
+      <UniqueIdentifier>{ab6dfc8c-2e47-4e97-ac0d-9ce54c8f21ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gen">
+      <UniqueIdentifier>{b4c4c973-6ee0-402b-ad86-1470ed436da6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="mainwindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="OgreTimer.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="UsbCamera.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="myCameraView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RecordWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="paras.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="replayWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraCalibration.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="VirtualCamera.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="calibrateWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="stereoCalWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="manualWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="StereoReconstructor.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="marker.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="gen\moc_calibrateWindow.cpp">
+      <Filter>gen</Filter>
+    </ClCompile>
+    <ClCompile Include="gen\moc_mainwindow.cpp">
+      <Filter>gen</Filter>
+    </ClCompile>
+    <ClCompile Include="gen\moc_manualWindow.cpp">
+      <Filter>gen</Filter>
+    </ClCompile>
+    <ClCompile Include="gen\moc_myCameraView.cpp">
+      <Filter>gen</Filter>
+    </ClCompile>
+    <ClCompile Include="gen\moc_recordWindow.cpp">
+      <Filter>gen</Filter>
+    </ClCompile>
+    <ClCompile Include="gen\moc_replayWindow.cpp">
+      <Filter>gen</Filter>
+    </ClCompile>
+    <ClCompile Include="gen\moc_stereoCalWindow.cpp">
+      <Filter>gen</Filter>
+    </ClCompile>
+    <ClCompile Include="track_info_list.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="measure_markers.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="gen\moc_measure_markers.cpp">
+      <Filter>gen</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="mainwindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="OgreTimer.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="UsbCamera.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="myCameraView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="marker.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="recordWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="paras.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="replayWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraCalibration.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualCamera.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="calibrateWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="stereoCalWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="manualWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StereoReconstructor.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="track_info_list.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="measure_markers.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
