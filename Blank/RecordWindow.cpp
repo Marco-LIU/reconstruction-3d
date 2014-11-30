@@ -33,7 +33,7 @@
 
 #include <vector>
 
-#include "UsbCameras.h"
+#include "usb_camera_group.h"
 #include "myCameraView.h"
 #include "marker.h"
 #include "paras.h"
@@ -63,7 +63,7 @@ RecordWindow::~RecordWindow() {
 }
 
 //把灰度数据转换为QImage格式
-QImage RecordWindow::convertToQImage(unsigned char* buffer) {
+QImage RecordWindow::convertToQImage(const unsigned char* buffer) {
   int w = Paras::getSingleton().width;
   int h = Paras::getSingleton().height;
   QImage temp(w, h, QImage::Format_ARGB32);
@@ -81,7 +81,7 @@ QImage RecordWindow::convertToQImage(unsigned char* buffer) {
   return temp;
 }
 //更新场景图像
-void RecordWindow::updatePixmap(unsigned char* leftBuffer, unsigned char* rightBuffer) {
+void RecordWindow::updatePixmap(const unsigned char* leftBuffer, const unsigned char* rightBuffer) {
   QImage li = convertToQImage(leftBuffer);
   QImage ri = convertToQImage(rightBuffer);
 
@@ -116,10 +116,11 @@ void RecordWindow::updatePixmap(unsigned char* leftBuffer, unsigned char* rightB
 void RecordWindow::preview() {
   //如果没有启动摄像头，启动，并开始预览
   if (mbPlay == false) {
-    mCameras = new UsbCameras("para.config");
+    mCameras = new UsbCameraGroup();
+    mCameras->Init("para.config");
 
     //如果启动失败，提示摄像机没有连接好
-    if (mCameras->getCameraCount() != 2) {
+    if (mCameras->camera_count() != 2) {
       delete mCameras;
       mCameras = NULL;
       mPlay->setText("停止");
@@ -130,7 +131,6 @@ void RecordWindow::preview() {
     }
     //成功启动
     else {
-      mCameras->setTriggerMode(true);
 
       //切换其它按钮状态
       mbPlay = true;
@@ -286,10 +286,10 @@ void RecordWindow::updateOneFrame() {
   static int FrameCount = 0;
   static int StartTime = mProTimer.getMilliseconds();
 
-  if (mCameras->captureTwoFrameSyncSoftControl(0, 1)) {
+  if (mCameras->CaptureFrame(true)) {
     FrameCount++;
 
-    updatePixmap(mCameras->getBuffer(0), mCameras->getBuffer(1));
+    updatePixmap(mCameras->camera_buffer(0), mCameras->camera_buffer(1));
   }
 
   //每20帧，统计下帧率

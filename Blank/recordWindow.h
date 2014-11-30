@@ -19,9 +19,9 @@ class QVBoxLayout;
 class QHBoxLayout;
 class QPushButton;
 
-class UsbCameras;
 class MyCameraView;
 class MyDetailView;
+class UsbCameraGroup;
 
 /*
   这个类，主要用于录制视频的界面
@@ -37,9 +37,9 @@ public:
 
   ~RecordWindow();
   //把灰度数据转换为QImage格式
-  QImage convertToQImage(unsigned char* buffer);
+  QImage convertToQImage(const unsigned char* buffer);
   //更新场景图像
-  void updatePixmap(unsigned char* leftBuffer, unsigned char* rightBuffer);
+  void updatePixmap(const unsigned char* leftBuffer, const unsigned char* rightBuffer);
 signals:
 
 public slots :
@@ -71,7 +71,7 @@ protected:
   QTimer*		mTimer;		//定时器触发
   Timer		mRecTimer;	//用于录制的定时器
   Timer		mProTimer;	//程序的计时器
-  UsbCameras*	mCameras;	//摄像头
+  UsbCameraGroup*	mCameras;	//摄像头
 
   //窗口布局
   QWidget*		mCenterWidget;			//中心窗口(即本窗口,this)

@@ -4,11 +4,13 @@
 
 class UsbCamera;
 
+// 代理接口，接口函数在后台线程中调用
+// 实现时注意同步
 class CameraGroupRecordDelegate {
 public:
   virtual ~CameraGroupRecordDelegate() {}
 
-  virtual std::string GetSavingDir() = 0;
+  virtual std::string GetSavingDir(unsigned int cam_id) = 0;
 
   // 通知抓取了一帧，index表示帧序号
   // 返回为false时忽略此帧
@@ -22,30 +24,34 @@ class UsbCameraGroup
 {
 public:
   UsbCameraGroup();
-  UsbCameraGroup(const std::string& config_content);
   ~UsbCameraGroup();
 
-  bool Init();
+  typedef std::map<int, unsigned char*> BufferMap;
+
+  bool Init(const std::string& config);
 
   bool StartAll();
 
-  bool StopAll();
+  void StopAll();
 
   unsigned int camera_count() const;
 
   UsbCamera* GetCamera(int id) const;
 
   // 同步抓取一帧
-  bool CaptureFrame(bool use_trigger, unsigned char** buffers = NULL);
+  bool CaptureFrame(bool use_trigger, const BufferMap* buffers = NULL);
 
   const unsigned char* camera_buffer(int id) const;
+
+  bool StartRecord(CameraGroupRecordDelegate* delegate);
+  void StopRecord();
 
 protected:
   typedef std::map<int, UsbCamera*> CameraMap;
 
   CameraMap cameras_;
 
-  unsigned char** buffers_;
+  BufferMap buffers_;
 
   class RecordContext;
   RecordContext* record_context_;
