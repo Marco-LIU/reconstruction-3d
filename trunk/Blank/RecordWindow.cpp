@@ -85,7 +85,7 @@ void RecordWindow::updatePixmap(const unsigned char* leftBuffer, const unsigned 
   QImage li = convertToQImage(leftBuffer);
   QImage ri = convertToQImage(rightBuffer);
 
-  if (mbRecord) {
+  /*if (mbRecord) {
     //如果录制
     mRecordCnt++;
 
@@ -104,7 +104,7 @@ void RecordWindow::updatePixmap(const unsigned char* leftBuffer, const unsigned 
 
     //显示信息
     mStatusBar->showMessage("图像" + name + "保存完毕");
-  }
+  }*/
 
   mLeftCameraPixmap->setPixmap(QPixmap::fromImage(li));
   mRightCameraPixmap->setPixmap(QPixmap::fromImage(ri));
@@ -240,6 +240,7 @@ void RecordWindow::recordVedio() {
     mRecord->setText("暂停");
 
     mStatusBar->showMessage("正在录制");
+    mCameras->StartRecord(NULL);
   }
   //切换到暂停状态
   else {
@@ -247,6 +248,7 @@ void RecordWindow::recordVedio() {
     mRecord->setText("录制");
 
     mStatusBar->showMessage("暂停录制");
+    mCameras->StopRecord();
   }
 }
 //结束录制视频
@@ -267,6 +269,7 @@ void RecordWindow::stopRecordVedio() {
     "视频文件成功保存，保存位置为:\n" + imagesFolder.absolutePath());	//文本内容
 
   mStatusBar->showMessage("正在预览");
+  mCameras->StopRecord();
 }
 //关闭视频录制界面
 void RecordWindow::closeRecordWindow() {
@@ -283,6 +286,8 @@ void RecordWindow::closeRecordWindow() {
 
 //更新一帧场景图像
 void RecordWindow::updateOneFrame() {
+  if (mbRecord) return;
+
   static int FrameCount = 0;
   static int StartTime = mProTimer.getMilliseconds();
 

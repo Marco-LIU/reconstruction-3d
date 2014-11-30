@@ -31,9 +31,18 @@ public:
     capture_data_ = new CaptureThreadData[camera_count_];
     io_data_ = new FileIOThreadData[camera_count_ * IO_THREAD_PER_CAMERA];
     threads_ = new HANDLE[camera_count_ * 3 + 1];
+    trigger_data_.loop = 0;
+
+    for (int i = 0; i < camera_count_; i++) {
+      capture_data_[i].ioBufferReady = false;
+    }
+    for (int i = 0; i < camera_count_ * IO_THREAD_PER_CAMERA; i++) {
+      io_data_[i].state = FileIOThreadData::IDLE;
+    }
 
     threads_[0] = CreateThread(NULL, 0, CameraTriggerThread, this, 0, NULL);
     if (!threads_[0]) return false;
+    pending_camera_count_ = 0;
 
     int i = 0;
     CameraMap::const_iterator cit = cameras.begin();
@@ -51,8 +60,8 @@ public:
       }
       FileIOThreadParam* p2 = new FileIOThreadParam;
       p2->context = this;
-      p2->io_index = i * IO_THREAD_PER_CAMERA;
-      p1->saving_dir = dir;
+      p2->io_index = i + IO_THREAD_PER_CAMERA;
+      p2->saving_dir = dir;
       threads_[1 + 3 * i + 1] = CreateThread(NULL, 0, FileIOThread, p2, 0, NULL);
       if (!threads_[1 + 3 * i + 1]) {
         delete p1;
@@ -155,7 +164,7 @@ private:
 
     CaptureThreadData& d = context->capture_data_[camId];
     int ioThreadIndex = -1;
-    while (!true) {
+    while (true) {
       if (WAIT_OBJECT_0 == WaitForSingleObject(context->stop_event_, 0))
         break;
       if (!d.ioBufferReady) {
@@ -173,7 +182,7 @@ private:
       if (WAIT_OBJECT_0 == WaitForSingleObject(context->stop_event_, 0))
         break;
 
-      if (!d.ioBufferReady) {
+      if (!d.ioBufferReady || ioThreadIndex == -1) {
         continue;
       }
 
@@ -183,6 +192,7 @@ private:
       if (!context->io_data_[ioThreadIndex].buffer) {
         context->io_data_[ioThreadIndex].buffer =
             new unsigned char[camera->buffer_length()];
+        context->io_data_[ioThreadIndex].size = camera->buffer_length();
       }
 
       d.captureResult = camera->CaptureFrameSync(
@@ -206,11 +216,15 @@ private:
       }
       d.postCaptureTime = context->timer_.getMicroseconds();
       d.ioBufferReady = false;
+      std::cout << "Trigger io thread: " << ioThreadIndex << std::endl;
       context->io_data_[ioThreadIndex].state = FileIOThreadData::WRITING;
       context->io_data_[ioThreadIndex].camIndex = camId;
       context->io_data_[ioThreadIndex].imgIndex = context->trigger_data_.loop;
       InterlockedDecrement(&context->pending_camera_count_);
     }
+
+    std::cout << "CaptureThread: " << camId << " quit" << std::endl;
+
     return 0;
   }
 
@@ -226,11 +240,12 @@ private:
     int ioIndex = param->io_index;
     std::string dir = param->saving_dir;
     delete param;
+    std::cout << "IO Thread: " << ioIndex << std::endl;
 
     FileIOThreadData& d = context->io_data_[ioIndex];
 
     char filename[32];
-    while (!true) {
+    while (true) {
       if (WAIT_OBJECT_0 == WaitForSingleObject(context->stop_event_, 0))
         break;
       if (d.state != FileIOThreadData::WRITING) {
@@ -239,7 +254,11 @@ private:
       }
 
       // Ð´ÈëÎÄ¼þ
-      _snprintf(filename, sizeof(filename), "%s/%02d_%08d.jpg", dir.c_str(), d.camIndex, d.imgIndex);
+      _snprintf(filename, sizeof(filename), "%s/save/%s/%d.jpg",
+                dir.c_str(), d.camIndex ? "right" : "left", d.imgIndex);
+
+      std::cout << ioIndex << " to write file: " << filename << std::endl;
+
       /*for (int i = d.camIndex * 4; i < d.camIndex * 4 + 4; i++) {
         if (gTimeBoard[i].size() < d.imgIndex) {
           gTimeBoard[i].resize(d.imgIndex);
@@ -264,7 +283,7 @@ private:
       d.state = FileIOThreadData::IDLE;
     }
 
-    //std::cerr << "IO thread finished" << std::endl;
+    std::cerr << "IO thread finished " << ioIndex << std::endl;
     return 0;
   }
 
@@ -295,7 +314,7 @@ private:
                              context->camera_count_);
       Sleep(2);
     }
-
+    std::cout << "CameraTriggerThread quit" << std::endl;
     return 0;
   }
 public:
