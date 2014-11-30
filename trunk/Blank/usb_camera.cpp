@@ -49,9 +49,12 @@ bool UsbCamera::Init() {
   //不使用自动曝光
   CameraSetAEC(index_, false);
 
+  CameraSetSnapMode(index_, CAMERA_SNAP_TRIGGER);
+
   //获取12位的产品序列号
-  char id[12];
+  char id[13];
   CameraReadSerialNumber(index_, id, 12);
+  id[12] = '\0';
   sn_ = id;
 
   int length = 0;
