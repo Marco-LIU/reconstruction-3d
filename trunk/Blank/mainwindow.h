@@ -80,7 +80,6 @@ protected:
   QAction*		ma3DShow;		//显示3d窗口
   QAction*		ma2DShow;		//显示2d窗口
 
-  int				maCurFun;		//当前的界面id
   QAction*		maTodo;
   //工具
 
@@ -90,10 +89,13 @@ protected:
   //窗口
   RecordWindow*		mRecordWindow;		//录制窗口
   ReplayWindow*		mReplayWindow;		//播放窗口
-  CalibrateWindow*	mCalibrateWindow;	//单目标定窗口
+  CalibrateWindow*	mLeftCalibrateWindow;	//左单目标定窗口
+  CalibrateWindow*	mRightCalibrateWindow;	//右单目标定窗口
   StereoCalibrationWindow* mStereoWindow;	//双目标定窗口
   ManualWindow*		mManualWindow;		//手动测量窗口
   MeasureMarkersWindow* mMeasureWindow;
+
+  QWidget* mCurrentWidget;
 };
 
 #endif

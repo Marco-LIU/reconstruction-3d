@@ -36,7 +36,7 @@
 
 #include <vector>
 
-#include "UsbCamera.h"
+#include "UsbCameras.h"
 #include "myCameraView.h"
 #include "marker.h"
 #include "paras.h"
@@ -162,7 +162,7 @@ void CalibrateWindow::setRightDetailView() {
 void CalibrateWindow::preview() {
   //如果没有启动摄像头，启动，并开始预览
   if (mbPlay == false) {
-    mCameras = new UsbCamera("para.config");
+    mCameras = new UsbCameras("para.config");
 
     //如果启动失败，提示摄像机没有连接好
     if (mCameras->getCameraIndex(mCameraId) == -1) {

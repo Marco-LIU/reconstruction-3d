@@ -6,7 +6,7 @@
 
 #include "highgui.h"
 #include "cv.h"
-#include "UsbCamera.h"
+#include "UsbCameras.h"
 #include "paras.h"
 
 #include <QtWidgets\qapplication.h>

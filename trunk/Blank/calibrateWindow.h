@@ -25,7 +25,7 @@ class QLabel;
 
 class MyCameraView;
 class MyDetailView;
-class UsbCamera;
+class UsbCameras;
 
 class CalibrateWindow : public QWidget
 {
@@ -91,7 +91,7 @@ protected:
   MyDetailView*   mZoomView;            //缩放视图
 
   QTimer*			mTimer;					//定时器触发
-  UsbCamera*		mCameras;				//摄像头
+  UsbCameras*		mCameras;				//摄像头
   int				mCameraId;				//0表示左摄像头，1表示右摄像头
   bool			mbLeftFocused;			//true表示左摄像头屏幕获得焦点
   Timer			mProTimer;				//程序的计时器

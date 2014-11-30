@@ -106,7 +106,9 @@
     <ClCompile Include="stereoCalWindow.cpp" />
     <ClCompile Include="StereoReconstructor.cpp" />
     <ClCompile Include="track_info_list.cpp" />
-    <ClCompile Include="UsbCamera.cpp" />
+    <ClCompile Include="UsbCameras.cpp" />
+    <ClCompile Include="usb_camera.cpp" />
+    <ClCompile Include="usb_camera_group.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="VirtualCamera.cpp" />
   </ItemGroup>
@@ -125,7 +127,9 @@
     <ClInclude Include="stereoCalWindow.h" />
     <ClInclude Include="StereoReconstructor.h" />
     <ClInclude Include="track_info_list.h" />
-    <ClInclude Include="UsbCamera.h" />
+    <ClInclude Include="UsbCameras.h" />
+    <ClInclude Include="usb_camera.h" />
+    <ClInclude Include="usb_camera_group.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="VirtualCamera.h" />
   </ItemGroup>

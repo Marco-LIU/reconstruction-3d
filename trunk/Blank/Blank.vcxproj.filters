@@ -28,9 +28,6 @@
     <ClCompile Include="OgreTimer.cpp">
       <Filter>utility</Filter>
     </ClCompile>
-    <ClCompile Include="UsbCamera.cpp">
-      <Filter>utility</Filter>
-    </ClCompile>
     <ClCompile Include="myCameraView.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -97,15 +94,21 @@
     <ClCompile Include="gen\moc_measure_markers.cpp">
       <Filter>gen</Filter>
     </ClCompile>
+    <ClCompile Include="usb_camera.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="UsbCameras.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="usb_camera_group.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mainwindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="OgreTimer.h">
-      <Filter>utility</Filter>
-    </ClInclude>
-    <ClInclude Include="UsbCamera.h">
       <Filter>utility</Filter>
     </ClInclude>
     <ClInclude Include="myCameraView.h">
@@ -149,6 +152,15 @@
     </ClInclude>
     <ClInclude Include="measure_markers.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="usb_camera.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="UsbCameras.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="usb_camera_group.h">
+      <Filter>utility</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

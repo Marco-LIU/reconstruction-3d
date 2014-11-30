@@ -19,7 +19,7 @@ class QVBoxLayout;
 class QHBoxLayout;
 class QPushButton;
 
-class UsbCamera;
+class UsbCameras;
 class MyCameraView;
 class MyDetailView;
 
@@ -71,7 +71,7 @@ protected:
   QTimer*		mTimer;		//定时器触发
   Timer		mRecTimer;	//用于录制的定时器
   Timer		mProTimer;	//程序的计时器
-  UsbCamera*	mCameras;	//摄像头
+  UsbCameras*	mCameras;	//摄像头
 
   //窗口布局
   QWidget*		mCenterWidget;			//中心窗口(即本窗口,this)
