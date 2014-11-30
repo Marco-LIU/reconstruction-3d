@@ -16,12 +16,13 @@
 #include "paras.h"
 
 MainWindow::MainWindow()
-  : maCurFun(0)
-  , mRecordWindow(NULL)
-  , mReplayWindow(NULL)
-  , mCalibrateWindow(NULL)
-  , mStereoWindow(NULL)
-  , mManualWindow(NULL) {
+    : mCurrentWidget(NULL)
+    , mRecordWindow(NULL)
+    , mReplayWindow(NULL)
+    , mLeftCalibrateWindow(NULL)
+    , mRightCalibrateWindow(NULL)
+    , mStereoWindow(NULL)
+    , mManualWindow(NULL) {
   //创建场景
   createScene();
 
@@ -46,71 +47,66 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::showRecordWindow() {
-  if (maCurFun == 1)
+  if (mCurrentWidget && mCurrentWidget == mRecordWindow)
     return;
 
-  maCurFun = 1;
   mRecordWindow = new RecordWindow(&mScene, mLeftCameraPixmap,
                                    mRightCameraPixmap, mStatusBar);
+  mCurrentWidget = mRecordWindow;
   this->setCentralWidget(mRecordWindow);
 }
 
 void MainWindow::showReplayWindow() {
-  if (maCurFun == 2)
+  if (mCurrentWidget && mCurrentWidget == mReplayWindow)
     return;
 
-  maCurFun = 2;
   mReplayWindow = new ReplayWindow(&mScene, mLeftCameraPixmap,
                                    mRightCameraPixmap, mStatusBar);
+  mCurrentWidget = mReplayWindow;
   this->setCentralWidget(mReplayWindow);
 }
 
 void MainWindow::showCalibrateLeft() {
-  if (maCurFun == 3)
+  if (mCurrentWidget && mCurrentWidget == mLeftCalibrateWindow)
     return;
 
-  maCurFun = 3;
-
-  mCalibrateWindow = new CalibrateWindow(&mScene, mLeftCameraPixmap,
-                                         mRightCameraPixmap, mStatusBar,
-                                         "./leftCamera/", true);
-  this->setCentralWidget(mCalibrateWindow);
+  mLeftCalibrateWindow = new CalibrateWindow(&mScene, mLeftCameraPixmap,
+                                             mRightCameraPixmap, mStatusBar,
+                                             "./leftCamera/", true);
+  mCurrentWidget = mLeftCalibrateWindow;
+  this->setCentralWidget(mLeftCalibrateWindow);
 }
 
 void MainWindow::showCalibrateRight() {
-  if (maCurFun == 4)
+  if (mCurrentWidget && mCurrentWidget == mRightCalibrateWindow)
     return;
 
-  maCurFun = 4;
-
-  mCalibrateWindow = new CalibrateWindow(&mScene, mLeftCameraPixmap,
-                                         mRightCameraPixmap, mStatusBar,
-                                         "./rightCamera/", false);
-  this->setCentralWidget(mCalibrateWindow);
+  mRightCalibrateWindow = new CalibrateWindow(&mScene, mLeftCameraPixmap,
+                                              mRightCameraPixmap, mStatusBar,
+                                              "./rightCamera/", false);
+  mCurrentWidget = mRightCalibrateWindow;
+  this->setCentralWidget(mRightCalibrateWindow);
 }
 
 void MainWindow::showCalibrateRT() {
-  if (maCurFun == 5)
+  if (mCurrentWidget && mCurrentWidget == mStereoWindow)
     return;
-
-  maCurFun = 5;
-
   mStereoWindow = new StereoCalibrationWindow(&mScene, mLeftCameraPixmap,
                                               mRightCameraPixmap, mStatusBar);
+  mCurrentWidget = mStereoWindow;
   this->setCentralWidget(mStereoWindow);
 }
 
 void MainWindow::showManualWindow() {
-  if (maCurFun == 6)
+  if (mCurrentWidget && mCurrentWidget == mMeasureWindow)
     return;
-
-  maCurFun = 6;
 
   //mManualWindow = new ManualWindow(&mScene, mLeftCameraPixmap,
   //                                 mRightCameraPixmap, mStatusBar);
   //this->setCentralWidget(mManualWindow);
   mMeasureWindow = new MeasureMarkersWindow(&mScene, mLeftCameraPixmap,
                                             mRightCameraPixmap, mStatusBar);
+  mCurrentWidget = mMeasureWindow;
   this->setCentralWidget(mMeasureWindow);
 }
 

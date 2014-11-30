@@ -34,7 +34,7 @@
 #include <QtGui\qevent.h>
 #include <QtGui\qpainter.h>
 
-#include "UsbCamera.h"
+#include "UsbCameras.h"
 #include "myCameraView.h"
 #include "marker.h"
 #include "paras.h"
@@ -177,7 +177,7 @@ void StereoCalibrationWindow::setRightDetailView() {
 void StereoCalibrationWindow::preview() {
   //如果没有启动摄像头，启动，并开始预览
   if (mbPlay == false) {
-    mCameras = new UsbCamera("para.config");
+    mCameras = new UsbCameras("para.config");
 
     //如果启动失败，提示摄像机没有连接好
     if (mCameras->getCameraCount() != 2) {

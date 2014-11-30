@@ -33,7 +33,7 @@
 #include <QtGui\qevent.h>
 #include <QtGui\qpainter.h>
 
-#include "UsbCamera.h"
+#include "UsbCameras.h"
 #include "myCameraView.h"
 #include "marker.h"
 #include "paras.h"
