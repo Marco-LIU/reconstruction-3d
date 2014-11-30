@@ -3,8 +3,26 @@
 #include "JHCap.h"
 #include "cv.h"
 #include "OgreTimer.h"
+#include "QtGui/qimage.h"
 
 #define IO_THREAD_PER_CAMERA 2
+
+QImage convertToQImage(const unsigned char* buffer,
+                       unsigned int w, unsigned int h) {
+  QImage temp(w, h, QImage::Format_ARGB32);
+  for (int i = 0; i < h; i++) {
+    unsigned char* pCurData = temp.scanLine(i);
+    for (int j = 0; j < w; j++) {
+      unsigned char data = buffer[i*w + j];
+
+      *(pCurData + j * 4) = data;
+      *(pCurData + j * 4 + 1) = data;
+      *(pCurData + j * 4 + 2) = data;
+      *(pCurData + j * 4 + 3) = 255;
+    }
+  }
+  return temp;
+}
 
 class UsbCameraGroup::RecordContext {
 public:
@@ -145,6 +163,8 @@ private:
     unsigned int   camIndex;
     unsigned long  imgIndex;
     volatile int   state;
+    unsigned int w;
+    unsigned int h;
   };
 
 
@@ -220,6 +240,8 @@ private:
       context->io_data_[ioThreadIndex].state = FileIOThreadData::WRITING;
       context->io_data_[ioThreadIndex].camIndex = camId;
       context->io_data_[ioThreadIndex].imgIndex = context->trigger_data_.loop;
+      context->io_data_[ioThreadIndex].w = camera->width();
+      context->io_data_[ioThreadIndex].h = camera->height();
       InterlockedDecrement(&context->pending_camera_count_);
     }
 
@@ -267,9 +289,11 @@ private:
       gTimeBoard[d.camIndex * 4 + 0][d.imgIndex - 1] = g_captureData[d.camIndex].preCaptureTime;
       gTimeBoard[d.camIndex * 4 + 1][d.imgIndex - 1] = g_captureData[d.camIndex].postCaptureTime;
       gTimeBoard[d.camIndex * 4 + 2][d.imgIndex - 1] = gTimer.getMicroseconds();*/
-      FILE* fp = fopen(filename, "w");
-      fwrite(d.buffer, d.size, 1, fp);
-      fclose(fp);
+      //FILE* fp = fopen(filename, "w");
+      //fwrite(d.buffer, d.size, 1, fp);
+      //fclose(fp);
+      QImage img = convertToQImage(d.buffer, d.w, d.h);
+      img.save(filename);
       if (WAIT_OBJECT_0 == WaitForSingleObject(context->stop_event_, 0))
         break;
       //gTimeBoard[d.camIndex * 4 + 3][d.imgIndex - 1] = gTimer.getMicroseconds();
