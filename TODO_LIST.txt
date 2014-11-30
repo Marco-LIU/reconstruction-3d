@@ -1,0 +1,8 @@
+1、缓存数据：Image、角点、矩阵等
+
+Image缓存：key->(Raw image, other images)
+角点：img_key->角点列表
+calibration_info：matrix，distortion，image_key_list
+
+2、重构虚拟摄像机对象：
+在内存中保存数据
