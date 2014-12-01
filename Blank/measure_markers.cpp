@@ -186,11 +186,11 @@ void MeasureMarkersWindow::preview() {
     if (mCameras->getCameraCount() != 2) {
       delete mCameras;
       mCameras = NULL;
-      mPlay->setText("停止");
+      mPlay->setText(QString::fromWCharArray(L"停止"));
       QMessageBox::critical(
         0,							//父窗口
-        "找不到可用的摄像头",		//标题栏
-        "找不到可用的摄像头，请查看摄像头是否已经连接到电脑，如已经连接，请重新插拔USB接口");		//文本内容
+        QString::fromWCharArray(L"找不到可用的摄像头"),		//标题栏
+        QString::fromWCharArray(L"找不到可用的摄像头，请查看摄像头是否已经连接到电脑，如已经连接，请重新插拔USB接口"));		//文本内容
     }
     //成功启动
     else {
@@ -198,7 +198,7 @@ void MeasureMarkersWindow::preview() {
 
       //切换其它按钮状态
       mbPlay = true;
-      mPlay->setText("停止");
+      mPlay->setText(QString::fromWCharArray(L"停止"));
 
       //设置定时触发
       mTimer = new QTimer(this);
@@ -218,7 +218,7 @@ void MeasureMarkersWindow::preview() {
       mTimer = NULL;
       delete mCameras;
       mCameras = NULL;
-      mPlay->setText("预览");
+      mPlay->setText(QString::fromWCharArray(L"预览"));
       mCapture->setDisabled(true);
       mSlider->setEnabled(true);
     }
@@ -333,7 +333,7 @@ std::vector<cv::Point2f> circleDetect(cv::Mat img_gray) {
         sum += val;
         num++;
       }
-      if (judge == 0 || reverse_time1 == 0 || reverse_time2 == 0 || reverse_time1 + reverse_time2<4 || (double)blacknum1 * 2 / num <= 0.2 || (double)blacknum2 * 2 / num >= 0.8 || abs(blacknum1 - blacknum2)>3) {
+      if (judge == 0 || reverse_time1 == 0 || reverse_time2 == 0 || reverse_time1 + reverse_time2<4 || (double)blacknum1 * 2 / num <= 0.2 || (double)blacknum2 * 2 / num >= 0.8 || abs(blacknum1 - blacknum2)>5) {
         break;
       }
       mean.push_back(sum / num);
@@ -360,7 +360,7 @@ std::vector<cv::Point2f> circleDetect(cv::Mat img_gray) {
     }
 
     if (judge) {
-      std::cout << i << std::endl;
+      //std::cout << i << std::endl;
       result.push_back(corners[i]);
     }
     mean.clear();
@@ -423,7 +423,7 @@ void MeasureMarkersWindow::capture() {
     mRightCameraPixmap->setPixmap(QPixmap::fromImage(rp));
 
     //提示找到角点
-    mStatusBar->showMessage("成功找到标记点");
+    mStatusBar->showMessage(QString::fromWCharArray(L"成功找到标记点"));
 
     int all = mImgs.size();
     QString ta;
@@ -443,11 +443,11 @@ void MeasureMarkersWindow::capture() {
     COUNT--;
 
     //弹出对话框，提示没有找到角点
-    mStatusBar->showMessage("没有找到标记点");
+    mStatusBar->showMessage(QString::fromWCharArray(L"没有找到标记点"));
     QMessageBox::StandardButton btn2 = QMessageBox::warning(
       0,						//父窗口
-      "没有找到标记点",			//标题栏
-      "在当前的图像中，没有找到对应的标记点");		//文本内容
+      QString::fromWCharArray(L"没有找到标记点"),			//标题栏
+      QString::fromWCharArray(L"在当前的图像中，没有找到对应的标记点"));		//文本内容
 
     //重新开始
     mTimer->start();
@@ -545,7 +545,7 @@ void MeasureMarkersWindow::createLayout() {
 void MeasureMarkersWindow::createWidget() {
   //预览按钮
   mPlay = new QPushButton();
-  mPlay->setText("预览");
+  mPlay->setText(QString::fromWCharArray(L"预览"));
   connect(mPlay, SIGNAL(pressed()), this, SLOT(preview()));
 
   //标签
@@ -555,13 +555,13 @@ void MeasureMarkersWindow::createWidget() {
 
   //捕获按钮
   mCapture = new QPushButton();
-  mCapture->setText("捕获");
+  mCapture->setText(QString::fromWCharArray(L"捕获"));
   connect(mCapture, SIGNAL(pressed()), this, SLOT(capture()));
   mCapture->setDisabled(true);
 
   //删除按钮
   mDelete = new QPushButton();
-  mDelete->setText("删除");
+  mDelete->setText(QString::fromWCharArray(L"删除"));
   connect(mDelete, SIGNAL(pressed()), this, SLOT(deleteImg()));
   mDelete->setDisabled(true);
 

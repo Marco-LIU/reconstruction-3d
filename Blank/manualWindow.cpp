@@ -103,11 +103,11 @@ void ManualWindow::preview() {
     if (mCameras->getCameraCount() != 2) {
       delete mCameras;
       mCameras = NULL;
-      mPlay->setText("停止");
+      mPlay->setText(QString::fromWCharArray(L"停止"));
       QMessageBox::critical(
         0,							//父窗口
-        "找不到可用的摄像头",		//标题栏
-        "找不到可用的摄像头，请查看摄像头是否已经连接到电脑，如已经连接，请重新插拔USB接口");		//文本内容
+        QString::fromWCharArray(L"找不到可用的摄像头"),		//标题栏
+        QString::fromWCharArray(L"找不到可用的摄像头，请查看摄像头是否已经连接到电脑，如已经连接，请重新插拔USB接口"));		//文本内容
     }
     //成功启动
     else {
@@ -115,7 +115,7 @@ void ManualWindow::preview() {
 
       //切换其它按钮状态
       mbPlay = true;
-      mPlay->setText("拍照");
+      mPlay->setText(QString::fromWCharArray(L"拍照"));
 
       //设置定时触发
       mTimer = new QTimer(this);
@@ -133,7 +133,7 @@ void ManualWindow::preview() {
       mTimer = NULL;
       delete mCameras;
       mCameras = NULL;
-      mPlay->setText("预览");
+      mPlay->setText(QString::fromWCharArray(L"预览"));
 
       //保存图像
       mLeftImg.save(mTempFolder + "left.jpg");
@@ -150,21 +150,21 @@ void ManualWindow::preview() {
 void ManualWindow::showLeftMarkers() {
   QMessageBox::about(
     0,				//父窗口
-    "消息框",		//标题栏
-    "todo选择，或批量删除左标记点");	//文本内容
+    QString::fromWCharArray(L"消息框"),		//标题栏
+    QString::fromWCharArray(L"todo选择，或批量删除左标记点"));	//文本内容
 }
 void ManualWindow::showRightMarkers() {
   QMessageBox::about(
     0,				//父窗口
-    "消息框",		//标题栏
-    "todo选择，或批量删除右标记点");	//文本内容
+    QString::fromWCharArray(L"消息框"),		//标题栏
+    QString::fromWCharArray(L"todo选择，或批量删除右标记点"));	//文本内容
 }
 //计算3d坐标
 void ManualWindow::calculate3dPoints() {
   QMessageBox::about(
     0,				//父窗口
-    "消息框",		//标题栏
-    "todo计算3d坐标");	//文本内容
+    QString::fromWCharArray(L"消息框"),		//标题栏
+    QString::fromWCharArray(L"todo计算3d坐标"));	//文本内容
 }
 
 //更新一帧场景图像
@@ -346,19 +346,19 @@ void ManualWindow::createLayout() {
 //创建按钮
 void ManualWindow::createWidget() {
   mPlay = new QPushButton();
-  mPlay->setText("预览");
+  mPlay->setText(QString::fromWCharArray(L"预览"));
   connect(mPlay, SIGNAL(pressed()), this, SLOT(preview()));
 
   mLM = new QPushButton();
-  mLM->setText("左标记点");
+  mLM->setText(QString::fromWCharArray(L"左标记点"));
   connect(mLM, SIGNAL(pressed()), this, SLOT(showLeftMarkers()));
 
   mRM = new QPushButton();
-  mRM->setText("右标记点");
+  mRM->setText(QString::fromWCharArray(L"右标记点"));
   connect(mRM, SIGNAL(pressed()), this, SLOT(showRightMarkers()));
 
   mCalculate = new QPushButton();
-  mCalculate->setText("计算3D坐标");
+  mCalculate->setText(QString::fromWCharArray(L"计算3D坐标"));
   connect(mCalculate, SIGNAL(pressed()), this, SLOT(calculate3dPoints()));
 
   //添加双击创建信号的响应
