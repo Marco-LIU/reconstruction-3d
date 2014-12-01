@@ -168,11 +168,13 @@ void CalibrateWindow::preview() {
     if (mCameras->getCameraIndex(mCameraId) == -1) {
       delete mCameras;
       mCameras = NULL;
-      mPlay->setText("停止");
+      mPlay->setText(QString::fromWCharArray(L"停止"));
+	  
       QMessageBox::critical(
         0,							//父窗口
-        "找不到可用的摄像头",		//标题栏
-        "找不到可用的摄像头，请查看摄像头是否已经连接到电脑，如已经连接，请重新插拔USB接口");		//文本内容
+        QString::fromWCharArray(L"找不到可用的摄像头"),		//标题栏
+        QString::fromWCharArray(L"找不到可用的摄像头，请查看摄像头是否已经连接到电脑，如已经连接，请重新插拔USB接口"));		//文本内容
+	  
     }
     //成功启动
     else {
@@ -180,7 +182,7 @@ void CalibrateWindow::preview() {
 
       //切换其它按钮状态
       mbPlay = true;
-      mPlay->setText("停止");
+      mPlay->setText(QString::fromWCharArray(L"停止"));
       //设置定时触发
       mTimer = new QTimer(this);
       connect(mTimer, SIGNAL(timeout()), this, SLOT(updateOneFrame()));
@@ -199,7 +201,7 @@ void CalibrateWindow::preview() {
       mTimer = NULL;
       delete mCameras;
       mCameras = NULL;
-      mPlay->setText("预览");
+      mPlay->setText(QString::fromWCharArray(L"预览"));
       mCapture->setDisabled(true);
       mSlider->setEnabled(true);
     }
@@ -255,7 +257,7 @@ void CalibrateWindow::capture() {
     setRightDetailView();
 
     //提示找到角点
-    mStatusBar->showMessage("成功找到角点");
+    mStatusBar->showMessage(QString::fromWCharArray(L"成功找到角点"));
 
     int all = mImgs.size();
     QString ta;
@@ -274,11 +276,11 @@ void CalibrateWindow::capture() {
     COUNT--;
 
     //弹出对话框，提示没有找到角点
-    mStatusBar->showMessage("没有找到角点");
+    mStatusBar->showMessage(QString::fromWCharArray(L"没有找到角点"));
     QMessageBox::StandardButton btn2 = QMessageBox::warning(
       0,						//父窗口
-      "没有找到角点",			//标题栏
-      "在当前的图像中，没有找到对应的棋盘格角点");		//文本内容
+      QString::fromWCharArray(L"没有找到角点"),			//标题栏
+      QString::fromWCharArray(L"在当前的图像中，没有找到对应的棋盘格角点"));		//文本内容
 
     //重新开始
     mTimer->start();
@@ -301,7 +303,10 @@ void CalibrateWindow::deleteImg() {
     mImgs.erase(mImgs.begin() + index - 1);
 
     updateButtonState();
-    updateCurrent(index);
+	if(index>1)
+		updateCurrent(index-1);
+	else
+		updateCurrent(index);
   }
 }
 //设置x方向的角点个数
@@ -312,8 +317,8 @@ void CalibrateWindow::setSizeX() {
   bool ok = false;
   int tx = QInputDialog::getInt(
     0,
-    "设置X方向的角点个数",
-    "输入X方向的角点个数",
+    QString::fromWCharArray(L"设置X方向的角点个数"),
+    QString::fromWCharArray(L"输入X方向的角点个数"),
     mXCorners,
     2,
     25,
@@ -339,8 +344,8 @@ void CalibrateWindow::setSizeY() {
   bool ok = false;
   int tx = QInputDialog::getInt(
     0,
-    "设置Y方向的角点个数",
-    "输入Y方向的角点个数",
+    QString::fromWCharArray(L"设置Y方向的角点个数"),
+    QString::fromWCharArray(L"输入Y方向的角点个数"),
     mYCorners,
     2,
     25,
@@ -391,11 +396,11 @@ void CalibrateWindow::calibrate() {
   if (mImgs.size() < 5) {
     QMessageBox::StandardButton btn2 = QMessageBox::warning(
       0,						//父窗口
-      "不能进行标定",			//标题栏
-      "当前捕获的图像太少，不能进行标定。至少捕获5张图像，才能进行标定");		//文本内容
+      QString::fromWCharArray(L"不能进行标定"),			//标题栏
+      QString::fromWCharArray(L"当前捕获的图像太少，不能进行标定。至少捕获5张图像，才能进行标定"));		//文本内容
   } else {
     //todo 弹出一个等待对话框
-    mStatusBar->showMessage("正在标定内参，请耐心等待几分钟");
+    mStatusBar->showMessage(QString::fromWCharArray(L"正在标定内参，请耐心等待几分钟"));
 
     std::vector<std::vector<cv::Point2f>> CamCorners;		//摄像机图像角点坐标
     std::vector<std::vector<cv::Point3f>> ObjCorners;		//记录定标点（世界坐标系）
@@ -445,14 +450,22 @@ void CalibrateWindow::calibrate() {
     msg.sprintf("%f", error);
     QMessageBox::about(
       0,				//父窗口
-      "标定内参",		//标题栏
-      "内参标定完成，平均像素误差为：" + msg);	//文本内容
+      QString::fromWCharArray(L"标定内参"),		//标题栏
+      QString::fromWCharArray(L"内参标定完成，平均像素误差为：") + msg	//文本内容
+	  );
   }
 }
 //滑动滑块更新当前选择的
 void CalibrateWindow::updateCurrent(int cs) {
   //更新状态信息
   int all = mImgs.size();
+  if(all == 0)
+  {
+	  QString ta;
+	  ta.sprintf(" %d/%d", 0, 0);
+	  mCaps->setText(ta);
+	  return;
+  }
   QString ta;
   ta.sprintf(" %d/%d", cs, all);
   mCaps->setText(ta);
@@ -573,7 +586,7 @@ void CalibrateWindow::createLayout() {
 void CalibrateWindow::createWidget() {
   //预览按钮
   mPlay = new QPushButton();
-  mPlay->setText("预览");
+  mPlay->setText(QString::fromWCharArray(L"预览"));
   connect(mPlay, SIGNAL(pressed()), this, SLOT(preview()));
 
   //标签
@@ -583,13 +596,13 @@ void CalibrateWindow::createWidget() {
 
   //捕获按钮
   mCapture = new QPushButton();
-  mCapture->setText("捕获");
+  mCapture->setText(QString::fromWCharArray(L"捕获"));
   connect(mCapture, SIGNAL(pressed()), this, SLOT(capture()));
   mCapture->setDisabled(true);
 
   //删除按钮
   mDelete = new QPushButton();
-  mDelete->setText("删除");
+  mDelete->setText(QString::fromWCharArray(L"删除"));
   connect(mDelete, SIGNAL(pressed()), this, SLOT(deleteImg()));
   mDelete->setDisabled(true);
 
@@ -624,7 +637,7 @@ void CalibrateWindow::createWidget() {
 
   //标定
   mCalibrate = new QPushButton();
-  mCalibrate->setText("标定");
+  mCalibrate->setText(QString::fromWCharArray(L"标定"));
   connect(mCalibrate, SIGNAL(pressed()), this, SLOT(calibrate()));
 
   //滑块
@@ -661,8 +674,7 @@ void CalibrateWindow::updateButtonState() {
   } else {
     mDelete->setDisabled(true);
   }
-  mSlider->setMinimum(1);
-  mSlider->setMaximum(mImgs.size());
+
   //更新滑块的状态
   if (mImgs.size() > 1) {
     mSlider->setEnabled(true);
@@ -670,6 +682,11 @@ void CalibrateWindow::updateButtonState() {
     mSlider->setDisabled(true);
   }
 
+  if(mImgs.size()!=0)
+  {
+	mSlider->setMinimum(1);
+	mSlider->setMaximum(mImgs.size());
+  }
   //更新标定按钮状态
   //始终可以，提示>5时，才能标定
 }
