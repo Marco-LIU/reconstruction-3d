@@ -103,6 +103,9 @@
     <ClCompile Include="gen\moc_MeasureMarkersWindows.cpp">
       <Filter>gen</Filter>
     </ClCompile>
+    <ClCompile Include="qt_utils.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mainwindow.h">
@@ -161,6 +164,9 @@
     </ClInclude>
     <ClInclude Include="MeasureMarkersWindows.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="qt_utils.h">
+      <Filter>utility</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
