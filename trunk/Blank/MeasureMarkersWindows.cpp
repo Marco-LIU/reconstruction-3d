@@ -40,6 +40,7 @@
 #include "paras.h"
 #include "CameraCalibration.h"
 
+
 MeasureMarkersWindow::MeasureMarkersWindow(QGraphicsScene* scene,
                                            QGraphicsPixmapItem* left,
                                            QGraphicsPixmapItem* right,

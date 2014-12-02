@@ -16,6 +16,7 @@
 #include "paras.h"
 
 #include "base/message_loop/message_loop.h"
+#include "qt_utils.h"
 
 MainWindow::MainWindow()
     : mCurrentWidget(NULL)
