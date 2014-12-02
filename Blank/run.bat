@@ -5,4 +5,4 @@ start moc.exe replayWindow.h -o gen\moc_replayWindow.cpp
 start moc.exe calibrateWindow.h -o gen\moc_calibrateWindow.cpp
 start moc.exe stereoCalWindow.h -o gen\moc_stereoCalWindow.cpp
 start moc.exe manualWindow.h -o gen\moc_manualWindow.cpp
-start moc.exe measure_markers.h -o gen\moc_measure_markers.cpp
+start moc.exe MeasureMarkersWindows.h -o gen\moc_MeasureMarkersWindows.cpp
