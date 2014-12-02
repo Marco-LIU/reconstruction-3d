@@ -21,9 +21,7 @@
 #if defined(ARCH_CPU_X86_FAMILY)
 #if defined(_MSC_VER)
 #include <intrin.h>
-#if _MSC_FULL_VER >= 160040219
 #include <immintrin.h>  // For _xgetbv()
-#endif
 #endif
 #endif
 
@@ -92,15 +90,6 @@ uint64 _xgetbv(uint32 xcr) {
 }
 
 #endif  // !_MSC_VER
-
-#if _MSC_FULL_VER < 160040219
-uint64 _xgetbv(uint32 xcr) {
-  uint32 eax, edx;
-
-  __asm__ volatile ("xgetbv" : "=a" (eax), "=d" (edx) : "c" (xcr));
-  return (static_cast<uint64>(edx) << 32) | eax;
-}
-#endif // !_MSC_FULL_VER < 160040219
 #endif  // ARCH_CPU_X86_FAMILY
 
 #if defined(ARCH_CPU_ARM_FAMILY) && (defined(OS_ANDROID) || defined(OS_LINUX))
@@ -252,8 +241,12 @@ void CPU::Initialize() {
     has_avx_ =
         has_avx_hardware_ &&
         (cpu_info[2] & 0x04000000) != 0 /* XSAVE */ &&
-        (cpu_info[2] & 0x08000000) != 0 /* OSXSAVE */ &&
-        (_xgetbv(0) & 6) == 6 /* XSAVE enabled by kernel */;
+        (cpu_info[2] & 0x08000000) != 0 /* OSXSAVE */
+#if _MSC_FULL_VER >= 160040219
+        && (_xgetbv(0) & 6) == 6 /* XSAVE enabled by kernel */;
+#else
+        ;
+#endif
     has_aesni_ = (cpu_info[2] & 0x02000000) != 0;
   }
 
