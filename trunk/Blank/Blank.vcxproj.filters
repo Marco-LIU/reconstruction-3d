@@ -88,12 +88,6 @@
     <ClCompile Include="track_info_list.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="measure_markers.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="gen\moc_measure_markers.cpp">
-      <Filter>gen</Filter>
-    </ClCompile>
     <ClCompile Include="usb_camera.cpp">
       <Filter>utility</Filter>
     </ClCompile>
@@ -102,6 +96,12 @@
     </ClCompile>
     <ClCompile Include="usb_camera_group.cpp">
       <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="MeasureMarkersWindows.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="gen\moc_MeasureMarkersWindows.cpp">
+      <Filter>gen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -150,9 +150,6 @@
     <ClInclude Include="track_info_list.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="measure_markers.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="usb_camera.h">
       <Filter>utility</Filter>
     </ClInclude>
@@ -161,6 +158,9 @@
     </ClInclude>
     <ClInclude Include="usb_camera_group.h">
       <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="MeasureMarkersWindows.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

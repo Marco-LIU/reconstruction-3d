@@ -13,8 +13,29 @@
 #include <QtWidgets\qmainwindow.h>
 #include "mainwindow.h"
 
+#include "base/command_line.h"
+#include "base/at_exit.h"
+#include "base/message_loop/message_loop.h"
+
+#ifdef _DEBUG
 int main(int argc,char** argv)
+#else
+int CALLBACK WinMain(
+  _In_  HINSTANCE hInstance,
+  _In_  HINSTANCE hPrevInstance,
+  _In_  LPSTR lpCmdLine,
+  _In_  int nCmdShow
+  )
+#endif
 {
+  base::AtExitManager at_exit;
+  CommandLine::Init(0, NULL);
+
+#ifndef _DEBUG
+  int argc = 0;
+  char** argv = NULL;
+#endif
+
   //创建程序和窗口
   QApplication a(argc, argv);
 
@@ -28,11 +49,20 @@ int main(int argc,char** argv)
   //必须创建QApplication后，才能创建Qt的对象
   Paras::getSingleton().LeftBlankImg.load("left.jpg");
   Paras::getSingleton().RightBlankImg.load("right.jpg");
-  
+
   MainWindow w;
   //显示窗口
   w.show();
 
+  // 初始化QT的消息钩子，否则使用我们自己的消息循环时无法处理QT消息
+  QApplication::processEvents();
+
+  // 创建自己的消息循环
+  base::MessageLoopForUI ui_ml;
+  ui_ml.Run();
+
+  return 0;
+
   //处理窗口消息事件
-    return a.exec();	
+  //return a.exec();
 }

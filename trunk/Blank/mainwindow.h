@@ -5,6 +5,7 @@
 #pragma execution_character_set("utf-8")
 //由于使用了utf8编码，调试的时候使用english，否则gbk会出现乱码
 
+#include "base/compiler_specific.h"
 #include "QtWidgets/qmainwindow.h"
 #include "QtWidgets/qgraphicsscene.h"
 
@@ -62,6 +63,9 @@ protected:
 
   //创建场景（左|空|右）
   void createScene();
+
+  // 处理窗口关闭，这里需要退出我们的消息循环
+  virtual void closeEvent(QCloseEvent* event) OVERRIDE;
 protected:
   //场景
   QGraphicsScene		mScene;				//场景对象

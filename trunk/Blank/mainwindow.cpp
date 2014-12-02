@@ -4,7 +4,7 @@
 #include "calibrateWindow.h"
 #include "stereoCalWindow.h"
 #include "manualWindow.h"
-#include "measure_markers.h"
+#include "MeasureMarkersWindows.h"
 
 #include "QtWidgets/qgraphicsitem.h"
 #include "QtWidgets/qaction.h"
@@ -14,6 +14,8 @@
 #include "QtWidgets/qmenubar.h"
 
 #include "paras.h"
+
+#include "base/message_loop/message_loop.h"
 
 MainWindow::MainWindow()
     : mCurrentWidget(NULL)
@@ -203,4 +205,10 @@ void MainWindow::createScene() {
   mRightCameraPixmap->setPos(mWidth * 2, 0);
   mScene.addItem(mLeftCameraPixmap);
   mScene.addItem(mRightCameraPixmap);
+}
+
+void MainWindow::closeEvent(QCloseEvent* event) {
+  QMainWindow::closeEvent(event);
+  if (base::MessageLoop::current())
+    base::MessageLoop::current()->Quit();
 }

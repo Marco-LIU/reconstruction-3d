@@ -475,10 +475,10 @@ void Utilities::folderScan(const char *path)
 {	
   _chdir(path);
 
-  WIN32_FIND_DATA data;
+  WIN32_FIND_DATAA data;
   HANDLE h;
 
-  h = FindFirstFile( "*.*", &data);
+  h = FindFirstFileA( "*.*", &data);
 
   int numOfFiles=0;
   if( h!=INVALID_HANDLE_VALUE ) 
@@ -487,17 +487,17 @@ void Utilities::folderScan(const char *path)
     {
       numOfFiles ++;
       //
-      char*  nPtr = new char [lstrlen( data.cFileName ) + 1];
+      char*  nPtr = new char [lstrlenA(data.cFileName ) + 1];
 
-      for( int i = 0; i < lstrlen( data.cFileName ); i++ )
+      for( int i = 0; i < lstrlenA( data.cFileName ); i++ )
         nPtr[i] = char( data.cFileName[i] );
 
-      nPtr[lstrlen( data.cFileName )] = '\0';
+      nPtr[lstrlenA( data.cFileName )] = '\0';
 
       std::cout<<nPtr<<"\n";
 
     } 
-    while(FindNextFile(h,&data));
+    while(FindNextFileA(h,&data));
 
   }
 
@@ -513,10 +513,10 @@ int Utilities::folderFilesScan(const char *path)
 
   _chdir(path);
 
-  WIN32_FIND_DATA data;
+  WIN32_FIND_DATAA data;
   HANDLE h;
 
-  h = FindFirstFile( "*.*", &data);
+  h = FindFirstFileA( "*.*", &data);
 
   int numOfFiles=0;
   if( h!=INVALID_HANDLE_VALUE ) 
@@ -525,17 +525,17 @@ int Utilities::folderFilesScan(const char *path)
     {
       numOfFiles ++;
       //
-      char*  nPtr = new char [lstrlen( data.cFileName ) + 1];
+      char*  nPtr = new char [lstrlenA( data.cFileName ) + 1];
 
-      for( int i = 0; i < lstrlen( data.cFileName ); i++ )
+      for( int i = 0; i < lstrlenA( data.cFileName ); i++ )
         nPtr[i] = char( data.cFileName[i] );
 
-      nPtr[lstrlen( data.cFileName )] = '\0';
+      nPtr[lstrlenA( data.cFileName )] = '\0';
 
       std::cout<<nPtr<<"\n";
 
     } 
-    while(FindNextFile(h,&data));
+    while(FindNextFileA(h,&data));
 
   }
 
@@ -551,10 +551,10 @@ std::vector<std::string> Utilities::folderImagesScan(const char *path)
 {	
   _chdir(path);
 
-  WIN32_FIND_DATA data;
+  WIN32_FIND_DATAA data;
   HANDLE h;
 
-  h = FindFirstFile( "*.jpg", &data);
+  h = FindFirstFileA( "*.jpg", &data);
 
   int numOfFiles=0;
   std::vector<std::string> ret;
@@ -565,17 +565,17 @@ std::vector<std::string> Utilities::folderImagesScan(const char *path)
       //by legendtkl
       numOfFiles ++;
       //
-      char*  nPtr = new char [lstrlen( data.cFileName ) + 1];
+      char*  nPtr = new char[lstrlenA(data.cFileName) + 1];
 
-      for( int i = 0; i < lstrlen( data.cFileName ); i++ )
+      for (int i = 0; i < lstrlenA(data.cFileName); i++)
         nPtr[i] = char( data.cFileName[i] );
 
-      nPtr[lstrlen( data.cFileName )] = '\0';
+      nPtr[lstrlenA(data.cFileName)] = '\0';
 
       std::string img(nPtr);
       ret.push_back(img);
     } 
-    while(FindNextFile(h,&data));
+    while (FindNextFileA(h, &data));
 
   }
 
@@ -591,10 +591,10 @@ std::vector<std::string> Utilities::folderBmpImagesScan(const char *path)
 {	
   _chdir(path);
 
-  WIN32_FIND_DATA data;
+  WIN32_FIND_DATAA data;
   HANDLE h;
 
-  h = FindFirstFile( "*.bmp", &data);
+  h = FindFirstFileA("*.bmp", &data);
 
   int numOfFiles=0;
   std::vector<std::string> ret;
@@ -605,17 +605,17 @@ std::vector<std::string> Utilities::folderBmpImagesScan(const char *path)
       //by legendtkl
       numOfFiles ++;
       //
-      char*  nPtr = new char [lstrlen( data.cFileName ) + 1];
+      char*  nPtr = new char[lstrlenA(data.cFileName) + 1];
 
-      for( int i = 0; i < lstrlen( data.cFileName ); i++ )
+      for (int i = 0; i < lstrlenA(data.cFileName); i++)
         nPtr[i] = char( data.cFileName[i] );
 
-      nPtr[lstrlen( data.cFileName )] = '\0';
+      nPtr[lstrlenA(data.cFileName)] = '\0';
 
       std::string img(nPtr);
       ret.push_back(img);
     } 
-    while(FindNextFile(h,&data));
+    while (FindNextFileA(h, &data));
 
   }
 
@@ -631,10 +631,10 @@ std::vector<std::string> Utilities::folderTxtScan(const char *path)
 {
   _chdir(path);
 
-  WIN32_FIND_DATA data;
+  WIN32_FIND_DATAA data;
   HANDLE h;
 
-  h = FindFirstFile( "*.txt", &data);
+  h = FindFirstFileA("*.txt", &data);
 
   int numOfFiles=0;
   std::vector<std::string> ret;
@@ -645,17 +645,17 @@ std::vector<std::string> Utilities::folderTxtScan(const char *path)
       //by legendtkl
       numOfFiles ++;
       //
-      char*  nPtr = new char [lstrlen( data.cFileName ) + 1];
+      char*  nPtr = new char[lstrlenA(data.cFileName) + 1];
 
-      for( int i = 0; i < lstrlen( data.cFileName ); i++ )
+      for (int i = 0; i < lstrlenA(data.cFileName); i++)
         nPtr[i] = char( data.cFileName[i] );
 
-      nPtr[lstrlen( data.cFileName )] = '\0';
+      nPtr[lstrlenA(data.cFileName)] = '\0';
 
       std::string img(nPtr);
       ret.push_back(img);
     } 
-    while(FindNextFile(h,&data));
+    while (FindNextFileA(h, &data));
 
   }
 
