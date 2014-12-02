@@ -1,4 +1,7 @@
-周炜：提交码AF4nu2eB5aG7
+周炜：
+用户名：zw.dijkstra@gmail.com
+密码：	61761700
+提交码：AF4nu2eB5aG7
 
 1、缓存数据：Image、角点、矩阵等
 

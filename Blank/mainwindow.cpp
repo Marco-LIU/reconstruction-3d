@@ -98,6 +98,16 @@ void MainWindow::showCalibrateRT() {
 }
 
 void MainWindow::showManualWindow() {
+  if (mCurrentWidget && mCurrentWidget == mManualWindow)
+    return;
+
+  mManualWindow = new ManualWindow(&mScene, mLeftCameraPixmap,
+                                 mRightCameraPixmap, mStatusBar);
+  mCurrentWidget = mManualWindow;
+  this->setCentralWidget(mManualWindow);
+}
+
+void MainWindow::showAutoMeasureWindow() {
   if (mCurrentWidget && mCurrentWidget == mMeasureWindow)
     return;
 
@@ -118,9 +128,12 @@ void MainWindow::iniParas() {
 }
 
 void MainWindow::createAction() {
+  //录播
   maRecord = new QAction(QString::fromWCharArray(L"录像"), this);
   connect(maRecord, SIGNAL(triggered()), this, SLOT(showRecordWindow()));
   maPlay = new QAction(QString::fromWCharArray(L"播放"), this);
+
+  //标定
   connect(maPlay, SIGNAL(triggered()), this, SLOT(showReplayWindow()));
   maLeftFXY = new QAction(QString::fromWCharArray(L"标定左摄像机"), this);
   connect(maLeftFXY, SIGNAL(triggered()), this, SLOT(showCalibrateLeft()));
@@ -129,13 +142,18 @@ void MainWindow::createAction() {
   maRT = new QAction(QString::fromWCharArray(L"标定外参"), this);
   connect(maRT, SIGNAL(triggered()), this, SLOT(showCalibrateRT()));
   maDefaultRT = new QAction(QString::fromWCharArray(L"重置为默认"), this);
+
   maManual = new QAction(QString::fromWCharArray(L"手动测量"), this);
   connect(maManual, SIGNAL(triggered()), this, SLOT(showManualWindow()));
+  maMeasure = new QAction(QString::fromWCharArray(L"自动测量"), this);
+  connect(maMeasure, SIGNAL(triggered()), this, SLOT(showAutoMeasureWindow()));
 
+  //跟踪
   maDefaultSpec = new QAction(QString::fromWCharArray(L"设置跟踪点"), this);
   maTrack = new QAction(QString::fromWCharArray(L"跟踪"), this);
   ma3DShow = new QAction(QString::fromWCharArray(L"二维显示"), this);
   ma2DShow = new QAction(QString::fromWCharArray(L"三维显示"), this);
+  
   //todo
   maTodo = new QAction(QString::fromWCharArray(L"todo"), this);
 }
@@ -159,6 +177,7 @@ void MainWindow::createMenu() {
   calMenu->addAction(maRT);
   calMenu->addAction(maDefaultRT);
   calMenu->addAction(maManual);
+  calMenu->addAction(maMeasure);
 
   trackMenu->addAction(maDefaultSpec);
   trackMenu->addAction(maTrack);

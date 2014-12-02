@@ -27,7 +27,6 @@ public:
   MainWindow();
   ~MainWindow();
 
-
 signals:
 
 public slots :
@@ -44,6 +43,8 @@ public slots :
   void showCalibrateRT();
   //显示手动测量窗口
   void showManualWindow();
+  //显示自动测量窗口
+  void showAutoMeasureWindow();
 protected:
   //初始化
   void iniParas();
@@ -63,18 +64,21 @@ protected:
   void createScene();
 protected:
   //场景
-  QGraphicsScene			mScene;				//场景对象
+  QGraphicsScene		mScene;				//场景对象
   QGraphicsPixmapItem*	mLeftCameraPixmap;	//左摄像拍摄的画面（场景图像项）
   QGraphicsPixmapItem*	mRightCameraPixmap;	//右摄像拍摄的画面（场景图像项）
 
   //菜单
-  QAction*		maRecord;		//录像菜单，id=1
-  QAction*		maPlay;			//播放菜单，id=2
-  QAction*		maLeftFXY;		//标定内参菜单，id=3
-  QAction*		maRightFXY;		//标定内参菜单，id=4
-  QAction*		maRT;			//标定外参菜单，id=5
+  QAction*		maRecord;		//录像菜单
+  QAction*		maPlay;			//播放菜单
+
+  QAction*		maLeftFXY;		//标定左摄像机内参菜单
+  QAction*		maRightFXY;		//标定右摄像机内参菜单
+  QAction*		maRT;			//标定外参菜单
   QAction*		maDefaultRT;	//重置为默认的外参
-  QAction*		maManual;		//手动测量菜单,id=6
+  QAction*		maManual;		//手动测量菜单
+  QAction*		maMeasure;		//自动测量菜单
+
   QAction*		maDefaultSpec;	//设置默认跟踪点
   QAction*		maTrack;		//跟踪窗口
   QAction*		ma3DShow;		//显示3d窗口
@@ -87,13 +91,13 @@ protected:
   QStatusBar*		mStatusBar;		//状态栏
 
   //窗口
-  RecordWindow*		mRecordWindow;		//录制窗口
-  ReplayWindow*		mReplayWindow;		//播放窗口
-  CalibrateWindow*	mLeftCalibrateWindow;	//左单目标定窗口
-  CalibrateWindow*	mRightCalibrateWindow;	//右单目标定窗口
-  StereoCalibrationWindow* mStereoWindow;	//双目标定窗口
-  ManualWindow*		mManualWindow;		//手动测量窗口
-  MeasureMarkersWindow* mMeasureWindow;
+  RecordWindow*				mRecordWindow;			//录制窗口
+  ReplayWindow*				mReplayWindow;			//播放窗口
+  CalibrateWindow*			mLeftCalibrateWindow;	//左单目标定窗口
+  CalibrateWindow*			mRightCalibrateWindow;	//右单目标定窗口
+  StereoCalibrationWindow*	mStereoWindow;			//双目标定窗口
+  ManualWindow*				mManualWindow;			//手动打标记点测量窗口
+  MeasureMarkersWindow*		mMeasureWindow;			//自动打标记点测量窗口
 
   QWidget* mCurrentWidget;
 };
