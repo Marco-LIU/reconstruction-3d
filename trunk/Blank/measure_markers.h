@@ -26,6 +26,9 @@ class UsbCameras;
 class MyDetailView;
 class MyCameraView;
 
+/*
+自动捕获标记点，手动可以修改
+*/
 class MeasureMarkersWindow : public QWidget
 {
   Q_OBJECT
