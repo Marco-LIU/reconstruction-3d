@@ -226,7 +226,7 @@ void MeasureMarkersWindow::preview() {
   }
 }
 
-const double PI = 3.14;
+const double PI = 3.1415926;
 
 std::vector<cv::Point2f> circleDetect(cv::Mat img_gray) {
   cv::Mat img_binary;

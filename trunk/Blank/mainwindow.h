@@ -20,6 +20,7 @@ class CalibrateWindow;
 class StereoCalibrationWindow;
 class ManualWindow;
 class MeasureMarkersWindow;
+class MarkerDefineWindow;
 
 class MainWindow : public QMainWindow
 {
@@ -46,6 +47,8 @@ public slots :
   void showManualWindow();
   //显示自动测量窗口
   void showAutoMeasureWindow();
+  //显示预定义点窗口
+  void showMarkerDefineWindow();
 protected:
   //初始化
   void iniParas();
@@ -102,6 +105,7 @@ protected:
   StereoCalibrationWindow*	mStereoWindow;			//双目标定窗口
   ManualWindow*				mManualWindow;			//手动打标记点测量窗口
   MeasureMarkersWindow*		mMeasureWindow;			//自动打标记点测量窗口
+  MarkerDefineWindow*		mMarkerDefWindow;		//设置跟踪点的窗口
 
   QWidget* mCurrentWidget;
 };

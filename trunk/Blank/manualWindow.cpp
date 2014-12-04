@@ -47,7 +47,7 @@ ManualWindow::ManualWindow(QGraphicsScene* scene, QGraphicsPixmapItem* left,
 
   mCameras = NULL;	//摄像头为空
   mbPlay = false;		//true表示正在预览
-  mbCapture = false;
+  mbCapture = true;
   mTempFolder = "./temp/";
 
   //创建布局

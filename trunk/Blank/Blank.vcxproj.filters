@@ -106,6 +106,12 @@
     <ClCompile Include="qt_utils.cpp">
       <Filter>utility</Filter>
     </ClCompile>
+    <ClCompile Include="gen\moc_MarkerDefineWindow.cpp">
+      <Filter>gen</Filter>
+    </ClCompile>
+    <ClCompile Include="markerDefineWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mainwindow.h">
@@ -167,6 +173,9 @@
     </ClInclude>
     <ClInclude Include="qt_utils.h">
       <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="markerDefineWindow.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
