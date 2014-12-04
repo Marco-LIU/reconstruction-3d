@@ -148,23 +148,78 @@ void ManualWindow::preview() {
 }
 //显示左标记点的编辑界面
 void ManualWindow::showLeftMarkers() {
+	mbCapture = true;
+	setLeftDetailView();	//switch to left view
   QMessageBox::about(
     0,				//父窗口
     QString::fromWCharArray(L"消息框"),		//标题栏
-    QString::fromWCharArray(L"todo选择，或批量删除左标记点"));	//文本内容
+    QString::fromWCharArray(L"选择，或批量删除左标记点"));	//文本内容
+
+  
+
+
 }
 void ManualWindow::showRightMarkers() {
+	mbCapture = true;
+	setRightDetailView();	//switch to right view
   QMessageBox::about(
     0,				//父窗口
     QString::fromWCharArray(L"消息框"),		//标题栏
-    QString::fromWCharArray(L"todo选择，或批量删除右标记点"));	//文本内容
+    QString::fromWCharArray(L"选择，或批量删除右标记点"));	//文本内容
+
+
 }
+
 //计算3d坐标
+//taokelu@gmail.com
 void ManualWindow::calculate3dPoints() {
   QMessageBox::about(
     0,				//父窗口
     QString::fromWCharArray(L"消息框"),		//标题栏
-    QString::fromWCharArray(L"todo计算3d坐标"));	//文本内容
+    QString::fromWCharArray(L"计算3d坐标"));	//文本内容
+
+  
+  //把标记点一一对应记录到left.txt和right.txt中，传给reconstructor
+  if(mLeftMarkers.size()!=mRightMarkers.size()){
+	QMessageBox::about(
+		0,
+		QString::fromWCharArray(L"消息框"),
+		QString::fromWCharArray(L"错误：左右标记点数目不相等！")
+		);
+	return;
+  }
+  std::vector<cv::Point2f> left_markers, right_markers;
+  for(std::list<Marker*>::iterator iter1=mLeftMarkers.begin(); iter1!=mLeftMarkers.end(); ++iter1){
+	  left_markers.push_back(cv::Point((*iter1)->getPosition().x(),(*iter1)->getPosition().y()));
+	  //right_markers.push_back(cv::Point((*iter2)->getPositon().x(),(*iter2)->getPositon().y()));
+	  bool flag=true;
+	  for(std::list<Marker*>::iterator iter2=mRightMarkers.begin(); iter2!=mRightMarkers.end(); ++iter2){
+		if((*iter1)->getText()==(*iter2)->getText()){
+			right_markers.push_back(cv::Point((*iter2)->getPosition().x()-Paras::getSingleton().width*2,(*iter2)->getPosition().y()));
+			flag = false;
+			break;
+		}
+	  }
+	  if(flag){
+		  QMessageBox::about(
+			0,
+			QString::fromWCharArray(L"消息框"),
+			QString::fromWCharArray(L"错误：左右标记点名称不匹配，请确保名称匹配！")
+			);
+		  return;
+	  }
+  }
+
+  /*
+  for(std::vector<cv::Point2f>::iterator iter1=left_markers.begin(),iter2=right_markers.begin(); iter1!=left_markers.end(); ++iter1,++iter2){
+	  std::cout << (*iter1).x << " " << (*iter1).y << std::endl;
+	  std::cout << (*iter2).x << " " << (*iter2).y << std::endl;
+  }*/
+  //
+  std::vector<StereoReconstructor::RestructPoint> ret = restructPoints(left_markers, right_markers);
+
+  double distance = sqrt((ret[0].point.x-ret[1].point.x)*(ret[0].point.x-ret[1].point.x)+(ret[0].point.y-ret[1].point.y)*(ret[0].point.y-ret[1].point.y)+(ret[0].point.z-ret[1].point.z)*(ret[0].point.z-ret[1].point.z));
+  std::cout << distance << std::endl;
 }
 
 //更新一帧场景图像

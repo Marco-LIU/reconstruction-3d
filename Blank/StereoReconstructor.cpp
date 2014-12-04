@@ -209,6 +209,7 @@ void StereoReconstructor::RestructCalibrationPointsFromImage(std::string leftFil
   bool f1, f2;
   CameraCalibration::findCorners(leftFilename, f1, x, y);
   CameraCalibration::findCorners(rightFilename, f2, x, y);
+  
   if (!f1 || !f2) {
     std::cout << "½ÇµãÃ»ÕÒµ½" << std::endl;
     return;

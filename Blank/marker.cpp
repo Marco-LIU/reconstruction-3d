@@ -35,7 +35,7 @@ void Marker::setPosition(QPoint pos) {
   temp.setY(temp.y() - mPixmap.height() / 2);
   this->setPos(temp);
 }
-QPoint Marker::getPositon() {
+QPoint Marker::getPosition() {
   QPoint temp = this->pos().toPoint();
   temp.setX(temp.x() + mPixmap.width() / 2);
   temp.setY(temp.y() + mPixmap.height() / 2);
@@ -88,7 +88,7 @@ QVariant Marker::itemChange(GraphicsItemChange change, const QVariant & value) {
 }
 //处理上下左右键盘响应
 void Marker::keyPressEvent(QKeyEvent * event) {
-  QPoint cp = getPositon();
+  QPoint cp = getPosition();
   if (event->key() == Qt::Key_Up) {
     cp.setY(cp.y() - 1);
   }
@@ -152,6 +152,6 @@ void Marker::setAlpha(int alpha, bool bc) {
 }
 //更新文本框的位置
 void Marker::updateTextPos() {
-  QPoint pos = getPositon();
+  QPoint pos = getPosition();
   mText.setPos(pos.x() - mPixmap.width() / 2, pos.y() - mPixmap.height() - 10);
 }

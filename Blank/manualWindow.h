@@ -73,6 +73,11 @@ public slots :
   void dealwithCreatSignal(QPoint sp);
   //处理按键删除命令
   void dealwithDeleteSignal();
+
+  static bool cmp(cv::Point2f p1, cv::Point2f p2){
+	if(p1.x == p2.x)	return p1.y<p2.y;
+	else	return p1.x<p2.x;
+  }
 private:
   //从左右匹配点重建三维坐标
   std::vector<StereoReconstructor::RestructPoint> restructPoints(
@@ -115,11 +120,14 @@ protected:
   std::list<Marker*>		mLeftMarkers;	//保存左摄像的所有标记点
   std::list<Marker*>		mRightMarkers;	//保存右摄像的所有标记点
 
+  int index;		//用于标志编号
   //从外部传入
   QGraphicsPixmapItem*	mLeftCameraPixmap;	//左摄像拍摄的画面（场景图像项）
   QGraphicsPixmapItem*	mRightCameraPixmap;	//右摄像拍摄的画面（场景图像项）
   QStatusBar*				mStatusBar;			//状态栏
   QGraphicsScene*			mScene;				//场景指针
+
+  QPushButton *			mClickMarker;		//手动选择标记点
 };
 
 #endif

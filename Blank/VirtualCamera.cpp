@@ -218,9 +218,8 @@ void VirtualCamera::loadKeyPoints(std::string filename)
 {
 	std::ifstream ik(filename.c_str());
 	std::pair<float,float> temp;
-	while(!ik.eof())
+	while(ik>>temp.first && ik>>temp.second)
 	{
-		ik>>temp.first>>temp.second;
 		keypoints.push_back(temp);
 	}
 	ik.close();
@@ -232,9 +231,8 @@ std::vector<cv::Point3f> VirtualCamera::load3dPoints(std::string filename)
 	std::vector<cv::Point3f> ret;
 	std::ifstream ik(filename.c_str());
 	float x,y,z;
-	while(!ik.eof())
+	while(ik>>x && ik>>y && ik>>z)
 	{
-		ik>>x>>y>>z;
 		ret.push_back(cv::Point3f(x,y,z));
 	}
 	ik.close();
