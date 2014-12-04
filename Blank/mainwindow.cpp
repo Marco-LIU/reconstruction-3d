@@ -5,6 +5,7 @@
 #include "stereoCalWindow.h"
 #include "manualWindow.h"
 #include "MeasureMarkersWindows.h"
+#include "markerDefineWindow.h"
 
 #include "QtWidgets/qgraphicsitem.h"
 #include "QtWidgets/qaction.h"
@@ -114,13 +115,20 @@ void MainWindow::showAutoMeasureWindow() {
   if (mCurrentWidget && mCurrentWidget == mMeasureWindow)
     return;
 
-  //mManualWindow = new ManualWindow(&mScene, mLeftCameraPixmap,
-  //                                 mRightCameraPixmap, mStatusBar);
-  //this->setCentralWidget(mManualWindow);
   mMeasureWindow = new MeasureMarkersWindow(&mScene, mLeftCameraPixmap,
                                             mRightCameraPixmap, mStatusBar);
   mCurrentWidget = mMeasureWindow;
   this->setCentralWidget(mMeasureWindow);
+}
+
+void MainWindow::showMarkerDefineWindow()
+{
+  if (mCurrentWidget && mCurrentWidget == mMarkerDefWindow)
+    return;
+
+  mMarkerDefWindow = new MarkerDefineWindow(mStatusBar);
+  mCurrentWidget = mMarkerDefWindow;
+  this->setCentralWidget(mMarkerDefWindow);
 }
 
 void MainWindow::iniParas() {
@@ -153,6 +161,7 @@ void MainWindow::createAction() {
 
   //跟踪
   maDefaultSpec = new QAction(QString::fromWCharArray(L"设置跟踪点"), this);
+  connect(maDefaultSpec, SIGNAL(triggered()), this, SLOT(showMarkerDefineWindow()));
   maTrack = new QAction(QString::fromWCharArray(L"跟踪"), this);
   ma3DShow = new QAction(QString::fromWCharArray(L"二维显示"), this);
   ma2DShow = new QAction(QString::fromWCharArray(L"三维显示"), this);

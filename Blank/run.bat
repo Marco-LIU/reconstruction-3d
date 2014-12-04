@@ -6,3 +6,4 @@ start moc.exe calibrateWindow.h -o gen\moc_calibrateWindow.cpp
 start moc.exe stereoCalWindow.h -o gen\moc_stereoCalWindow.cpp
 start moc.exe manualWindow.h -o gen\moc_manualWindow.cpp
 start moc.exe MeasureMarkersWindows.h -o gen\moc_MeasureMarkersWindows.cpp
+start moc.exe markerDefineWindow.h -o gen\moc_MarkerDefineWindow.cpp
