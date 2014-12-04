@@ -24,7 +24,7 @@ public:
 
   //设置标注点位置（输入参数为标志点中心的位置）
   void setPosition(QPoint pos);
-  QPoint getPositon();
+  QPoint getPosition();
 
   //选择标记物
   bool isMarkerSelected();

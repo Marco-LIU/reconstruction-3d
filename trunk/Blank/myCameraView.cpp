@@ -203,6 +203,7 @@ void MyDetailView::keyPressEvent(QKeyEvent * event) {
   if (event->key() == Qt::Key_Delete) {
     emit deleteMarker();
   }
+  QGraphicsView::keyPressEvent(event);
 }
 //重绘更新对应矩形框的位置(响应滚动条事件)
 void MyDetailView::paintEvent(QPaintEvent * event) {
