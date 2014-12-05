@@ -112,6 +112,12 @@
     <ClCompile Include="markerDefineWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="trackingWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="gen\moc_trackingWindow.cpp">
+      <Filter>gen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mainwindow.h">
@@ -175,6 +181,9 @@
       <Filter>utility</Filter>
     </ClInclude>
     <ClInclude Include="markerDefineWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="trackingWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -105,6 +105,7 @@
     <ClCompile Include="gen\moc_recordWindow.cpp" />
     <ClCompile Include="gen\moc_replayWindow.cpp" />
     <ClCompile Include="gen\moc_stereoCalWindow.cpp" />
+    <ClCompile Include="gen\moc_trackingWindow.cpp" />
     <ClCompile Include="mainwindow.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="manualWindow.cpp" />
@@ -119,6 +120,7 @@
     <ClCompile Include="replayWindow.cpp" />
     <ClCompile Include="stereoCalWindow.cpp" />
     <ClCompile Include="StereoReconstructor.cpp" />
+    <ClCompile Include="trackingWindow.cpp" />
     <ClCompile Include="track_info_list.cpp" />
     <ClCompile Include="UsbCameras.cpp" />
     <ClCompile Include="usb_camera.cpp" />
@@ -142,6 +144,7 @@
     <ClInclude Include="replayWindow.h" />
     <ClInclude Include="stereoCalWindow.h" />
     <ClInclude Include="StereoReconstructor.h" />
+    <ClInclude Include="trackingWindow.h" />
     <ClInclude Include="track_info_list.h" />
     <ClInclude Include="UsbCameras.h" />
     <ClInclude Include="usb_camera.h" />

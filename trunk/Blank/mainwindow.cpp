@@ -6,6 +6,7 @@
 #include "manualWindow.h"
 #include "MeasureMarkersWindows.h"
 #include "markerDefineWindow.h"
+#include "trackingWindow.h"
 
 #include "QtWidgets/qgraphicsitem.h"
 #include "QtWidgets/qaction.h"
@@ -131,6 +132,17 @@ void MainWindow::showMarkerDefineWindow()
   this->setCentralWidget(mMarkerDefWindow);
 }
 
+void MainWindow::showTrackingWindow()
+{
+  if (mCurrentWidget && mCurrentWidget == mTrackingWindow)
+    return;
+
+  mTrackingWindow = new TrackingWindow(&mScene, mLeftCameraPixmap,
+                                            mRightCameraPixmap, mStatusBar);
+  mCurrentWidget = mTrackingWindow;
+  this->setCentralWidget(mTrackingWindow);
+}
+
 void MainWindow::iniParas() {
   //设置窗口，初始位置和最小大小
   setGeometry(50, 50, 800, 600);
@@ -163,6 +175,7 @@ void MainWindow::createAction() {
   maDefaultSpec = new QAction(QString::fromWCharArray(L"设置跟踪点"), this);
   connect(maDefaultSpec, SIGNAL(triggered()), this, SLOT(showMarkerDefineWindow()));
   maTrack = new QAction(QString::fromWCharArray(L"跟踪"), this);
+  connect(maTrack, SIGNAL(triggered()), this, SLOT(showTrackingWindow()));
   ma3DShow = new QAction(QString::fromWCharArray(L"二维显示"), this);
   ma2DShow = new QAction(QString::fromWCharArray(L"三维显示"), this);
   

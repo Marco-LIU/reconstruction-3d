@@ -152,11 +152,9 @@ private:
 
   //创建列表
   void createPredefineList(QListWidget* lw);
-
-
 protected:
   //属性参数
-	
+
   //按钮
   QLabel*		mLPredefine;		//预定义点标签
   QLabel*		mLCurMarker;		//当前定义点标签
