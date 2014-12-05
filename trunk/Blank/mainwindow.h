@@ -48,10 +48,15 @@ public slots :
   void showManualWindow();
   //显示自动测量窗口
   void showAutoMeasureWindow();
+
+  //重置为默认
+  void setAsDefault();
+
   //显示预定义点窗口
   void showMarkerDefineWindow();
   //显示跟踪窗口
   void showTrackingWindow();
+
 protected:
   //初始化
   void iniParas();
