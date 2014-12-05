@@ -20,6 +20,9 @@
 #include "base/message_loop/message_loop.h"
 #include "qt_utils.h"
 
+#include <QtCore/QDir>
+#include <QtWidgets\qmessagebox.h>
+
 MainWindow::MainWindow()
     : mCurrentWidget(NULL)
     , mRecordWindow(NULL)
@@ -165,12 +168,12 @@ void MainWindow::createAction() {
   maRT = new QAction(QString::fromWCharArray(L"标定外参"), this);
   connect(maRT, SIGNAL(triggered()), this, SLOT(showCalibrateRT()));
   maDefaultRT = new QAction(QString::fromWCharArray(L"重置为默认"), this);
-
+  connect(maDefaultRT, SIGNAL(triggered()), this, SLOT(setAsDefault()));
   maManual = new QAction(QString::fromWCharArray(L"手动测量"), this);
   connect(maManual, SIGNAL(triggered()), this, SLOT(showManualWindow()));
   maMeasure = new QAction(QString::fromWCharArray(L"自动测量"), this);
   connect(maMeasure, SIGNAL(triggered()), this, SLOT(showAutoMeasureWindow()));
-
+  
   //跟踪
   maDefaultSpec = new QAction(QString::fromWCharArray(L"设置跟踪点"), this);
   connect(maDefaultSpec, SIGNAL(triggered()), this, SLOT(showMarkerDefineWindow()));
@@ -234,4 +237,30 @@ void MainWindow::closeEvent(QCloseEvent* event) {
   QMainWindow::closeEvent(event);
   if (base::MessageLoop::current())
     base::MessageLoop::current()->Quit();
+}
+
+void MainWindow::setAsDefault(){
+	QString destPath("reconstruct\\");
+	QString srcPath("defaultRT\\");
+	QDir curDir(destPath);
+
+	//删除reconstruct文件夹下的所有文件
+	QFileInfoList allFileInfos = curDir.entryInfoList();
+	for(int i=0;i<allFileInfos.size();i++)
+	{
+		QFile::remove(destPath + allFileInfos[i].fileName());
+	}
+	//从default拷贝
+	curDir = srcPath;
+	allFileInfos = curDir.entryInfoList();
+	for(int i=0;i<allFileInfos.size();i++)
+	{
+		QFile::copy(srcPath + allFileInfos[i].fileName(), destPath + allFileInfos[i].fileName());
+	}
+
+	QMessageBox::about(
+		0,
+		QString::fromWCharArray(L"消息框"),
+		QString::fromWCharArray(L"已将外参数设置成默认参数！")
+	);
 }
