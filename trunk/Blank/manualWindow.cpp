@@ -195,7 +195,7 @@ static std::vector<cv::Point2f> circleDetect(cv::Mat img_gray) {
     std::vector<int> mean;	//圆周的归一化值
     int x = corners[i].x, y = corners[i].y, judge = 1;
 
-    for (int k = 5; k<10 && judge; k++) {
+    for (int k = 5; k<25 && judge; k++) {
       //num：圆周的像素点数，考虑到图像像素数离散的，所以只取了2×R个点，R是直径
       //sum：圆周的像素二值化值加和，255或者0
       //reverse_time：统计圆周像素变换，对角标志的话会变换4次，所以小于4次全都淘汰
@@ -248,8 +248,9 @@ static std::vector<cv::Point2f> circleDetect(cv::Mat img_gray) {
         sum += val;
         num++;
       }
-      if (judge == 0 || reverse_time1 == 0 || reverse_time2 == 0 || reverse_time1 + reverse_time2<4 || (double)blacknum1 * 2 / num <= 0.2 || (double)blacknum2 * 2 / num >= 0.8 || abs(blacknum1 - blacknum2)>5) {
-        break;
+      if (judge == 0 || reverse_time1 == 0 || reverse_time2 == 0 || reverse_time1 + reverse_time2<4 || (double)blacknum1 * 2 / num <= 0.3 || (double)blacknum2 * 2 / num >= 0.7 || abs(blacknum1 - blacknum2)>3) {
+		judge = 0;
+		  break;
       }
       mean.push_back(sum / num);
     }
@@ -262,7 +263,7 @@ static std::vector<cv::Point2f> circleDetect(cv::Mat img_gray) {
     int avarage = 0;
     for (int j = 0; j<mean.size(); j++)
       avarage += mean[j];
-    avarage /= 5;
+    avarage /= 20;
 
     int threshold_val = 30;
     for (int j = 0; j<5; j++) {
@@ -283,6 +284,159 @@ static std::vector<cv::Point2f> circleDetect(cv::Mat img_gray) {
   return result;
 }
 
+static std::vector<cv::Point2f> circleDetect1(cv::Mat img_gray) {
+  cv::Mat img_binary;
+  cv::threshold(img_gray, img_binary, 60, 255, cv::THRESH_BINARY);
+  cv::imwrite("./measure/binary.jpg", img_binary);
+
+  std::vector<cv::Point2f> corners, result;
+  cv::goodFeaturesToTrack(img_gray, corners, 200, 0.01, 10);
+
+  //对角点进行聚类
+
+  int threshold_group = 10;
+  std::vector<std::vector<cv::Point2f> > group;
+  for (size_t i = 0; i != corners.size(); ++i) {
+    bool flag = true;
+    for (size_t j = 0; j != group.size(); ++j) {
+      if (sqrt((double)abs((corners[i].x - group[j][0].x)*(corners[i].x - group[j][0].x) + (corners[i].y - group[j][0].y)*(corners[i].y - group[j][0].y))) <= threshold_group) {
+        group[j].push_back(corners[i]);
+        flag = false;
+        break;
+      }
+    }
+    if (flag) {
+      group.push_back(std::vector<cv::Point2f>(1, corners[i]));
+    }
+  }
+  corners.clear();
+  for (size_t i = 0; i != group.size(); ++i) {
+    int x = 0, y = 0;
+    for (size_t j = 0; j != group[i].size(); ++j) {
+      x += group[i][j].x;
+      y += group[i][j].y;
+    }
+    corners.push_back(cv::Point2f(x / group[i].size(), y / group[i].size()));
+  }
+
+  //求亚像素角点
+  cv::cornerSubPix(img_gray, corners, cv::Size(11, 11), cv::Size(-1, -1), cv::TermCriteria(CV_TERMCRIT_ITER + CV_TERMCRIT_EPS, 30, 0.1));
+  //test code for corners
+  cv::Mat img_rgb;
+  cv::cvtColor(img_gray, img_rgb, CV_GRAY2RGB);
+  for (int i = 0; i<corners.size(); i++)
+    cv::circle(img_rgb, corners[i], 2, cv::Scalar(0, 0, 255), -1, 8, 0);
+  cv::imwrite("./measure/corners.jpg", img_rgb);
+ 
+  for (size_t i = 0; i != corners.size(); ++i) {
+    std::vector<int> mean;	//圆周的归一化值
+    int x = corners[i].x, y = corners[i].y, judge = 1;
+
+    for (int k = 5; k<15 && judge; k++) {
+      //num：圆周的像素点数，考虑到图像像素数离散的，所以只取了2×R个点，R是直径
+      //sum：圆周的像素二值化值加和，255或者0
+      //reverse_time：统计圆周像素变换，对角标志的话会变换4次，所以小于4次全都淘汰
+      int sum = 0, reverse_time1 = 0, reverse_time2 = 0, flag = -1, blacknum2 = 0, blacknum1 = 0, num = 0;
+	  std::string str1, str2;
+
+      for (int xx = x - k; xx <= x + k; xx++) {
+        if (xx<0 || xx >= img_gray.cols) {
+          judge = 0;
+          break;
+        }
+        int yy = y - static_cast<int>(sqrt(static_cast<double>(k*k - (xx - x)*(xx - x))) + 0.5);
+        if (yy<0 || yy >= img_gray.rows) {
+          judge = 0;
+          break;
+        }
+
+        int val = img_binary.at<uchar>(yy, xx);
+        if (flag == -1)
+          flag = val;
+        else if (flag != val) {
+          flag = val;
+          reverse_time1++;
+        }
+        if (val == 0){
+          blacknum1++;
+		  str1.push_back('0');
+		}else{
+			str1.push_back('1');
+		}
+        sum += val;
+        num++;
+      }
+      for (int xx = x + k; xx >= x - k; xx--) {
+        if (xx<0 || xx >= img_gray.cols) {
+          judge = 0;
+          break;
+        }
+        int yy = y + static_cast<int>(sqrt(static_cast<double>(k*k - (xx - x)*(xx - x))) + 0.5);
+        if (yy<0 || yy >= img_gray.rows) {
+          judge = 0;
+          break;
+        }
+
+        int val = img_binary.at<uchar>(yy, xx);
+        if (flag == -1)
+          flag = val;
+        else if (flag != val) {
+          flag = val;
+          reverse_time2++;
+        }
+        if (val == 0){
+          blacknum2++;
+		  str2.push_back('0');
+		}else{
+			str2.push_back('1');
+		}
+        sum += val;
+        num++;
+      }
+      if (judge == 0 || reverse_time1 == 0 || reverse_time2 == 0 || reverse_time1 + reverse_time2<4 || (double)blacknum1 * 2 / num <= 0.3 || (double)blacknum2 * 2 / num >= 0.7 || abs(blacknum1 - blacknum2)>3) {
+		judge = 0;
+		  break;
+      }
+	  int diff=0;
+      for(size_t t=0; t!=str1.size(); t++){
+		if(str1[t]!=str2[t])
+			diff++;
+	  }
+	  if(diff>4){
+		judge=0;
+		break;
+	  }
+		  mean.push_back(sum/num);
+    }
+
+    if (judge == 0 || mean.size()<10) {
+      mean.clear();
+      continue;
+    }
+
+    int avarage = 0;
+    for (int j = 0; j<mean.size(); j++)
+      avarage += mean[j];
+    avarage /= mean.size();
+
+    int threshold_val = 30;
+    for (int j = 0; j<5; j++) {
+      //std::cout << mean[j] << " ";
+      if (abs(mean[j] - mean[0])>threshold_val) {
+        judge = 0;
+        break;
+      }
+    }
+
+    if (judge) {
+      //std::cout << i << std::endl;
+      result.push_back(corners[i]);
+    }
+    mean.clear();
+
+  }
+  return result;
+}
 //用于自动检测标记点
 void ManualWindow::autoDetectMarkers(){
 	//读取图像，计算角点
@@ -292,26 +446,29 @@ void ManualWindow::autoDetectMarkers(){
 	cv::cvtColor(li, liGrey, cv::COLOR_BGR2GRAY);
 	cv::cvtColor(ri, riGrey, cv::COLOR_BGR2GRAY);
 
-	std::vector<cv::Point2f> left_markers = circleDetect(liGrey);
-	std::vector<cv::Point2f> right_markers = circleDetect(riGrey);
+	std::vector<cv::Point2f> left_markers = circleDetect1(liGrey);
+	std::vector<cv::Point2f> right_markers = circleDetect1(riGrey);
 
-	if(left_markers.size()==2 && right_markers.size()==2){
-		//sort(left_markers.begin(), left_markers.end());
-		//sort(right_markers.begin(), right_markers.end());
+	for (int i = 0; i < left_markers.size(); i++)
+		cv::circle(li, left_markers[i], 4, cv::Scalar(0, 0, 255), 3, 8, 0);
+	for (int i = 0; i < right_markers.size(); i++)
+		cv::circle(ri, right_markers[i], 4, cv::Scalar(0, 0, 255), 3, 8, 0);
 
-		for(int i=0; i<2; i++){
-			Marker* plm = new Marker(QPoint(left_markers[i].x, left_markers[i].y), QString::number(i+1), mScene);
-			mLeftMarkers.push_back(plm);
-			Marker* prm = new Marker(QPoint(left_markers[i].x, left_markers[i].y), QString::number(i+1), mScene);
-			mRightMarkers.push_back(prm);
-		}
+	//保存绘制的角点图像
+	cv::imwrite((mTempFolder + "left_result.jpg").toStdString(), li);
+	cv::imwrite((mTempFolder + "right_result.jpg").toStdString(), ri);
+	for(int i=0; i<left_markers.size(); i++){
+		Marker* plm = new Marker(QPoint(left_markers[i].x, left_markers[i].y), QString::number(i+1), mScene);
+		mLeftMarkers.push_back(plm);
 	}
-	else{
-		QMessageBox::about(
-		0,				//父窗口
-		QString::fromWCharArray(L"消息框"),		//标题栏
-		QString::fromWCharArray(L"找不到标记点，请手动选择"));	//文本内容
+	for(int i=0; i<right_markers.size(); i++){
+		Marker* prm = new Marker(QPoint(right_markers[i].x+Paras::getSingleton().width*2, right_markers[i].y), QString::number(i+1), mScene);
+		mRightMarkers.push_back(prm);
 	}
+	QMessageBox::about(
+	0,				//父窗口
+	QString::fromWCharArray(L"消息框"),		//标题栏
+	QString::fromWCharArray(L"请删除错误的角点，添加正确的角点，注意名称一致"));	//文本内容
 }
 
 //显示左标记点的编辑界面
