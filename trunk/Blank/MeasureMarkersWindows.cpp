@@ -228,7 +228,7 @@ void MeasureMarkersWindow::preview() {
 
 const double PI = 3.1415926;
 
-std::vector<cv::Point2f> circleDetect(cv::Mat img_gray) {
+static std::vector<cv::Point2f> circleDetect(cv::Mat img_gray) {
   cv::Mat img_binary;
   cv::threshold(img_gray, img_binary, 60, 255, cv::THRESH_BINARY);
   cv::imwrite("./measure/binary.jpg", img_binary);
@@ -367,7 +367,7 @@ std::vector<cv::Point2f> circleDetect(cv::Mat img_gray) {
     mean.clear();
 
   }
-  //加一个直线的判据
+  
 
   return result;
 }
