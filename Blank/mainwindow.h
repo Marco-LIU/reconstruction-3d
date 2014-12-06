@@ -57,6 +57,11 @@ public slots :
   //显示跟踪窗口
   void showTrackingWindow();
 
+  //显示设置左右摄像机增益和曝光的窗口
+  void setLeftCameraGain();
+  void setLeftCameraExpo();
+  void setRightCameraGain();
+  void setRightCameraExpo();
 protected:
   //初始化
   void iniParas();
@@ -84,6 +89,13 @@ protected:
   QGraphicsPixmapItem*	mRightCameraPixmap;	//右摄像拍摄的画面（场景图像项）
 
   //菜单
+  QAction*		maLG;			//左摄像头增益
+  QAction*		maLE;			//左摄像头曝光
+  QAction*		maRG;			//右摄像头增益
+  QAction*		maRE;			//右摄像头曝光
+
+  QAction*		maGainExpo;		//设置增益和曝光
+
   QAction*		maRecord;		//录像菜单
   QAction*		maPlay;			//播放菜单
 

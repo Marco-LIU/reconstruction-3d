@@ -22,6 +22,10 @@
 
 #include <QtCore/QDir>
 #include <QtWidgets\qmessagebox.h>
+#include <QtWidgets\qlayout.h>
+#include <QtWidgets\qlabel.h>
+#include <QtWidgets\qslider.h>
+#include <QtWidgets\qinputdialog.h>
 
 MainWindow::MainWindow()
     : mCurrentWidget(NULL)
@@ -146,6 +150,105 @@ void MainWindow::showTrackingWindow()
   this->setCentralWidget(mTrackingWindow);
 }
 
+/*
+void MainWindow::setGainExpo()
+{
+	//todo 有空再写界面吧
+	QWidget* sw = new QWidget();
+	QVBoxLayout* layout = new QVBoxLayout();
+	sw->setLayout(layout);
+
+	QLabel* lg = new QLabel();
+	lg->setText(QString::fromWCharArray(L"左摄像头增益"));
+	QLabel* le = new QLabel();
+	le->setText(QString::fromWCharArray(L"左摄像头曝光"));
+
+	QLabel* rg = new QLabel();
+	rg->setText(QString::fromWCharArray(L"右摄像头增益"));
+	QLabel* re = new QLabel();
+	re->setText(QString::fromWCharArray(L"右摄像头曝光"));
+
+	layout->addWidget(lg);
+	layout->addWidget(le);
+	layout->addWidget(rg);
+	layout->addWidget(re);
+
+	sw->setWindowModality(Qt::WindowModal);
+	sw->show();
+}
+*/
+
+void MainWindow::setLeftCameraGain()
+{
+	//显示当前值，刘浏加上
+	int cur = 10;
+
+	//设置新值
+	int nv = QInputDialog::getInt(
+		0,
+		QString::fromWCharArray(L"设置左摄像头增益"),
+		QString::fromWCharArray(L"设置左摄像头增益："),
+		cur,
+		0,
+		255);
+
+	//设置左摄像机为新值，刘浏加上
+
+}
+
+void MainWindow::setLeftCameraExpo()
+{
+	//显示当前值，刘浏加上
+	int cur = 10;
+
+	//设置新值
+	int nv = QInputDialog::getInt(
+		0,
+		QString::fromWCharArray(L"设置左摄像头曝光"),
+		QString::fromWCharArray(L"设置左摄像头曝光："),
+		cur,
+		0,
+		4000);
+
+	//设置左摄像机为新值，刘浏加上
+
+}
+
+void MainWindow::setRightCameraGain()
+{
+	//显示当前值，刘浏加上
+	int cur = 10;
+
+	//设置新值
+	int nv = QInputDialog::getInt(
+		0,
+		QString::fromWCharArray(L"设置右摄像头增益"),
+		QString::fromWCharArray(L"设置右摄像头增益："),
+		cur,
+		0,
+		255);
+
+	//设置左摄像机为新值，刘浏加上
+
+}
+
+void MainWindow::setRightCameraExpo()
+{
+	//显示当前值，刘浏加上
+	int cur = 10;
+
+	//设置新值
+	int nv = QInputDialog::getInt(
+		0,
+		QString::fromWCharArray(L"设置左摄像头曝光"),
+		QString::fromWCharArray(L"设置左摄像头曝光："),
+		cur,
+		0,
+		4000);
+
+	//设置左摄像机为新值，刘浏加上
+
+}
 void MainWindow::iniParas() {
   //设置窗口，初始位置和最小大小
   setGeometry(50, 50, 800, 600);
@@ -154,6 +257,16 @@ void MainWindow::iniParas() {
 }
 
 void MainWindow::createAction() {
+  //文件
+  maLG = new QAction(QString::fromWCharArray(L"设置左摄像头增益"), this);
+  connect(maLG, SIGNAL(triggered()), this, SLOT(setLeftCameraGain()));
+  maLE = new QAction(QString::fromWCharArray(L"设置左摄像头曝光"), this);
+  connect(maLE, SIGNAL(triggered()), this, SLOT(setLeftCameraExpo()));	
+  maRG = new QAction(QString::fromWCharArray(L"设置右摄像头增益"), this);
+  connect(maRG, SIGNAL(triggered()), this, SLOT(setRightCameraGain()));	
+  maRE = new QAction(QString::fromWCharArray(L"设置右摄像头曝光"), this);
+  connect(maRE, SIGNAL(triggered()), this, SLOT(setRightCameraExpo()));	
+ 
   //录播
   maRecord = new QAction(QString::fromWCharArray(L"录像"), this);
   connect(maRecord, SIGNAL(triggered()), this, SLOT(showRecordWindow()));
@@ -194,7 +307,11 @@ void MainWindow::createMenu() {
   QMenu* helpMenu = menuBar()->addMenu(QString::fromWCharArray(L"帮助"));
 
   //todo
-  fileMenu->addAction(maTodo);
+  fileMenu->addAction(maLG);
+  fileMenu->addAction(maLE);
+  fileMenu->addAction(maRG);
+  fileMenu->addAction(maRE);
+
   helpMenu->addAction(maTodo);
 
   recPlayMenu->addAction(maRecord);
