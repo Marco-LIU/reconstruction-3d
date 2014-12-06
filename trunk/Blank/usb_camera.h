@@ -11,7 +11,7 @@ public:
   UsbCamera(int index, int id);
   ~UsbCamera();
 public:
-  bool Init();
+  bool Init(int resolution_index = 0);
 
   //读写第i个编号摄像头的增益,-1表示失败
   int GetGain() const;

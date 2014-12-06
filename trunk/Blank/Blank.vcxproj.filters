@@ -142,6 +142,9 @@
     <ClCompile Include="VirtualCamera.cpp">
       <Filter>camera</Filter>
     </ClCompile>
+    <ClCompile Include="frame_record.cc">
+      <Filter>camera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mainwindow.h">
@@ -235,6 +238,9 @@
       <Filter>camera</Filter>
     </ClInclude>
     <ClInclude Include="VirtualCamera.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="frame_record.h">
       <Filter>camera</Filter>
     </ClInclude>
   </ItemGroup>
