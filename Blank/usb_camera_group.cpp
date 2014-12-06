@@ -10,6 +10,8 @@
 #include "base/bind.h"
 #include "base/callback.h"
 #include "base/file_util.h"
+#include "base/values.h"
+#include "base/json/json_reader.h"
 
 #include "camera_group_pump.h"
 #include "camera_frame.h"
@@ -393,8 +395,9 @@ bool UsbCameraGroup::Init(const std::string& config) {
   bool succ = true;
 
   std::map<std::string, int>* sn_to_id = NULL;
+  int resolution_index = 0;
 
-  if (config != "") {
+  if (config == "para.config") {
     sn_to_id = new std::map<std::string, int>();
     //从配置文件中读取摄像头序列号
     cv::FileStorage fs(config, cv::FileStorage::READ);
@@ -407,9 +410,45 @@ bool UsbCameraGroup::Init(const std::string& config) {
     fs.release();
   }
 
+  if (config == "para.json") {
+    base::FilePath data_path(L"./");
+    data_path = data_path.AppendASCII(config);
+    std::string data;
+    if (base::ReadFileToString(data_path, &data)) {
+      scoped_ptr<base::Value> v(base::JSONReader::Read(data));
+      base::DictionaryValue* dict = NULL;
+
+      if (v.get() && v->GetAsDictionary(&dict)) {
+        if (dict->HasKey("ver")) {
+          int ver = 0;
+          if (dict->GetInteger("ver", &ver) && ver ==1) {
+            dict->GetInteger("resolution", &resolution_index);
+            base::ListValue* cam_list = NULL;
+            if (dict->GetList("cameras", &cam_list) && cam_list) {
+              int count = cam_list->GetSize();
+              for (int i = 0; i < count; ++i) {
+                base::DictionaryValue* cam = NULL;
+                if (cam_list->GetDictionary(i, &cam) && cam) {
+                  if (cam->HasKey("sn") && cam->HasKey("id")) {
+                    std::string sn;
+                    int id;
+                    cam->GetString("sn", &sn);
+                    cam->GetInteger("id", &id);
+                    if (!sn_to_id) sn_to_id = new std::map<std::string, int>();
+                    (*sn_to_id)[sn] = id;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
   for (int i = 0; i < count; i++) {
     UsbCamera* c = new UsbCamera(i);
-    if (c->Init()) {
+    if (c->Init(resolution_index)) {
       if (sn_to_id) {
         std::string sn = c->sn();
 

@@ -22,7 +22,7 @@ UsbCamera::~UsbCamera() {
   CameraFree(index_);
 }
 
-bool UsbCamera::Init() {
+bool UsbCamera::Init(int resolution_index) {
   int result = CameraInit(index_);
   if (API_OK != result) {
     // TODO: report error
@@ -38,7 +38,7 @@ bool UsbCamera::Init() {
   //设置为最大分辨率，1280x1024
   int width = 640, height = 480;
   CameraGetResolutionMax(index_, &width, &height);
-  result = CameraSetResolution(index_, 0, &width, &height);
+  result = CameraSetResolution(index_, resolution_index, &width, &height);
   width_ = width;
   height_ = height;
 

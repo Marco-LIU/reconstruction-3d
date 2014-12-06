@@ -94,7 +94,8 @@ QImage RecordWindow::convertToQImage(const unsigned char* buffer) {
   return temp;
 }
 //更新场景图像
-void RecordWindow::updatePixmap(const unsigned char* leftBuffer, const unsigned char* rightBuffer) {
+void RecordWindow::updatePixmap(const unsigned char* leftBuffer,
+                                const unsigned char* rightBuffer) {
   QImage li = convertToQImage(leftBuffer);
   QImage ri = convertToQImage(rightBuffer);
 
@@ -135,7 +136,7 @@ void RecordWindow::preview() {
   //如果没有启动摄像头，启动，并开始预览
   if (mbPlay == false) {
     mCameras = new UsbCameraGroup();
-    bool succ = mCameras->Init("para.config");
+    bool succ = mCameras->Init("para.json");
 
     //如果启动失败，提示摄像机没有连接好
     if (!succ || mCameras->camera_count() != 2) {
@@ -144,7 +145,8 @@ void RecordWindow::preview() {
       QMessageBox::critical(
         0,							//父窗口
         "找不到可用的摄像头",		//标题栏
-        "找不到可用的摄像头，请查看摄像头是否已经连接到电脑，如已经连接，请重新插拔USB接口");		//文本内容
+        "找不到可用的摄像头，请查看摄像头是否已经连接到电脑，"
+        "如已经连接，请重新插拔USB接口");		//文本内容
     }
     //成功启动
     else {

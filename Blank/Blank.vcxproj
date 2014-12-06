@@ -103,6 +103,7 @@
     <ClCompile Include="camera_frame.cc" />
     <ClCompile Include="camera_group_pump.cc" />
     <ClCompile Include="camera_pump.cc" />
+    <ClCompile Include="frame_record.cc" />
     <ClCompile Include="gen\moc_calibrateWindow.cpp" />
     <ClCompile Include="gen\moc_mainwindow.cpp" />
     <ClCompile Include="gen\moc_manualWindow.cpp" />
@@ -147,6 +148,7 @@
     <ClInclude Include="camera_group_pump_delegate.h" />
     <ClInclude Include="camera_pump.h" />
     <ClInclude Include="camera_pump_delegate.h" />
+    <ClInclude Include="frame_record.h" />
     <ClInclude Include="mainwindow.h" />
     <ClInclude Include="manualWindow.h" />
     <ClInclude Include="marker.h" />
