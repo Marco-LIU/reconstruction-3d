@@ -36,7 +36,9 @@
 #include "base/callback.h"
 #include "base/bind.h"
 #include "base/strings/string_number_conversions.h"
+#include "base/strings/sys_string_conversions.h"
 #include "base/files/file_util.h"
+#include "base/message_loop/message_loop_proxy.h"
 
 #include "runtime_context.h"
 #include "working_thread.h"
@@ -49,7 +51,8 @@
 using LLX::WorkingThread;
 
 RecordWindow::RecordWindow(QGraphicsScene* scene, QGraphicsPixmapItem* left,
-                           QGraphicsPixmapItem* right, QStatusBar* status) {
+                           QGraphicsPixmapItem* right, QStatusBar* status)
+    : weak_factory_(this) {
   mLeftCameraPixmap = left;
   mRightCameraPixmap = right;
   mStatusBar = status;
@@ -247,6 +250,8 @@ void RecordWindow::recordVedio() {
     //创建文件
     QFile file(Paras::getSingleton().ImagesFoler + "info.txt");
     file.open(QIODevice::ReadWrite);
+    file.write("/left/0_img_list.txt\r\n");
+    file.write("/right/0_img_list.txt\r\n");
     file.close();
   }
 
@@ -265,13 +270,18 @@ void RecordWindow::recordVedio() {
     mStatusBar->showMessage("暂停录制");
   }
 }
-//结束录制视频
-void RecordWindow::stopRecordVedio() {
-  mbStop = true;
 
-  mbRecord = false;
+namespace
+{
+  void RunInFileThread(scoped_refptr<base::MessageLoopProxy> ml,
+                       base::Closure cb) {
+    ml->PostTask(FROM_HERE, cb);
+  }
+}
+
+void RecordWindow::OnRecorderSaveDone() {
   mRecord->setText("录制");
-  mStop->setDisabled(true);
+  mRecord->setEnabled(true);
   mPlay->setEnabled(true);
   mRecordFolder->setEnabled(true);
 
@@ -283,6 +293,24 @@ void RecordWindow::stopRecordVedio() {
     "视频文件成功保存，保存位置为:\n" + imagesFolder.absolutePath());	//文本内容
 
   mStatusBar->showMessage("正在预览");
+}
+
+//结束录制视频
+void RecordWindow::stopRecordVedio() {
+  mbStop = true;
+
+  mbRecord = false;
+  mStop->setDisabled(true);
+  mRecord->setDisabled(true);
+
+  base::Closure callback = base::Bind(&RecordWindow::OnRecorderSaveDone,
+                                      weak_factory_.GetWeakPtr());
+
+  WorkingThread::PostTask(WorkingThread::FILE, FROM_HERE,
+                          base::Bind(&RunInFileThread,
+                                     base::MessageLoopProxy::current(),
+                                     callback));
+  
   //mCameras->StopRecord();
 }
 //关闭视频录制界面
@@ -429,6 +457,15 @@ void RecordWindow::createWidget() {
 namespace {
   static void SaveImage(QImage image, const base::FilePath& path) {
     base::FilePath p = MakeAbsoluteFilePath(path);
+    base::FilePath dir = p.DirName();
+    base::FilePath list_path = dir.Append(L"0_img_list.txt");
+    if (!base::PathExists(list_path)) {
+      base::WriteFile(list_path, "", 0);
+    }
+
+    std::string base_name = base::SysWideToUTF8(p.BaseName().value()) + "\r\n";
+    base::AppendToFile(list_path, base_name.c_str(), base_name.length());
+
     bool s = image.save(QString::fromWCharArray(p.value().c_str()));
     LLX_INFO() << "Save image to " << p.value().c_str()
       << " " << (s ? "DONE" : "FAIL");
@@ -449,8 +486,9 @@ void RecordWindow::RecordFrame(CameraFrames& frames) {
       d = dir.Append(L"left");
     else continue;
 
-    std::wstring filename = base::UintToString16(mRecordCnt) + L"_" +
-      base::Int64ToString16(it->second.time_stamp.ToInternalValue()) + L".jpg";
+    std::wstring filename = base::UintToString16(mRecordCnt) + L"_"
+        + base::Int64ToString16(it->second.time_stamp.ToInternalValue() / 1000)
+        + L".jpg";
 
     d = d.Append(filename);
 

@@ -12,6 +12,7 @@
 
 #include "base/memory/ref_counted.h"
 #include "base/files/file_path.h"
+#include "base/memory/weak_ptr.h"
 
 #include "camera_frame.h"
 
@@ -75,6 +76,8 @@ private:
   void createWidget();
 
   void RecordFrame(CameraFrames& frames);
+
+  void OnRecorderSaveDone();
 protected:
   //属性
   QTimer*		mTimer;		//定时器触发
@@ -111,6 +114,8 @@ protected:
   QGraphicsPixmapItem*	mRightCameraPixmap;	//右摄像拍摄的画面（场景图像项）
   QStatusBar*				mStatusBar;			//状态栏
   QGraphicsScene*			mScene;				//场景指针
+
+  base::WeakPtrFactory<RecordWindow> weak_factory_;
 };
 
 #endif

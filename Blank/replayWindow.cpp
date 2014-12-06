@@ -38,7 +38,8 @@
 #include "marker.h"
 #include "paras.h"
 
-ReplayWindow::ReplayWindow(QGraphicsScene* scene, QGraphicsPixmapItem* left, QGraphicsPixmapItem* right, QStatusBar* status) {
+ReplayWindow::ReplayWindow(QGraphicsScene* scene, QGraphicsPixmapItem* left,
+                           QGraphicsPixmapItem* right, QStatusBar* status) {
   mLeftCameraPixmap = left;
   mRightCameraPixmap = right;
   mStatusBar = status;
