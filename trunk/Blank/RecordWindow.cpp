@@ -342,22 +342,23 @@ void RecordWindow::updateOneFrame() {
   if (frames.size() == 2) {
     FrameCount++;
     updatePixmap(frames[0].ToQImage(), frames[1].ToQImage());
-  }
 
-  //每20帧，统计下帧率
-  if (FrameCount == 20) {
-    int endTime = mProTimer.getMilliseconds();
-    float fps = (float)FrameCount * 1000 / (endTime - StartTime);
-
+    float fps = mCameras->FrameRate();
     //更新状态栏显示
     QString show;
     show.sprintf("当前的帧率为：%f", fps);
     mStatusBar->showMessage(show);
+  }
+
+  //每20帧，统计下帧率
+  //if (FrameCount == 20) {
+  //  int endTime = mProTimer.getMilliseconds();
+  //  float fps = (float)FrameCount * 1000 / (endTime - StartTime);
 
     //置0
-    FrameCount = 0;
-    StartTime = mProTimer.getMilliseconds();
-  }
+    //FrameCount = 0;
+    //StartTime = mProTimer.getMilliseconds();
+  //}
 }
 //设置详细视图为左视图
 void RecordWindow::setLeftDetailView() {

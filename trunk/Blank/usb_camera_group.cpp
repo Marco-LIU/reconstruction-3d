@@ -564,8 +564,11 @@ void UsbCameraGroup::SoftTriggerAll() {
 }
 
 void UsbCameraGroup::SetFrameCallback(FrameCallback callback) {
-  DCHECK(base::MessageLoopProxy::current() == born_loop_);
   frame_callback_ = callback;
+}
+
+float UsbCameraGroup::FrameRate() {
+  return group_pump_->FrameRate();
 }
 
 /*bool UsbCameraGroup::StartRecord(CameraGroupRecordDelegate* delegate) {
