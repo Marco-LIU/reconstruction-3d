@@ -33,6 +33,10 @@
 
 #include <vector>
 
+#include "base/callback.h"
+#include "base/bind.h"
+#include "base/strings/string_number_conversions.h"
+
 #include "usb_camera_group.h"
 #include "camera_frame.h"
 #include "myCameraView.h"
@@ -127,7 +131,6 @@ void RecordWindow::preview() {
 
     //如果启动失败，提示摄像机没有连接好
     if (!succ || mCameras->camera_count() != 2) {
-      delete mCameras;
       mCameras = NULL;
       mPlay->setText("停止");
       QMessageBox::critical(
@@ -158,7 +161,6 @@ void RecordWindow::preview() {
       delete mTimer;
       mTimer = NULL;
       mCameras->StopAll();
-      delete mCameras;
       mCameras = NULL;
       mPlay->setText("预览");
 
@@ -247,7 +249,8 @@ void RecordWindow::recordVedio() {
     mRecord->setText("暂停");
 
     mStatusBar->showMessage("正在录制");
-    //mCameras->StartRecord(NULL);
+    mCameras->StartRecord(
+        base::Bind(&RecordWindow::PreRecord, base::Unretained(this)));
   }
   //切换到暂停状态
   else {
@@ -255,7 +258,7 @@ void RecordWindow::recordVedio() {
     mRecord->setText("录制");
 
     mStatusBar->showMessage("暂停录制");
-    //mCameras->StopRecord();
+    mCameras->StopRecord();
   }
 }
 //结束录制视频
@@ -417,4 +420,18 @@ void RecordWindow::createWidget() {
   mCtrlLayout->addWidget(mRecord);
   mCtrlLayout->addWidget(mStop);
   mCtrlLayout->addWidget(mRecordFolder);
+}
+
+base::FilePath RecordWindow::PreRecord(int id, const CameraFrame& frame) {
+  base::FilePath dir(Paras::getSingleton().ImagesFoler.toStdWString());
+
+  if (id == 1)
+    dir = dir.Append(L"right");
+  else
+    dir = dir.Append(L"left");
+
+  std::wstring filename = base::UintToString16(frame.frame_seq) + L"_" +
+      base::Int64ToString16(frame.time_stamp.ToInternalValue()) + L".jpg";
+
+  return dir.Append(filename);
 }

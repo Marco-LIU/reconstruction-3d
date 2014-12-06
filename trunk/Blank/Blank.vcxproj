@@ -125,6 +125,7 @@
     <ClCompile Include="runtime_context.cc" />
     <ClCompile Include="stereoCalWindow.cpp" />
     <ClCompile Include="StereoReconstructor.cpp" />
+    <ClCompile Include="thread_manager.cpp" />
     <ClCompile Include="trackingWindow.cpp" />
     <ClCompile Include="track_info_list.cpp" />
     <ClCompile Include="UsbCameras.cpp" />
@@ -133,6 +134,7 @@
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="VirtualCamera.cpp" />
     <ClCompile Include="win_utils.cc" />
+    <ClCompile Include="working_thread.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="calibrateWindow.h" />
@@ -156,6 +158,7 @@
     <ClInclude Include="runtime_context.h" />
     <ClInclude Include="stereoCalWindow.h" />
     <ClInclude Include="StereoReconstructor.h" />
+    <ClInclude Include="thread_manager.h" />
     <ClInclude Include="trackingWindow.h" />
     <ClInclude Include="track_info_list.h" />
     <ClInclude Include="UsbCameras.h" />
@@ -164,6 +167,7 @@
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="VirtualCamera.h" />
     <ClInclude Include="win_utils.h" />
+    <ClInclude Include="working_thread.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

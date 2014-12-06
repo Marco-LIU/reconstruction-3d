@@ -221,10 +221,10 @@ bool CameraGroupPump::Context::NeedStop() {
 }
 //------------------------------------------------------------------------------
 void CameraGroupPump::Context::NotifyNewFrame() {
-  DCHECK_EQ(camera_count_, (unsigned int)frame_cache_.size());
   scoped_ptr<CameraFrames> frame_cache(new CameraFrames);
   {
     base::AutoLock al(lock_);
+    DCHECK_EQ(camera_count_, (unsigned int)frame_cache_.size());
     frame_cache->swap(frame_cache_);
   }
   if (delegate_) delegate_->OnFrame(frame_cache.Pass());

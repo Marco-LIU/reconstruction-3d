@@ -10,6 +10,9 @@
 #include "QtWidgets/qwidget.h"
 #include "OgreTimer.h"
 
+#include "base/memory/ref_counted.h"
+#include "base/files/file_path.h"
+
 class QGraphicsScene;
 class QGraphicsPixmapItem;
 class QStatusBar;
@@ -22,6 +25,8 @@ class QPushButton;
 class MyCameraView;
 class MyDetailView;
 class UsbCameraGroup;
+
+struct CameraFrame;
 
 /*
   这个类，主要用于录制视频的界面
@@ -68,12 +73,14 @@ private:
 
   //创建按钮
   void createWidget();
+
+  base::FilePath PreRecord(int id, const CameraFrame& frame);
 protected:
   //属性
   QTimer*		mTimer;		//定时器触发
   Timer		mRecTimer;	//用于录制的定时器
   Timer		mProTimer;	//程序的计时器
-  UsbCameraGroup*	mCameras;	//摄像头
+  scoped_refptr<UsbCameraGroup>   mCameras;     //摄像头
 
   //窗口布局
   QWidget*		mCenterWidget;			//中心窗口(即本窗口,this)

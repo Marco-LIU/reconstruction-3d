@@ -9,9 +9,14 @@
 #include "base/location.h"
 #include "base/bind.h"
 #include "base/callback.h"
+#include "base/file_util.h"
 
 #include "camera_group_pump.h"
 #include "camera_frame.h"
+#include "working_thread.h"
+#include "runtime_context.h"
+
+using LLX::WorkingThread;
 
 /*#define IO_THREAD_PER_CAMERA 2
 
@@ -364,7 +369,8 @@ public:
   HANDLE* threads_;
 };*/
 
-UsbCameraGroup::UsbCameraGroup() {
+UsbCameraGroup::UsbCameraGroup()
+    : is_recording_(false) {
   born_loop_ = base::MessageLoopProxy::current();
 }
 
@@ -396,7 +402,8 @@ bool UsbCameraGroup::Init(const std::string& config) {
     sn_to_id = new std::map<std::string, int>();
     //从配置文件中读取摄像头序列号
     cv::FileStorage fs(config, cv::FileStorage::READ);
-    for (cv::FileNodeIterator i = fs["Camera"].begin(); i != fs["Camera"].end(); i++) {
+    for (cv::FileNodeIterator i = fs["Camera"].begin();
+         i != fs["Camera"].end(); i++) {
       std::string nodeName = (*i).name();
       int id = int(*i);
       (*sn_to_id)[nodeName] = id;
@@ -522,11 +529,20 @@ const unsigned char* UsbCameraGroup::camera_buffer(int id) const {
   return NULL;
 }
 
+namespace {
+  static void SaveImage(QImage image, const base::FilePath& path) {
+    base::FilePath p = MakeAbsoluteFilePath(path);
+    bool s = image.save(QString::fromWCharArray(p.value().c_str()));
+    LLX_INFO() << "Save image to " << p.value().c_str()
+        << " " << (s ? "DONE" : "FAIL");
+  }
+}
+
 void UsbCameraGroup::OnFrame(scoped_ptr<CameraFrames> frames) {
   if (base::MessageLoopProxy::current() != born_loop_) {
     born_loop_->PostTask(FROM_HERE,
                          base::Bind(&UsbCameraGroup::OnFrame,
-                         base::Unretained(this), base::Passed(&frames)));
+                         this, base::Passed(&frames)));
     return;
   }
   /*static DWORD last_tick = 0;
@@ -539,6 +555,21 @@ void UsbCameraGroup::OnFrame(scoped_ptr<CameraFrames> frames) {
 
   if (frames.get()) {
     frames->swap(cached_frames_);
+
+    if (is_recording_) {
+      CameraFrames::iterator it = cached_frames_.begin();
+
+      while (it != cached_frames_.end()) {
+        base::FilePath saving_path =
+            pre_record_callback_.Run(it->first, it->second);
+        QImage saving_image = it->second.ToQImage();
+        WorkingThread::PostTask(WorkingThread::FILE, FROM_HERE,
+                                base::Bind(&SaveImage,
+                                           saving_image,
+                                           saving_path));
+        ++it;
+      }
+    }
   }
 }
 
@@ -555,6 +586,20 @@ void UsbCameraGroup::SoftTriggerAll() {
     it->second->SoftTrigger();
     ++it;
   }
+}
+
+void UsbCameraGroup::StartRecord(UsbCameraGroup::PreRecordCallback callback) {
+  DCHECK(!is_recording_);
+  DCHECK(!callback.is_null());
+  DCHECK(group_pump_->IsPumping());
+
+  is_recording_ = true;
+  pre_record_callback_ = callback;
+}
+
+void UsbCameraGroup::StopRecord() {
+  is_recording_ = false;
+  pre_record_callback_ = PreRecordCallback();
 }
 
 /*bool UsbCameraGroup::StartRecord(CameraGroupRecordDelegate* delegate) {
