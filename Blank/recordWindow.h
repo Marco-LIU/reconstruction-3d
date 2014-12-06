@@ -39,7 +39,9 @@ public:
   //把灰度数据转换为QImage格式
   QImage convertToQImage(const unsigned char* buffer);
   //更新场景图像
-  void updatePixmap(const unsigned char* leftBuffer, const unsigned char* rightBuffer);
+  void updatePixmap(const unsigned char* leftBuffer,
+                    const unsigned char* rightBuffer);
+  void updatePixmap(QImage& li, QImage& ri);
 signals:
 
 public slots :

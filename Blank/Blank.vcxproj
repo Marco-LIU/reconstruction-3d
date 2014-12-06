@@ -56,6 +56,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;COMPONENT_BUILD;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);..\dependencies\ChromeBase;..\dependencies\OpenCV2.3.1\include;..\dependencies\OpenCV2.3.1\include\opencv;..\dependencies\JHCamera;..\dependencies\relay;..\dependencies\Qt5.3\include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -96,6 +97,9 @@
   <ItemGroup>
     <ClCompile Include="calibrateWindow.cpp" />
     <ClCompile Include="CameraCalibration.cpp" />
+    <ClCompile Include="camera_frame.cc" />
+    <ClCompile Include="camera_group_pump.cc" />
+    <ClCompile Include="camera_pump.cc" />
     <ClCompile Include="gen\moc_calibrateWindow.cpp" />
     <ClCompile Include="gen\moc_mainwindow.cpp" />
     <ClCompile Include="gen\moc_manualWindow.cpp" />
@@ -118,6 +122,7 @@
     <ClCompile Include="qt_utils.cpp" />
     <ClCompile Include="RecordWindow.cpp" />
     <ClCompile Include="replayWindow.cpp" />
+    <ClCompile Include="runtime_context.cc" />
     <ClCompile Include="stereoCalWindow.cpp" />
     <ClCompile Include="StereoReconstructor.cpp" />
     <ClCompile Include="trackingWindow.cpp" />
@@ -127,10 +132,16 @@
     <ClCompile Include="usb_camera_group.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="VirtualCamera.cpp" />
+    <ClCompile Include="win_utils.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="calibrateWindow.h" />
     <ClInclude Include="CameraCalibration.h" />
+    <ClInclude Include="camera_frame.h" />
+    <ClInclude Include="camera_group_pump.h" />
+    <ClInclude Include="camera_group_pump_delegate.h" />
+    <ClInclude Include="camera_pump.h" />
+    <ClInclude Include="camera_pump_delegate.h" />
     <ClInclude Include="mainwindow.h" />
     <ClInclude Include="manualWindow.h" />
     <ClInclude Include="marker.h" />
@@ -142,6 +153,7 @@
     <ClInclude Include="qt_utils.h" />
     <ClInclude Include="recordWindow.h" />
     <ClInclude Include="replayWindow.h" />
+    <ClInclude Include="runtime_context.h" />
     <ClInclude Include="stereoCalWindow.h" />
     <ClInclude Include="StereoReconstructor.h" />
     <ClInclude Include="trackingWindow.h" />
@@ -151,6 +163,7 @@
     <ClInclude Include="usb_camera_group.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="VirtualCamera.h" />
+    <ClInclude Include="win_utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

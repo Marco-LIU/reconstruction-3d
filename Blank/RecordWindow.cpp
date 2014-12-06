@@ -34,6 +34,7 @@
 #include <vector>
 
 #include "usb_camera_group.h"
+#include "camera_frame.h"
 #include "myCameraView.h"
 #include "marker.h"
 #include "paras.h"
@@ -106,21 +107,26 @@ void RecordWindow::updatePixmap(const unsigned char* leftBuffer, const unsigned 
     mStatusBar->showMessage("图像" + name + "保存完毕");
   }*/
 
+  updatePixmap(li, ri);
+}
+
+void RecordWindow::updatePixmap(QImage& li, QImage& ri) {
   mLeftCameraPixmap->setPixmap(QPixmap::fromImage(li));
   mRightCameraPixmap->setPixmap(QPixmap::fromImage(ri));
   //更新图像
   update();
 }
+
 //1录制视频，4按钮的处理函数
 //预览视频拍摄的画面
 void RecordWindow::preview() {
   //如果没有启动摄像头，启动，并开始预览
   if (mbPlay == false) {
     mCameras = new UsbCameraGroup();
-    mCameras->Init("para.config");
+    bool succ = mCameras->Init("para.config");
 
     //如果启动失败，提示摄像机没有连接好
-    if (mCameras->camera_count() != 2) {
+    if (!succ || mCameras->camera_count() != 2) {
       delete mCameras;
       mCameras = NULL;
       mPlay->setText("停止");
@@ -131,7 +137,7 @@ void RecordWindow::preview() {
     }
     //成功启动
     else {
-
+      mCameras->StartAll();
       //切换其它按钮状态
       mbPlay = true;
       mRecord->setEnabled(true);
@@ -151,6 +157,7 @@ void RecordWindow::preview() {
       mTimer->stop();
       delete mTimer;
       mTimer = NULL;
+      mCameras->StopAll();
       delete mCameras;
       mCameras = NULL;
       mPlay->setText("预览");
@@ -240,7 +247,7 @@ void RecordWindow::recordVedio() {
     mRecord->setText("暂停");
 
     mStatusBar->showMessage("正在录制");
-    mCameras->StartRecord(NULL);
+    //mCameras->StartRecord(NULL);
   }
   //切换到暂停状态
   else {
@@ -248,7 +255,7 @@ void RecordWindow::recordVedio() {
     mRecord->setText("录制");
 
     mStatusBar->showMessage("暂停录制");
-    mCameras->StopRecord();
+    //mCameras->StopRecord();
   }
 }
 //结束录制视频
@@ -269,7 +276,7 @@ void RecordWindow::stopRecordVedio() {
     "视频文件成功保存，保存位置为:\n" + imagesFolder.absolutePath());	//文本内容
 
   mStatusBar->showMessage("正在预览");
-  mCameras->StopRecord();
+  //mCameras->StopRecord();
 }
 //关闭视频录制界面
 void RecordWindow::closeRecordWindow() {
@@ -291,10 +298,11 @@ void RecordWindow::updateOneFrame() {
   static int FrameCount = 0;
   static int StartTime = mProTimer.getMilliseconds();
 
-  if (mCameras->CaptureFrame(true)) {
+  CameraFrames frames;
+  mCameras->GetFrames(frames);
+  if (frames.size() == 2) {
     FrameCount++;
-
-    updatePixmap(mCameras->camera_buffer(0), mCameras->camera_buffer(1));
+    updatePixmap(frames[0].ToQImage(), frames[1].ToQImage());
   }
 
   //每20帧，统计下帧率

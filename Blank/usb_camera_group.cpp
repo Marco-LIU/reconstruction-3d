@@ -5,7 +5,15 @@
 #include "OgreTimer.h"
 #include "QtGui/qimage.h"
 
-#define IO_THREAD_PER_CAMERA 2
+#include "base/logging.h"
+#include "base/location.h"
+#include "base/bind.h"
+#include "base/callback.h"
+
+#include "camera_group_pump.h"
+#include "camera_frame.h"
+
+/*#define IO_THREAD_PER_CAMERA 2
 
 QImage convertToQImage(const unsigned char* buffer,
                        unsigned int w, unsigned int h) {
@@ -281,14 +289,14 @@ private:
 
       std::cout << ioIndex << " to write file: " << filename << std::endl;
 
-      /*for (int i = d.camIndex * 4; i < d.camIndex * 4 + 4; i++) {
-        if (gTimeBoard[i].size() < d.imgIndex) {
-          gTimeBoard[i].resize(d.imgIndex);
-        }
-      }
-      gTimeBoard[d.camIndex * 4 + 0][d.imgIndex - 1] = g_captureData[d.camIndex].preCaptureTime;
-      gTimeBoard[d.camIndex * 4 + 1][d.imgIndex - 1] = g_captureData[d.camIndex].postCaptureTime;
-      gTimeBoard[d.camIndex * 4 + 2][d.imgIndex - 1] = gTimer.getMicroseconds();*/
+      // for (int i = d.camIndex * 4; i < d.camIndex * 4 + 4; i++) {
+      //   if (gTimeBoard[i].size() < d.imgIndex) {
+      //     gTimeBoard[i].resize(d.imgIndex);
+      //   }
+      // }
+      // gTimeBoard[d.camIndex * 4 + 0][d.imgIndex - 1] = g_captureData[d.camIndex].preCaptureTime;
+      // gTimeBoard[d.camIndex * 4 + 1][d.imgIndex - 1] = g_captureData[d.camIndex].postCaptureTime;
+      // gTimeBoard[d.camIndex * 4 + 2][d.imgIndex - 1] = gTimer.getMicroseconds();
       //FILE* fp = fopen(filename, "w");
       //fwrite(d.buffer, d.size, 1, fp);
       //fclose(fp);
@@ -298,12 +306,12 @@ private:
         break;
       //gTimeBoard[d.camIndex * 4 + 3][d.imgIndex - 1] = gTimer.getMicroseconds();
 
-      /*std::cerr << "file written: " << filename << " with time "
-      << gTimeBoard[d.camIndex * 4 + 0][d.imgIndex - 1] << ","
-      << gTimeBoard[d.camIndex * 4 + 1][d.imgIndex - 1] << ","
-      << gTimeBoard[d.camIndex * 4 + 2][d.imgIndex - 1] << ","
-      << gTimeBoard[d.camIndex * 4 + 3][d.imgIndex - 1] << ""
-      << std::endl; */
+      // std::cerr << "file written: " << filename << " with time "
+      // << gTimeBoard[d.camIndex * 4 + 0][d.imgIndex - 1] << ","
+      // << gTimeBoard[d.camIndex * 4 + 1][d.imgIndex - 1] << ","
+      // << gTimeBoard[d.camIndex * 4 + 2][d.imgIndex - 1] << ","
+      // << gTimeBoard[d.camIndex * 4 + 3][d.imgIndex - 1] << ""
+      // << std::endl;
       d.state = FileIOThreadData::IDLE;
     }
 
@@ -354,22 +362,16 @@ public:
   FileIOThreadData* io_data_;
   Timer timer_;
   HANDLE* threads_;
-};
+};*/
 
-UsbCameraGroup::UsbCameraGroup()
-    : record_context_(NULL) {
-  record_context_ = new RecordContext();
+UsbCameraGroup::UsbCameraGroup() {
+  born_loop_ = base::MessageLoopProxy::current();
 }
 
 UsbCameraGroup::~UsbCameraGroup() {
   StopAll();
 
   {
-    CameraMap::iterator it = cameras_.begin();
-    while (it != cameras_.end()) {
-      delete it->second;
-      ++it;
-    }
     cameras_.clear();
   }
   {
@@ -380,12 +382,12 @@ UsbCameraGroup::~UsbCameraGroup() {
     }
     buffers_.clear();
   }
-  delete record_context_;
 }
 
 bool UsbCameraGroup::Init(const std::string& config) {
   int count = 0;
-  CameraGetCount(&count);
+  API_STATUS rc = CameraGetCount(&count);
+  if (rc != API_OK || count == 0) return false;
   bool succ = true;
 
   std::map<std::string, int>* sn_to_id = NULL;
@@ -411,20 +413,24 @@ bool UsbCameraGroup::Init(const std::string& config) {
         std::map<std::string, int>::iterator it = sn_to_id->find(sn);
         if (it != sn_to_id->end()) {
           cameras_[it->second] = c;
+          c->SetId(it->second);
           unsigned char* buf = new unsigned char[c->buffer_length()];
           memset(buf, 0, c->buffer_length());
           buffers_[it->second] = buf;
         } else {
           succ = false;
+          break;
         }
       } else {
         cameras_[i] = c;
+        c->SetId(i);
         unsigned char* buf = new unsigned char[c->buffer_length()];
         memset(buf, 0, c->buffer_length());
         buffers_[i] = buf;
       }
     } else {
       succ = false;
+      break;
     }
   }
 
@@ -442,23 +448,31 @@ bool UsbCameraGroup::StartAll() {
       succ = false;
     ++it;
   }
+
+  group_pump_.reset(new CameraGroupPump(this, this));
+  succ = group_pump_->StartPumping();
+
+  if (!succ) StopAll();
+
   return succ;
 }
 
 void UsbCameraGroup::StopAll() {
-  StopRecord();
+  //StopRecord();
   CameraMap::iterator it = cameras_.begin();
   while (it != cameras_.end()) {
     it->second->Stop();
     ++it;
   }
+  if (group_pump_.get())
+    group_pump_->StopPumping();
 }
 
 unsigned int UsbCameraGroup::camera_count() const {
   return cameras_.size();
 }
 
-UsbCamera* UsbCameraGroup::GetCamera(int id) const {
+scoped_refptr<UsbCamera> UsbCameraGroup::GetCamera(int id) const {
   CameraMap::const_iterator it = cameras_.find(id);
   if (it != cameras_.end()) return it->second;
 
@@ -508,7 +522,42 @@ const unsigned char* UsbCameraGroup::camera_buffer(int id) const {
   return NULL;
 }
 
-bool UsbCameraGroup::StartRecord(CameraGroupRecordDelegate* delegate) {
+void UsbCameraGroup::OnFrame(scoped_ptr<CameraFrames> frames) {
+  if (base::MessageLoopProxy::current() != born_loop_) {
+    born_loop_->PostTask(FROM_HERE,
+                         base::Bind(&UsbCameraGroup::OnFrame,
+                         base::Unretained(this), base::Passed(&frames)));
+    return;
+  }
+  /*static DWORD last_tick = 0;
+  DWORD tick = GetTickCount();
+
+  if (last_tick)
+    std::cout << tick - last_tick << std::endl;
+
+  last_tick = tick;*/
+
+  if (frames.get()) {
+    frames->swap(cached_frames_);
+  }
+}
+
+void UsbCameraGroup::GetFrames(CameraFrames& frame_map) {
+  DCHECK(base::MessageLoopProxy::current() == born_loop_);
+
+  frame_map.swap(cached_frames_);
+}
+
+void UsbCameraGroup::SoftTriggerAll() {
+  CameraMap::iterator it = cameras_.begin();
+
+  while (it != cameras_.end()) {
+    it->second->SoftTrigger();
+    ++it;
+  }
+}
+
+/*bool UsbCameraGroup::StartRecord(CameraGroupRecordDelegate* delegate) {
   if (record_context_->is_recording_) return false;
   bool result = false;
 
@@ -526,4 +575,4 @@ void UsbCameraGroup::StopRecord() {
     record_context_->ForceQuit();
   }
   record_context_->is_recording_ = false;
-}
+}*/

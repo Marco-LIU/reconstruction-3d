@@ -1,6 +1,8 @@
 #include "usb_camera.h"
 #include "JHCap.h"
 
+#include <iostream>
+
 UsbCamera::UsbCamera(int index)
   : index_(index)
   , id_(0)
@@ -33,9 +35,9 @@ bool UsbCamera::Init() {
   CameraSetTriggerPolarity(index_, true);
 
   //设置为最大分辨率，1280x1024
-  int width, height;
-  CameraGetResolutionMax(index_, &width, &height);
-  result = CameraSetResolution(index_, 0, &width, &height);
+  int width = 640, height = 480;
+  //CameraGetResolutionMax(index_, &width, &height);
+  result = CameraSetResolution(index_, 3, &width, &height);
   width_ = width;
   height_ = height;
 
@@ -58,7 +60,7 @@ bool UsbCamera::Init() {
   sn_ = id;
 
   int length = 0;
-  CameraGetImageBufferSize(0, &length, CAMERA_IMAGE_RAW8);
+  CameraGetImageBufferSize(0, &length, CAMERA_IMAGE_GRAY8);
   buffer_length_ = length;
 
   buffer_ = new unsigned char[buffer_length_];
@@ -109,6 +111,10 @@ void UsbCamera::Stop() {
   CameraStop(index_);
 }
 
+bool UsbCamera::SoftTrigger() {
+  return API_OK == CameraTriggerShot(index_);
+}
+
 bool UsbCamera::CaptureFrameSync(bool use_trigger,
                                  unsigned char* buffer /* = NULL */) {
   if (async_capturing_ > 0) return false;
@@ -120,8 +126,9 @@ bool UsbCamera::CaptureFrameSync(bool use_trigger,
   int len = buffer_length_;
   if (!buffer)
     buffer = buffer_;
-
-  return API_OK == CameraQueryImage(index_, buffer, &len, opt);
+  API_STATUS rc = CameraQueryImage(index_, buffer, &len, opt);
+  CameraTriggerShot(index_);
+  return API_OK == rc;
 }
 
 namespace

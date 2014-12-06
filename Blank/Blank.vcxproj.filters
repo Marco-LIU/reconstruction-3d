@@ -118,6 +118,21 @@
     <ClCompile Include="gen\moc_trackingWindow.cpp">
       <Filter>gen</Filter>
     </ClCompile>
+    <ClCompile Include="camera_pump.cc">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="camera_group_pump.cc">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="camera_frame.cc">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="runtime_context.cc">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="win_utils.cc">
+      <Filter>utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mainwindow.h">
@@ -185,6 +200,27 @@
     </ClInclude>
     <ClInclude Include="trackingWindow.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="camera_pump.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="camera_group_pump.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="camera_frame.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="camera_pump_delegate.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="camera_group_pump_delegate.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="runtime_context.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="win_utils.h">
+      <Filter>utility</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
