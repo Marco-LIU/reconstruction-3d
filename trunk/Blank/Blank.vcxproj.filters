@@ -19,6 +19,9 @@
     <Filter Include="gen">
       <UniqueIdentifier>{b4c4c973-6ee0-402b-ad86-1470ed436da6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="camera">
+      <UniqueIdentifier>{afcae492-85a9-4202-bbbe-a6e15291d1ab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -41,9 +44,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="CameraCalibration.cpp">
-      <Filter>utility</Filter>
-    </ClCompile>
-    <ClCompile Include="VirtualCamera.cpp">
       <Filter>utility</Filter>
     </ClCompile>
     <ClCompile Include="calibrateWindow.cpp">
@@ -88,15 +88,6 @@
     <ClCompile Include="track_info_list.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="usb_camera.cpp">
-      <Filter>utility</Filter>
-    </ClCompile>
-    <ClCompile Include="UsbCameras.cpp">
-      <Filter>utility</Filter>
-    </ClCompile>
-    <ClCompile Include="usb_camera_group.cpp">
-      <Filter>utility</Filter>
-    </ClCompile>
     <ClCompile Include="MeasureMarkersWindows.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -118,15 +109,6 @@
     <ClCompile Include="gen\moc_trackingWindow.cpp">
       <Filter>gen</Filter>
     </ClCompile>
-    <ClCompile Include="camera_pump.cc">
-      <Filter>utility</Filter>
-    </ClCompile>
-    <ClCompile Include="camera_group_pump.cc">
-      <Filter>utility</Filter>
-    </ClCompile>
-    <ClCompile Include="camera_frame.cc">
-      <Filter>utility</Filter>
-    </ClCompile>
     <ClCompile Include="runtime_context.cc">
       <Filter>utility</Filter>
     </ClCompile>
@@ -138,6 +120,27 @@
     </ClCompile>
     <ClCompile Include="working_thread.cc">
       <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="camera_frame.cc">
+      <Filter>camera</Filter>
+    </ClCompile>
+    <ClCompile Include="camera_group_pump.cc">
+      <Filter>camera</Filter>
+    </ClCompile>
+    <ClCompile Include="camera_pump.cc">
+      <Filter>camera</Filter>
+    </ClCompile>
+    <ClCompile Include="usb_camera.cpp">
+      <Filter>camera</Filter>
+    </ClCompile>
+    <ClCompile Include="usb_camera_group.cpp">
+      <Filter>camera</Filter>
+    </ClCompile>
+    <ClCompile Include="UsbCameras.cpp">
+      <Filter>camera</Filter>
+    </ClCompile>
+    <ClCompile Include="VirtualCamera.cpp">
+      <Filter>camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -165,9 +168,6 @@
     <ClInclude Include="CameraCalibration.h">
       <Filter>utility</Filter>
     </ClInclude>
-    <ClInclude Include="VirtualCamera.h">
-      <Filter>utility</Filter>
-    </ClInclude>
     <ClInclude Include="calibrateWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -186,15 +186,6 @@
     <ClInclude Include="track_info_list.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="usb_camera.h">
-      <Filter>utility</Filter>
-    </ClInclude>
-    <ClInclude Include="UsbCameras.h">
-      <Filter>utility</Filter>
-    </ClInclude>
-    <ClInclude Include="usb_camera_group.h">
-      <Filter>utility</Filter>
-    </ClInclude>
     <ClInclude Include="MeasureMarkersWindows.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -207,21 +198,6 @@
     <ClInclude Include="trackingWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="camera_pump.h">
-      <Filter>utility</Filter>
-    </ClInclude>
-    <ClInclude Include="camera_group_pump.h">
-      <Filter>utility</Filter>
-    </ClInclude>
-    <ClInclude Include="camera_frame.h">
-      <Filter>utility</Filter>
-    </ClInclude>
-    <ClInclude Include="camera_pump_delegate.h">
-      <Filter>utility</Filter>
-    </ClInclude>
-    <ClInclude Include="camera_group_pump_delegate.h">
-      <Filter>utility</Filter>
-    </ClInclude>
     <ClInclude Include="runtime_context.h">
       <Filter>utility</Filter>
     </ClInclude>
@@ -233,6 +209,33 @@
     </ClInclude>
     <ClInclude Include="working_thread.h">
       <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="camera_pump_delegate.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="camera_frame.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="camera_group_pump.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="camera_group_pump_delegate.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="camera_pump.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="usb_camera.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="usb_camera_group.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="UsbCameras.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualCamera.h">
+      <Filter>camera</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

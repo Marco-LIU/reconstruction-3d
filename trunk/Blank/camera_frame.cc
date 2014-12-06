@@ -5,6 +5,7 @@ QImage CameraFrame::ToQImage() const {
   if (!cached_image.isNull())
     return cached_image;
 
-  cached_image = FromRawGray(data, width, height);
+  if(data.get())
+	cached_image = FromRawGray(data, width, height);
   return cached_image;
 }
