@@ -150,7 +150,8 @@ void RecordWindow::preview() {
     else {
       mCameras->StartAll();
 
-      mCameras->SetFrameCallback(base::Bind(&RecordWindow::RecordFrame, base::Unretained(this)));
+      mCameras->SetFrameCallback(base::Bind(&RecordWindow::RecordFrame,
+                                            base::Unretained(this)));
       //切换其它按钮状态
       mbPlay = true;
       mRecord->setEnabled(true);
@@ -170,6 +171,7 @@ void RecordWindow::preview() {
       mTimer->stop();
       delete mTimer;
       mTimer = NULL;
+      mCameras->SetFrameCallback(UsbCameraGroup::FrameCallback());
       mCameras->StopAll();
       mCameras = NULL;
       mPlay->setText("预览");
@@ -199,7 +201,9 @@ void RecordWindow::selectSaveFolder() {
       QMessageBox::StandardButton btn = QMessageBox::question(
         0,						//父窗口
         "视频文件已经存在",		//标题栏
-        "视频文件已经存在。\n选择yes，系统将覆盖当前文件。\n选择no，您可以重新选择保存位置");		//文本内容
+        "视频文件已经存在。\n"
+        "选择yes，系统将覆盖当前文件。\n"
+        "选择no，您可以重新选择保存位置");		//文本内容
       if (btn == QMessageBox::Yes) {
         //先删除，在创建新的
         if (imagesFolder.exists("left")) {
@@ -455,7 +459,9 @@ void RecordWindow::createWidget() {
 }
 
 namespace {
-  static void SaveImage(QImage image, const base::FilePath& path) {
+  static void SaveImage(int index,
+                        const CameraFrame& frame,
+                        const base::FilePath& path) {
     base::FilePath p = MakeAbsoluteFilePath(path);
     base::FilePath dir = p.DirName();
     base::FilePath list_path = dir.Append(L"0_img_list.txt");
@@ -463,9 +469,14 @@ namespace {
       base::WriteFile(list_path, "", 0);
     }
 
-    std::string base_name = base::SysWideToUTF8(p.BaseName().value()) + "\r\n";
+    std::string base_name = base::IntToString(index) +
+      " " + base::Int64ToString(frame.time_stamp.ToInternalValue() / 1000) +
+      " " + base::Int64ToString(frame.sync_stamp.ToInternalValue() / 1000) +
+      "\r\n";
+
     base::AppendToFile(list_path, base_name.c_str(), base_name.length());
 
+    QImage image = frame.ToQImage();
     bool s = image.save(QString::fromWCharArray(p.value().c_str()));
     LLX_INFO() << "Save image to " << p.value().c_str()
       << " " << (s ? "DONE" : "FAIL");
@@ -473,7 +484,7 @@ namespace {
 }
 
 void RecordWindow::RecordFrame(CameraFrames& frames) {
-  if(!mbRecord) return;
+  if (!mbRecord || frames.size() < 2) return;
 
   base::FilePath dir(Paras::getSingleton().ImagesFoler.toStdWString());
   ++mRecordCnt;
@@ -493,7 +504,7 @@ void RecordWindow::RecordFrame(CameraFrames& frames) {
     d = d.Append(filename);
 
     WorkingThread::PostTask(LLX::WorkingThread::FILE, FROM_HERE,
-                            base::Bind(&SaveImage, it->second.ToQImage(), d));
+                            base::Bind(&SaveImage, mRecordCnt, it->second, d));
 
     ++it;
   }
