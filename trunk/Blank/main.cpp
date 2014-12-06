@@ -17,6 +17,8 @@
 #include "base/at_exit.h"
 #include "base/message_loop/message_loop.h"
 
+#include "runtime_context.h"
+
 #ifdef _DEBUG
 int main(int argc,char** argv)
 #else
@@ -30,6 +32,7 @@ int CALLBACK WinMain(
 {
   base::AtExitManager at_exit;
   CommandLine::Init(0, NULL);
+  LLX_INFO() << "Start";
 
 #ifndef _DEBUG
   int argc = 0;
@@ -60,6 +63,8 @@ int CALLBACK WinMain(
   // 创建自己的消息循环
   base::MessageLoopForUI ui_ml;
   ui_ml.Run();
+
+  LLX_INFO() << "End";
 
   return 0;
 

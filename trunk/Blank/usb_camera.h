@@ -2,22 +2,9 @@
 #include <Windows.h>
 #include <string>
 
-// 代理接口，接口函数在后台线程中调用
-// 实现时注意同步
-class CameraRecordDelegate {
-public:
-  virtual ~CameraRecordDelegate() {}
+#include "base/memory/ref_counted.h"
 
-  virtual std::string GetSavingDir() = 0;
-
-  // 通知抓取了一帧，index表示帧序号
-  // 返回为false时忽略此帧
-  virtual bool OnFrame(unsigned int frame_seq,
-                       const unsigned char* data,
-                       unsigned int len) = 0;
-};
-
-class UsbCamera
+class UsbCamera : public base::RefCountedThreadSafe<UsbCamera>
 {
 public:
   UsbCamera(int index);
@@ -50,10 +37,6 @@ public:
   //启动摄像机
   bool Start();
 
-  // TODO：未实现
-  bool StartRecord(CameraRecordDelegate* delegate) { return false; }
-  void StopRecord() {}
-
   unsigned int width() const { return width_; }
 
   unsigned int height() const { return height_; }
@@ -61,6 +44,8 @@ public:
   unsigned int buffer_length() const { return buffer_length_; }
 
   const unsigned char* buffer() const { return buffer_; }
+
+  bool SoftTrigger();
 
   // 同步抓取一帧，函数在抓取完成后返回
   // 在异步抓取的过程中调用此方法会失败
@@ -88,7 +73,6 @@ protected:
   std::string sn_;
 
   volatile LONG async_capturing_;
-
-  class RecordContext;
-  RecordContext* record_context_;
+private:
+  friend class base::RefCountedThreadSafe<UsbCamera>;
 };

@@ -2,31 +2,25 @@
 #include <string>
 #include <map>
 
+#include "base/memory/ref_counted.h"
+#include "base/memory/scoped_ptr.h"
+#include "base/message_loop/message_loop_proxy.h"
+
+#include "camera_group_pump_delegate.h"
+
 class UsbCamera;
+class CameraGroupPump;
 
-// 代理接口，接口函数在后台线程中调用
-// 实现时注意同步
-class CameraGroupRecordDelegate {
-public:
-  virtual ~CameraGroupRecordDelegate() {}
-
-  virtual std::string GetSavingDir(unsigned int cam_id) = 0;
-
-  // 通知抓取了一帧，index表示帧序号
-  // 返回为false时忽略此帧
-  virtual bool OnFrame(unsigned int cam_id,
-                       unsigned int frame_seq,
-                       const unsigned char* data,
-                       unsigned int len) = 0;
-};
-
-class UsbCameraGroup
+class UsbCameraGroup : public CameraGroupPumpDelegate
 {
 public:
   UsbCameraGroup();
   ~UsbCameraGroup();
 
   typedef std::map<int, unsigned char*> BufferMap;
+
+  // id -> camera
+  typedef std::map<int, scoped_refptr<UsbCamera> > CameraMap;
 
   bool Init(const std::string& config);
 
@@ -36,23 +30,32 @@ public:
 
   unsigned int camera_count() const;
 
-  UsbCamera* GetCamera(int id) const;
+  scoped_refptr<UsbCamera> GetCamera(int id) const;
+
+  const CameraMap& cameras() const { return cameras_; }
+
+  void SoftTriggerAll();
 
   // 同步抓取一帧
   bool CaptureFrame(bool use_trigger, const BufferMap* buffers = NULL);
 
   const unsigned char* camera_buffer(int id) const;
 
-  bool StartRecord(CameraGroupRecordDelegate* delegate);
-  void StopRecord();
+  virtual void OnFrame(scoped_ptr<CameraFrames> frames) OVERRIDE;
+
+  void GetFrames(CameraFrames& frame_map);
+
+  /*bool StartRecord(CameraGroupRecordDelegate* delegate);
+  void StopRecord();*/
 
 protected:
-  typedef std::map<int, UsbCamera*> CameraMap;
-
   CameraMap cameras_;
 
   BufferMap buffers_;
 
-  class RecordContext;
-  RecordContext* record_context_;
+  scoped_ptr<CameraGroupPump> group_pump_;
+
+  scoped_refptr<base::MessageLoopProxy> born_loop_;
+
+  CameraFrames cached_frames_;
 };
