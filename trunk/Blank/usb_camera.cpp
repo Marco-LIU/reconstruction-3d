@@ -19,6 +19,7 @@ UsbCamera::UsbCamera(int index, int id)
 UsbCamera::~UsbCamera() {
   if (buffer_) delete[] buffer_;
   Stop();
+  CameraFree(index_);
 }
 
 bool UsbCamera::Init() {
