@@ -49,11 +49,9 @@ public:
 
   void GetFrames(CameraFrames& frame_map);
 
-  typedef base::Callback<base::FilePath(int, const CameraFrame&)>
-      PreRecordCallback;
+  typedef base::Callback<void(CameraFrames&)> FrameCallback;
 
-  void StartRecord(PreRecordCallback callback);
-  void StopRecord();
+  void SetFrameCallback(FrameCallback callback);
 
 protected:
   CameraMap cameras_;
@@ -66,6 +64,5 @@ protected:
 
   CameraFrames cached_frames_;
 
-  bool is_recording_;
-  PreRecordCallback pre_record_callback_;
+  FrameCallback frame_callback_;
 };

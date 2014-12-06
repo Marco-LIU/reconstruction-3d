@@ -36,8 +36,8 @@ bool UsbCamera::Init() {
 
   //设置为最大分辨率，1280x1024
   int width = 640, height = 480;
-  //CameraGetResolutionMax(index_, &width, &height);
-  result = CameraSetResolution(index_, 3, &width, &height);
+  CameraGetResolutionMax(index_, &width, &height);
+  result = CameraSetResolution(index_, 0, &width, &height);
   width_ = width;
   height_ = height;
 

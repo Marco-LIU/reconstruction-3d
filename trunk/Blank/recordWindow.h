@@ -13,6 +13,8 @@
 #include "base/memory/ref_counted.h"
 #include "base/files/file_path.h"
 
+#include "camera_frame.h"
+
 class QGraphicsScene;
 class QGraphicsPixmapItem;
 class QStatusBar;
@@ -25,8 +27,6 @@ class QPushButton;
 class MyCameraView;
 class MyDetailView;
 class UsbCameraGroup;
-
-struct CameraFrame;
 
 /*
   这个类，主要用于录制视频的界面
@@ -74,7 +74,7 @@ private:
   //创建按钮
   void createWidget();
 
-  base::FilePath PreRecord(int id, const CameraFrame& frame);
+  void RecordFrame(CameraFrames& frames);
 protected:
   //属性
   QTimer*		mTimer;		//定时器触发

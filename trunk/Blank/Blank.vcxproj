@@ -57,6 +57,8 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;COMPONENT_BUILD;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);..\dependencies\ChromeBase;..\dependencies\OpenCV2.3.1\include;..\dependencies\OpenCV2.3.1\include\opencv;..\dependencies\JHCamera;..\dependencies\relay;..\dependencies\Qt5.3\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -80,6 +82,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);..\dependencies\ChromeBase;..\dependencies\OpenCV2.3.1\include;..\dependencies\OpenCV2.3.1\include\opencv;..\dependencies\JHCamera;..\dependencies\relay;..\dependencies\Qt5.3\include;$(IncludePath)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
