@@ -2,6 +2,8 @@
 #include <string>
 #include <map>
 
+#include "base/callback.h"
+#include "base/files/file_path.h"
 #include "base/memory/ref_counted.h"
 #include "base/memory/scoped_ptr.h"
 #include "base/message_loop/message_loop_proxy.h"
@@ -11,7 +13,9 @@
 class UsbCamera;
 class CameraGroupPump;
 
-class UsbCameraGroup : public CameraGroupPumpDelegate
+class UsbCameraGroup
+    : public CameraGroupPumpDelegate
+    , public base::RefCountedThreadSafe<UsbCameraGroup>
 {
 public:
   UsbCameraGroup();
@@ -45,8 +49,11 @@ public:
 
   void GetFrames(CameraFrames& frame_map);
 
-  /*bool StartRecord(CameraGroupRecordDelegate* delegate);
-  void StopRecord();*/
+  typedef base::Callback<base::FilePath(int, const CameraFrame&)>
+      PreRecordCallback;
+
+  void StartRecord(PreRecordCallback callback);
+  void StopRecord();
 
 protected:
   CameraMap cameras_;
@@ -58,4 +65,7 @@ protected:
   scoped_refptr<base::MessageLoopProxy> born_loop_;
 
   CameraFrames cached_frames_;
+
+  bool is_recording_;
+  PreRecordCallback pre_record_callback_;
 };

@@ -105,6 +105,8 @@ DWORD CameraPump::Context::PumpingThread(void* p) {
 void CameraPump::Context::PumpRunLoop() {
   bool start_seq = frame_.frame_seq;
   while (true) {
+    //base::TimeTicks ts = base::TimeTicks::Now();
+
     if (NeedStop()) break;
 
     if (delagate_ && !delagate_->BeforeFrame(camera_id_)) break;
@@ -120,10 +122,10 @@ void CameraPump::Context::PumpRunLoop() {
     if (NeedStop()) break;
 
     unsigned char* b = const_cast<unsigned char*>(buf->front());
-    base::TimeTicks ts = base::TimeTicks::Now();
+
     bool succ = camera_->CaptureFrameSync(true, b);
-    base::TimeDelta td = base::TimeTicks::Now() - ts;
-    LLX_INFO() << td.InMilliseconds();
+    frame_.time_stamp = base::TimeTicks::Now();
+
     if (NeedStop()) break;
 
     if (delagate_) {
@@ -138,6 +140,9 @@ void CameraPump::Context::PumpRunLoop() {
     if (delagate_ && !delagate_->AfterFrame(camera_id_)) break;
 
     if (NeedStop()) break;
+
+    // base::TimeDelta td = base::TimeTicks::Now() - ts;
+    // LLX_INFO() << td.InMilliseconds();
   }
 
   if (delagate_) delagate_->OnDone(camera_id_, frame_.frame_seq - start_seq);

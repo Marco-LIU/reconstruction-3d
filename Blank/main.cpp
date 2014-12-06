@@ -18,6 +18,7 @@
 #include "base/message_loop/message_loop.h"
 
 #include "runtime_context.h"
+#include "working_thread.h"
 
 #ifdef _DEBUG
 int main(int argc,char** argv)
@@ -33,6 +34,7 @@ int CALLBACK WinMain(
   base::AtExitManager at_exit;
   CommandLine::Init(0, NULL);
   LLX_INFO() << "Start";
+  LLX::AssureWorkingThreadStartup();
 
 #ifndef _DEBUG
   int argc = 0;
@@ -63,6 +65,8 @@ int CALLBACK WinMain(
   // 创建自己的消息循环
   base::MessageLoopForUI ui_ml;
   ui_ml.Run();
+
+  LLX::NotifyWorkingThreadShutdown();
 
   LLX_INFO() << "End";
 

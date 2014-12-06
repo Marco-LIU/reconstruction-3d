@@ -133,6 +133,12 @@
     <ClCompile Include="win_utils.cc">
       <Filter>utility</Filter>
     </ClCompile>
+    <ClCompile Include="thread_manager.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="working_thread.cc">
+      <Filter>utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mainwindow.h">
@@ -220,6 +226,12 @@
       <Filter>utility</Filter>
     </ClInclude>
     <ClInclude Include="win_utils.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="thread_manager.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="working_thread.h">
       <Filter>utility</Filter>
     </ClInclude>
   </ItemGroup>

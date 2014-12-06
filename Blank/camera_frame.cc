@@ -2,5 +2,9 @@
 #include "qt_utils.h"
 
 QImage CameraFrame::ToQImage() const {
-  return FromRawGray(data, width, height);
+  if (!cached_image.isNull())
+    return cached_image;
+
+  cached_image = FromRawGray(data, width, height);
+  return cached_image;
 }
