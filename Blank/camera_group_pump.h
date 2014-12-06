@@ -19,6 +19,8 @@ public:
   bool StartPumping();
   void StopPumping();
 
+  float FrameRate();
+
 private:
   class Context;
   scoped_refptr<Context> context_;

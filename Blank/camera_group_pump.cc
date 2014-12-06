@@ -37,6 +37,8 @@ public:
 
   virtual void OnDone(int id, unsigned int frames) OVERRIDE;
 
+  float FrameRate();
+
 private:
   static DWORD WINAPI PumpingThread(void* p);
 
@@ -50,6 +52,12 @@ private:
   // used in main thread
   UsbCameraGroup* camera_group_;
   unsigned int camera_count_;
+
+  // used in backgound thread
+  // 每5帧统计一次帧率
+  unsigned int frame_spin_;
+  base::Time last_tick_;
+  volatile float frame_rate_;
 
   // filled in each CameraPump thread, collected in backgroud thread
   CameraFrames frame_cache_;
@@ -160,6 +168,10 @@ void CameraGroupPump::Context::Stop() {
   }
 }
 //------------------------------------------------------------------------------
+float CameraGroupPump::Context::FrameRate() {
+  return frame_rate_;
+}
+//------------------------------------------------------------------------------
 bool CameraGroupPump::Context::IsPumping() const {
   // 是否正在运作
   if (!pumping_thread_) return false;
@@ -176,6 +188,9 @@ DWORD CameraGroupPump::Context::PumpingThread(void* p) {
 //------------------------------------------------------------------------------
 void CameraGroupPump::Context::PumpRunLoop() {
   bool need_stop = false;
+  frame_spin_ = 0;
+  last_tick_ = base::Time::Now();
+  frame_rate_ = -1;
   while (!NeedStop()) {
     //camera_group_->SoftTriggerAll();
     // 同时触发各个camera开始获取图像
@@ -240,6 +255,15 @@ bool CameraGroupPump::Context::NeedStop() {
 //------------------------------------------------------------------------------
 void CameraGroupPump::Context::NotifyNewFrame() {
   base::Time t = base::Time::Now();
+  base::TimeDelta td = t - last_tick_;
+  if (++frame_spin_ == 5) {
+    frame_rate_ = (float)(frame_spin_ * 1000 / (td.InMillisecondsF()));
+    frame_spin_ = 0;
+    last_tick_ = t;
+  } else if(frame_rate_ < 0) {
+    frame_rate_ = (float)(frame_spin_ * 1000 / (td.InMillisecondsF()));
+  }
+
   scoped_ptr<CameraFrames> frame_cache(new CameraFrames);
   {
     base::AutoLock al(lock_);
@@ -284,5 +308,10 @@ void CameraGroupPump::StopPumping() {
   if (IsPumping() && context_.get()) {
     context_->Stop();
   }
+}
+//------------------------------------------------------------------------------
+float CameraGroupPump::FrameRate() {
+  if (!IsPumping() || !context_.get()) return 0.0f;
+  return context_->FrameRate();
 }
 //------------------------------------------------------------------------------

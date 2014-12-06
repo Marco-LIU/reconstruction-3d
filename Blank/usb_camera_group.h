@@ -53,6 +53,8 @@ public:
 
   void SetFrameCallback(FrameCallback callback);
 
+  float FrameRate();
+
 protected:
   CameraMap cameras_;
 
