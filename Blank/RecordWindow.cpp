@@ -36,12 +36,17 @@
 #include "base/callback.h"
 #include "base/bind.h"
 #include "base/strings/string_number_conversions.h"
+#include "base/files/file_util.h"
 
+#include "runtime_context.h"
+#include "working_thread.h"
 #include "usb_camera_group.h"
 #include "camera_frame.h"
 #include "myCameraView.h"
 #include "marker.h"
 #include "paras.h"
+
+using LLX::WorkingThread;
 
 RecordWindow::RecordWindow(QGraphicsScene* scene, QGraphicsPixmapItem* left,
                            QGraphicsPixmapItem* right, QStatusBar* status) {
@@ -141,6 +146,8 @@ void RecordWindow::preview() {
     //成功启动
     else {
       mCameras->StartAll();
+
+      mCameras->SetFrameCallback(base::Bind(&RecordWindow::RecordFrame, base::Unretained(this)));
       //切换其它按钮状态
       mbPlay = true;
       mRecord->setEnabled(true);
@@ -249,8 +256,6 @@ void RecordWindow::recordVedio() {
     mRecord->setText("暂停");
 
     mStatusBar->showMessage("正在录制");
-    mCameras->StartRecord(
-        base::Bind(&RecordWindow::PreRecord, base::Unretained(this)));
   }
   //切换到暂停状态
   else {
@@ -258,7 +263,6 @@ void RecordWindow::recordVedio() {
     mRecord->setText("录制");
 
     mStatusBar->showMessage("暂停录制");
-    mCameras->StopRecord();
   }
 }
 //结束录制视频
@@ -422,16 +426,37 @@ void RecordWindow::createWidget() {
   mCtrlLayout->addWidget(mRecordFolder);
 }
 
-base::FilePath RecordWindow::PreRecord(int id, const CameraFrame& frame) {
+namespace {
+  static void SaveImage(QImage image, const base::FilePath& path) {
+    base::FilePath p = MakeAbsoluteFilePath(path);
+    bool s = image.save(QString::fromWCharArray(p.value().c_str()));
+    LLX_INFO() << "Save image to " << p.value().c_str()
+      << " " << (s ? "DONE" : "FAIL");
+  }
+}
+
+void RecordWindow::RecordFrame(CameraFrames& frames) {
+  if(!mbRecord) return;
+
   base::FilePath dir(Paras::getSingleton().ImagesFoler.toStdWString());
+  ++mRecordCnt;
+  CameraFrames::iterator it = frames.begin();
+  while(it != frames.end()) {
+    base::FilePath d = dir;
+    if (it->first == 1)
+      d = dir.Append(L"right");
+    else if (it->first == 0)
+      d = dir.Append(L"left");
+    else continue;
 
-  if (id == 1)
-    dir = dir.Append(L"right");
-  else
-    dir = dir.Append(L"left");
+    std::wstring filename = base::UintToString16(mRecordCnt) + L"_" +
+      base::Int64ToString16(it->second.time_stamp.ToInternalValue()) + L".jpg";
 
-  std::wstring filename = base::UintToString16(frame.frame_seq) + L"_" +
-      base::Int64ToString16(frame.time_stamp.ToInternalValue()) + L".jpg";
+    d = d.Append(filename);
 
-  return dir.Append(filename);
+    WorkingThread::PostTask(LLX::WorkingThread::FILE, FROM_HERE,
+                            base::Bind(&SaveImage, it->second.ToQImage(), d));
+
+    ++it;
+  }
 }

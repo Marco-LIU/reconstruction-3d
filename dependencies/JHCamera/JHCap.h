@@ -141,9 +141,9 @@ Description: Set the image format
 Parameters:device_id, the camera index
 		   format, options are CAMERA_IMAGE_RAW8 / CAMERA_IMAGE_GRAY8 /
                                 CAMERA_IMAGE_RGB24 / CAMERA_IMAGE_BGR /
-                                CAMERA_IMAGE_BMP  /  CAMERA_IMAGE_STRETCH
+                                CAMERA_IMAGE_GRAY8  /  CAMERA_IMAGE_STRETCH
 Return: returns API_OK on success, otherwise returns API_ERROR.
-Note:the default image format is CAMERA_IMAGE_BMP
+Note:the default image format is CAMERA_IMAGE_GRAY8
  --------------------------------------------------------------*/
 
 extern "C" DLL_EXPORT API_STATUS __stdcall CameraSetOption(int device_id,int format);
@@ -155,9 +155,9 @@ Description: Set the image format
 Parameters: device_id, the camera index
 			format, options are CAMERA_IMAGE_RAW8 / CAMERA_IMAGE_GRAY8 /
                                 CAMERA_IMAGE_RGB24 / CAMERA_IMAGE_BGR /
-                                CAMERA_IMAGE_BMP  /  CAMERA_IMAGE_STRETCH
+                                CAMERA_IMAGE_GRAY8  /  CAMERA_IMAGE_STRETCH
 Return: returns API_OK on success, otherwise returns API_ERROR.
-Note:the default image format is CAMERA_IMAGE_BMP (CAMERA_IMAGE_RGB24 | CAMERA_IMAGE_BGR)
+Note:the default image format is CAMERA_IMAGE_GRAY8 (CAMERA_IMAGE_RGB24 | CAMERA_IMAGE_BGR)
  --------------------------------------------------------------*/
 
 extern "C" DLL_EXPORT API_STATUS __stdcall CameraGetOption(int device_id,int *format);

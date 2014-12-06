@@ -130,7 +130,7 @@ void CameraPump::Context::PumpRunLoop() {
     unsigned char* b = const_cast<unsigned char*>(buf->front());
     // ¶ÁÈ¡Êý¾Ý
     bool succ = camera_->CaptureFrameSync(true, b);
-    frame_.time_stamp = base::TimeTicks::Now();
+    frame_.time_stamp = base::Time::Now();
 
     if (NeedStop()) break;
 
