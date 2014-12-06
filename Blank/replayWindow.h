@@ -14,6 +14,8 @@
 
 #include <vector>
 
+#include "frame_record.h"
+
 class QGraphicsScene;
 class QGraphicsPixmapItem;
 class QStatusBar;
@@ -76,6 +78,8 @@ protected:
   QTimer*			mTimer;				//定时器触发
   std::vector<int> mAllIndex;			//记录所有照片的索引
   std::vector<int> mAllTimes;			//记录所有照片的拍摄时间
+
+  RecordedFrames frames_;
 
   //按钮
   QLabel*			mTime;				//显示时间

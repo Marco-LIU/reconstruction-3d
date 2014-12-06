@@ -33,6 +33,8 @@
 #include <QtGui\qevent.h>
 #include <QtGui\qpainter.h>
 
+#include "base/files/file_path.h"
+
 #include "UsbCameras.h"
 #include "myCameraView.h"
 #include "marker.h"
@@ -89,7 +91,7 @@ void ReplayWindow::updateImage(int value) {
   int hour = length / 3600;
   int minute = (length - hour * 3600) / 60;
   int second = length - hour * 3600 - minute * 60;
-  int ct = mAllTimes[value - mStartIndex];
+  int ct = frames_[0][value].time_stamp.ToInternalValue() / 1000;
   int cl = (ct - mStartTime) / 1000;
   int hl = cl / 3600;
   int ml = (cl - hl * 3600) / 60;
@@ -122,8 +124,43 @@ void ReplayWindow::open() {
     mAllIndex.clear();
     mAllTimes.clear();
 
+    frames_.clear();
+
+    base::FilePath path(selectFile.toStdWString());
+
+    if (LoadRecordedFrames(path.DirName(), frames_)) {
+      mStartIndex = frames_[0].front().frame_seq;
+      mEndIndex = frames_[0].back().frame_seq;
+      mStartTime = frames_[0].front().time_stamp.ToInternalValue() / 1000;
+      mEndTime = frames_[0].back().time_stamp.ToInternalValue() / 1000;
+
+      mbOpen = true;
+      mbPlay = false;
+
+      //载入第一帧率
+      int length = (mEndTime - mStartTime) / 1000;	//转换为秒
+      int hour = length / 3600;
+      int minute = (length - hour * 3600) / 60;
+      int second = length - hour * 3600 - minute * 60;
+      QString tt;
+      tt.sprintf("0:0:0/%d:%d:%d", hour, minute, second);
+      mTime->setText(tt);
+      mTime->setEnabled(true);
+      mPlay->setEnabled(true);
+      mNext->setEnabled(true);
+      mBefore->setEnabled(true);
+      mSlider->setMinimum(mStartIndex);
+      mSlider->setMaximum(mEndIndex);
+      mSlider->setValue(mStartIndex);
+      mSlider->setTickInterval((mEndIndex - mStartIndex) / 10);
+      mSlider->setEnabled(true);
+      loadImage(mStartIndex);
+
+      //todo 是否缓存图像
+    }
+
     //读取文件内容
-    QFile file(selectFile);
+    /*QFile file(selectFile);
     file.open(QIODevice::ReadWrite);
     QTextStream ts(&file);
     int i1, i2;
@@ -137,37 +174,13 @@ void ReplayWindow::open() {
     mImagesFoler = tfi.absolutePath();
     mLeftImagesFoler = mImagesFoler + "/left/";
     mRightImagesFoler = mImagesFoler + "/right/";
-    file.close();
+    file.close();*/
 
     //设置相关参数
-    mStartIndex = mAllIndex.front();
+    /*mStartIndex = mAllIndex.front();
     mEndIndex = mAllIndex.back();
     mStartTime = mAllTimes.front();
-    mEndTime = mAllTimes.back();
-
-    mbOpen = true;
-    mbPlay = false;
-
-    //载入第一帧率
-    int length = (mEndTime - mStartTime) / 1000;	//转换为秒
-    int hour = length / 3600;
-    int minute = (length - hour * 3600) / 60;
-    int second = length - hour * 3600 - minute * 60;
-    QString tt;
-    tt.sprintf("0:0:0/%d:%d:%d", hour, minute, second);
-    mTime->setText(tt);
-    mTime->setEnabled(true);
-    mPlay->setEnabled(true);
-    mNext->setEnabled(true);
-    mBefore->setEnabled(true);
-    mSlider->setMinimum(mStartIndex);
-    mSlider->setMaximum(mEndIndex);
-    mSlider->setValue(mStartIndex);
-    mSlider->setTickInterval((mEndIndex - mStartIndex) / 10);
-    mSlider->setEnabled(true);
-    loadImage(mStartIndex);
-
-    //todo 是否缓存图像
+    mEndTime = mAllTimes.back();*/
   }
 }
 //播放视频
@@ -213,14 +226,16 @@ void ReplayWindow::before() {
 }
 //载入索引所指的图像
 void ReplayWindow::loadImage(int i) {
-  QImage li, ri;
+  /*QImage li, ri;
   QString name;
   name.sprintf("%d.jpg", i);
   li.load(mLeftImagesFoler + name);
   ri.load(mRightImagesFoler + name);
   mLeftCameraPixmap->setPixmap(QPixmap::fromImage(li));
-  mRightCameraPixmap->setPixmap(QPixmap::fromImage(ri));
+  mRightCameraPixmap->setPixmap(QPixmap::fromImage(ri));*/
 
+  mLeftCameraPixmap->setPixmap(QPixmap::fromImage(frames_[0][i].ToQImage()));
+  mRightCameraPixmap->setPixmap(QPixmap::fromImage(frames_[1][i].ToQImage()));
   //更新图像
   update();
 }

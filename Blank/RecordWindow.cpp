@@ -47,6 +47,7 @@
 #include "myCameraView.h"
 #include "marker.h"
 #include "paras.h"
+#include "frame_record.h"
 
 using LLX::WorkingThread;
 
