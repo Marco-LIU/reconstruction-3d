@@ -181,7 +181,7 @@ void MainWindow::setGainExpo()
 void MainWindow::setLeftCameraGain()
 {
 	//显示当前值，刘浏加上
-	int cur = 10;
+	int cur = Paras::getSingletonPtr()->left_gain_;
 
 	//设置新值
 	int nv = QInputDialog::getInt(
@@ -193,13 +193,13 @@ void MainWindow::setLeftCameraGain()
 		255);
 
 	//设置左摄像机为新值，刘浏加上
-
+  Paras::getSingletonPtr()->SetLeftGain(nv);
 }
 
 void MainWindow::setLeftCameraExpo()
 {
 	//显示当前值，刘浏加上
-	int cur = 10;
+  int cur = Paras::getSingletonPtr()->left_expo_;
 
 	//设置新值
 	int nv = QInputDialog::getInt(
@@ -211,13 +211,13 @@ void MainWindow::setLeftCameraExpo()
 		4000);
 
 	//设置左摄像机为新值，刘浏加上
-
+  Paras::getSingletonPtr()->SetLeftExpo(nv);
 }
 
 void MainWindow::setRightCameraGain()
 {
 	//显示当前值，刘浏加上
-	int cur = 10;
+  int cur = Paras::getSingletonPtr()->right_gain_;
 
 	//设置新值
 	int nv = QInputDialog::getInt(
@@ -229,25 +229,25 @@ void MainWindow::setRightCameraGain()
 		255);
 
 	//设置左摄像机为新值，刘浏加上
-
+  Paras::getSingletonPtr()->SetRightGain(nv);
 }
 
 void MainWindow::setRightCameraExpo()
 {
 	//显示当前值，刘浏加上
-	int cur = 10;
+  int cur = Paras::getSingletonPtr()->right_expo_;
 
 	//设置新值
 	int nv = QInputDialog::getInt(
 		0,
-		QString::fromWCharArray(L"设置左摄像头曝光"),
-		QString::fromWCharArray(L"设置左摄像头曝光："),
+		QString::fromWCharArray(L"设置右摄像头曝光"),
+		QString::fromWCharArray(L"设置右摄像头曝光："),
 		cur,
 		0,
 		4000);
 
 	//设置左摄像机为新值，刘浏加上
-
+  Paras::getSingletonPtr()->SetRightExpo(nv);
 }
 void MainWindow::iniParas() {
   //设置窗口，初始位置和最小大小

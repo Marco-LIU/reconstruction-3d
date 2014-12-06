@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+
 #include "base/time/time.h"
 #include "base/files/file_path.h"
 #include "base/containers/hash_tables.h"
@@ -18,4 +20,8 @@ struct FrameRecord {
   void Purge();
 };
 
-typedef base::hash_map<int, FrameRecord> FramesRecord;
+typedef std::vector<FrameRecord> FrameRecords;
+
+typedef base::hash_map<int, FrameRecords> RecordedFrames;
+
+bool LoadRecordedFrames(const base::FilePath& dir, RecordedFrames& frames);

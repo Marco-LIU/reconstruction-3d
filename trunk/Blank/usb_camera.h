@@ -4,7 +4,11 @@
 
 #include "base/memory/ref_counted.h"
 
-class UsbCamera : public base::RefCountedThreadSafe<UsbCamera>
+#include "paras.h"
+
+class UsbCamera
+    : public ParaObserver
+    , public base::RefCountedThreadSafe<UsbCamera>
 {
 public:
   UsbCamera(int index);
@@ -27,7 +31,7 @@ public:
   int index() const { return index_; }
   //返回索引指定的摄像机id
   int id() const { return id_; }
-  void SetId(int id) { id_ = id; }
+  void SetId(int id);
   //返回索引指定的摄像机的sn
   std::string sn() const { return sn_; }
   //返回系统中可以使用的摄像机的个数
@@ -60,6 +64,9 @@ public:
   bool IsAsyncSuccess(HANDLE handle);
 
   bool async_capturing() const { return async_capturing_ != 0; }
+
+  virtual void OnGainChanged(int id, int gain) OVERRIDE;
+  virtual void OnExposureChanged(int id, int expo) OVERRIDE;
 
 protected:
   unsigned int buffer_length_;    // 缓存大小

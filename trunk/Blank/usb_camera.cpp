@@ -4,19 +4,23 @@
 #include <iostream>
 
 UsbCamera::UsbCamera(int index)
-  : index_(index)
-  , id_(0)
-  , buffer_(NULL)
-  , async_capturing_(0) {}
+    : index_(index)
+    , id_(0)
+    , buffer_(NULL)
+    , async_capturing_(0) {
+  Paras::getSingletonPtr()->AddOb(this);
+}
 
 UsbCamera::UsbCamera(int index, int id)
     : index_(index)
     , id_(id)
     , buffer_(NULL)
     , async_capturing_(0) {
+  Paras::getSingletonPtr()->AddOb(this);
 }
 
 UsbCamera::~UsbCamera() {
+  Paras::getSingletonPtr()->RemoveOb(this);
   if (buffer_) delete[] buffer_;
   Stop();
   CameraFree(index_);
@@ -68,6 +72,24 @@ bool UsbCamera::Init(int resolution_index) {
 
   return true;
 }
+
+void UsbCamera::SetId(int id) {
+  id_ = id;
+
+  int gain = 0;
+  CameraGetGain(index_, &gain);
+  int expo = 0;
+  CameraGetExposure(index_, &expo);
+
+  if (id_ == 0) {
+    Paras::getSingletonPtr()->left_gain_ = gain;
+    Paras::getSingletonPtr()->left_expo_ = expo;
+  } else if (id_ == 1) {
+    Paras::getSingletonPtr()->right_gain_ = gain;
+    Paras::getSingletonPtr()->right_expo_ = expo;
+  }
+}
+
 int UsbCamera::GetGain() const {
   int gain;
   API_STATUS status = CameraGetGain(index_, &gain);
@@ -187,4 +209,16 @@ bool UsbCamera::IsAsyncSuccess(HANDLE handle) {
     return exit_code == 0;
   }
   return false;
+}
+
+void UsbCamera::OnGainChanged(int id, int gain) {
+  if (id_ == id) {
+    CameraSetGain(index_, gain);
+  }
+}
+
+void UsbCamera::OnExposureChanged(int id, int expo) {
+  if (id_ == id) {
+    CameraSetExposure(index_, expo);
+  }
 }

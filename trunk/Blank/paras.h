@@ -167,6 +167,7 @@ Test::getSingletonPtr()->show();
 
 #include <QtCore\qstring.h>
 #include <QtGui\qpixmap.h>
+#include <set>
 
 //定义一个单件类
 template<typename T> 
@@ -194,6 +195,8 @@ public:
 	{ return ms_Singleton; }
 };
 
+class ParaObserver;
+
 //这个类保存了程序中所有要使用的参数
 class Paras : public Singleton<Paras>
 {
@@ -205,9 +208,34 @@ public:
 	QString		ImagesFoler;		//总文件夹
 	QPixmap		LeftBlankImg;		//左空白图像
 	QPixmap		RightBlankImg;		//右空白图像
+
+  int left_gain_;
+  int right_gain_;
+  int left_expo_;
+  int right_expo_;
+
+public:
+  void SetLeftGain(int gain);
+  void SetLeftExpo(int expo);
+  void SetRightGain(int gain);
+  void SetRightExpo(int expo);
+
 public:
 	static Paras& getSingleton(void);
 	static Paras* getSingletonPtr(void);
+
+public:
+  void AddOb(ParaObserver* ob);
+  void RemoveOb(ParaObserver* ob);
+
+private:
+  std::set<ParaObserver*> observers_;
+};
+
+class ParaObserver {
+public:
+  virtual void OnGainChanged(int id, int gain) {}
+  virtual void OnExposureChanged(int id, int expo) {}
 };
 
 #endif
