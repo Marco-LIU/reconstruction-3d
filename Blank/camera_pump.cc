@@ -47,7 +47,7 @@ CameraPump::Context::Context(scoped_refptr<UsbCamera> camera,
     , thread_handle_(NULL) {
   DCHECK(camera_.get());
   DCHECK(delagate_);
-
+  // 初始化
   camera_id_ = camera_->id();
   buffer_length_ = camera_->buffer_length();
   frame_.width = camera_->width();
@@ -63,6 +63,7 @@ CameraPump::Context::~Context() {
 }
 //------------------------------------------------------------------------------
 bool CameraPump::Context::IsPumping() const {
+  // 是否正在运行
   if (!thread_handle_) return false;
   return base::subtle::NoBarrier_Load(&stop_event_) == 0;
 }
@@ -70,7 +71,9 @@ bool CameraPump::Context::IsPumping() const {
 bool CameraPump::Context::Start() {
   DCHECK(camera_.get());
 
+  // 初始化停止事件
   base::subtle::NoBarrier_Store(&stop_event_, 0);
+  // balanced at end of thread
   AddRef();
   thread_handle_ = ::CreateThread(NULL, 0,
                                 &Context::PumpingThread, this, 0, NULL);
@@ -82,8 +85,10 @@ bool CameraPump::Context::Start() {
 }
 //------------------------------------------------------------------------------
 void CameraPump::Context::Stop() {
+  // 通知子线程停止
   base::subtle::NoBarrier_Store(&stop_event_, 1);
   if (thread_handle_) {
+    // 等待子线程退出
     DWORD wait_result = ::WaitForSingleObject(thread_handle_, 2000);
     if (WAIT_OBJECT_0 != wait_result) {
       ::TerminateThread(thread_handle_, 255);
@@ -108,12 +113,13 @@ void CameraPump::Context::PumpRunLoop() {
     //base::TimeTicks ts = base::TimeTicks::Now();
 
     if (NeedStop()) break;
-
+    // 一帧即将开始
     if (delagate_ && !delagate_->BeforeFrame(camera_id_)) break;
 
     if (NeedStop()) break;
 
     scoped_refptr<base::RefCountedBytes> buf;
+    // 即将读取数据
     if (delagate_) buf = delagate_->WillRead(camera_id_, buffer_length_);
     if (!buf.get()) {
       buf = CameraPump::NewBuffer(buffer_length_);
@@ -122,12 +128,13 @@ void CameraPump::Context::PumpRunLoop() {
     if (NeedStop()) break;
 
     unsigned char* b = const_cast<unsigned char*>(buf->front());
-
+    // 读取数据
     bool succ = camera_->CaptureFrameSync(true, b);
     frame_.time_stamp = base::TimeTicks::Now();
 
     if (NeedStop()) break;
 
+    // 采集了一帧的数据
     if (delagate_) {
       frame_.data = succ ? buf : scoped_refptr<base::RefCountedBytes>();
       delagate_->OnFrame(camera_id_, frame_);
@@ -137,6 +144,7 @@ void CameraPump::Context::PumpRunLoop() {
 
     if (NeedStop()) break;
 
+    // 一帧采集完成
     if (delagate_ && !delagate_->AfterFrame(camera_id_)) break;
 
     if (NeedStop()) break;

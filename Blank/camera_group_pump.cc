@@ -18,12 +18,14 @@ class CameraGroupPump::Context
 public:
   Context(UsbCameraGroup* camera_group, CameraGroupPumpDelegate* delegate);
   ~Context();
-
+  // 开始
   bool Start();
+  // 停止
   void Stop();
 
   bool IsPumping() const;
 
+  // 实现CameraPumpDelegate
   virtual bool BeforeFrame(int id) OVERRIDE;
 
   virtual scoped_refptr<base::RefCountedBytes> WillRead(
@@ -91,6 +93,7 @@ bool CameraGroupPump::Context::Start() {
   if (!camera_count_) return false;
   do
   {
+    // 为各个摄像头创建pump
     pump_map_.clear();
     const UsbCameraGroup::CameraMap& cameras = camera_group_->cameras();
 
@@ -102,14 +105,19 @@ bool CameraGroupPump::Context::Start() {
       ++cit;
     }
 
+    // 创建同步信号量
     semaphore_ = ::CreateSemaphoreW(NULL, 0, camera_count_, NULL);
     if (!semaphore_) break;
 
+    // 初始化
     base::subtle::NoBarrier_Store(&stop_event_, 0);
+    // 空闲摄像头数目
     base::subtle::NoBarrier_Store(&free_cameras_, 0);
 
+    // balance at end of thread
     AddRef();
 
+    // 创建子线程
     pumping_thread_ = ::CreateThread(NULL, 0,
                                      &Context::PumpingThread, this, 0, NULL);
 
@@ -129,6 +137,7 @@ bool CameraGroupPump::Context::Start() {
 }
 //------------------------------------------------------------------------------
 void CameraGroupPump::Context::Stop() {
+  // 停止各个摄像头的pump
   base::hash_map<int, linked_ptr<CameraPump> >::iterator it =
       pump_map_.begin();
   while (it != pump_map_.end()) {
@@ -136,9 +145,10 @@ void CameraGroupPump::Context::Stop() {
     ++it;
   }
   pump_map_.clear();
-
+  // 通知后台线程退出
   base::subtle::NoBarrier_Store(&stop_event_, 1);
 
+  // 等待后台线程退出完成
   if (pumping_thread_) {
     DWORD wait_result = ::WaitForSingleObject(pumping_thread_, 2000);
     if (WAIT_OBJECT_0 != wait_result) {
@@ -151,6 +161,7 @@ void CameraGroupPump::Context::Stop() {
 }
 //------------------------------------------------------------------------------
 bool CameraGroupPump::Context::IsPumping() const {
+  // 是否正在运作
   if (!pumping_thread_) return false;
   return base::subtle::NoBarrier_Load(&stop_event_) == 0;
 }
@@ -167,12 +178,15 @@ void CameraGroupPump::Context::PumpRunLoop() {
   bool need_stop = false;
   while (!NeedStop()) {
     //camera_group_->SoftTriggerAll();
+    // 同时触发各个camera开始获取图像
     ::ReleaseSemaphore(semaphore_, camera_count_, NULL);
 
     while (true) {
+      // 等待各个camera获取图像完成
       if (camera_count_ == base::subtle::NoBarrier_CompareAndSwap(
           &free_cameras_, camera_count_, 0))
         break;
+      // 是否需要停止
       if (NeedStop()) {
         need_stop = true;
         break;
@@ -180,13 +194,14 @@ void CameraGroupPump::Context::PumpRunLoop() {
       ::Sleep(1);
     }
     if (need_stop) break;
-
+    // 到这里完成了一帧的收集
     NotifyNewFrame();
   }
 }
 //------------------------------------------------------------------------------
 bool CameraGroupPump::Context::BeforeFrame(int id) {
   while (true) {
+    // 等待一帧的开始信号
     if (WAIT_OBJECT_0 == WaitForSingleObject(semaphore_, 0)) return true;
     if (NeedStop()) return false;
     ::Sleep(1);
@@ -194,16 +209,19 @@ bool CameraGroupPump::Context::BeforeFrame(int id) {
 }
 //------------------------------------------------------------------------------
 scoped_refptr<base::RefCountedBytes> CameraGroupPump::Context::WillRead(
-  int id, unsigned int len) {
+    int id, unsigned int len) {
+  // 创建缓存
   return CameraPump::NewBuffer(len);
 }
 //------------------------------------------------------------------------------
 void CameraGroupPump::Context::OnFrame(int id, const CameraFrame& frame) {
+  // 摄像头获取了一帧，需要对frame_cache_加锁
   base::AutoLock al(lock_);
   frame_cache_[id] = frame;
 }
 //------------------------------------------------------------------------------
 bool CameraGroupPump::Context::AfterFrame(int id) {
+  // 表示摄像头空闲
   base::subtle::NoBarrier_AtomicIncrement(&free_cameras_, 1);
   return true;
 }
@@ -224,6 +242,7 @@ void CameraGroupPump::Context::NotifyNewFrame() {
   scoped_ptr<CameraFrames> frame_cache(new CameraFrames);
   {
     base::AutoLock al(lock_);
+    // 理论上能获为每个摄像头获取一帧
     DCHECK_EQ(camera_count_, (unsigned int)frame_cache_.size());
     frame_cache->swap(frame_cache_);
   }
