@@ -2,7 +2,7 @@
 
 #include "base/atomicops.h"
 #include "base/memory/linked_ptr.h"
-#include "base/synchronization/lock.h";
+#include "base/synchronization/lock.h"
 
 #include "camera_frame.h"
 #include "camera_pump.h"
@@ -239,6 +239,7 @@ bool CameraGroupPump::Context::NeedStop() {
 }
 //------------------------------------------------------------------------------
 void CameraGroupPump::Context::NotifyNewFrame() {
+  base::Time t = base::Time::Now();
   scoped_ptr<CameraFrames> frame_cache(new CameraFrames);
   {
     base::AutoLock al(lock_);
@@ -246,6 +247,12 @@ void CameraGroupPump::Context::NotifyNewFrame() {
     DCHECK_EQ(camera_count_, (unsigned int)frame_cache_.size());
     frame_cache->swap(frame_cache_);
   }
+  CameraFrames::iterator it = frame_cache->begin();
+  while (it != frame_cache->end()) {
+    it->second.sync_stamp = t;
+    ++it;
+  }
+
   if (delegate_) delegate_->OnFrame(frame_cache.Pass());
 }
 //------------------------------------------------------------------------------

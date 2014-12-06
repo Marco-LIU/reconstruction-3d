@@ -11,6 +11,7 @@ struct CameraFrame {
   unsigned int height;
   short bpp;
   base::Time time_stamp;
+  base::Time sync_stamp;
   scoped_refptr<base::RefCountedBytes> data;
 
   mutable QImage cached_image;
