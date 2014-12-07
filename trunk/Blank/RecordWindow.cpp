@@ -142,7 +142,7 @@ void RecordWindow::preview() {
     //如果启动失败，提示摄像机没有连接好
     if (!succ || mCameras->camera_count() != 2) {
       mCameras = NULL;
-      mPlay->setText("停止");
+      mPlay->setText("未连接");
       QMessageBox::critical(
         0,							//父窗口
         "找不到可用的摄像头",		//标题栏
