@@ -81,13 +81,8 @@ void UsbCamera::SetId(int id) {
   int expo = 0;
   CameraGetExposure(index_, &expo);
 
-  if (id_ == 0) {
-    Paras::getSingletonPtr()->left_gain_ = gain;
-    Paras::getSingletonPtr()->left_expo_ = expo;
-  } else if (id_ == 1) {
-    Paras::getSingletonPtr()->right_gain_ = gain;
-    Paras::getSingletonPtr()->right_expo_ = expo;
-  }
+  Paras::getSingletonPtr()->SetGain(id_, gain, false);
+  Paras::getSingletonPtr()->SetExpo(id_, expo, false);
 }
 
 int UsbCamera::GetGain() const {
