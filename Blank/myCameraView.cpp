@@ -1,11 +1,13 @@
 #include "myCameraView.h"
 
 #include <iostream>
+#include "runtime_context.h"
 
 //rect对应场景中要显示的矩形区域
 MyDetailView::MyDetailView(QGraphicsScene * parent, QRect rect)
   : QGraphicsView(parent) {
   //设置基本属性
+  //mScaleFactor = 1.0f;
   mScene = parent;
   mbDragging = false;
   mbZoomMode = true;
@@ -54,6 +56,10 @@ void MyDetailView::resizeEvent(QResizeEvent * event) {
   QSize oldSize = event->oldSize();
   QSize curSize = event->size();
 
+  LLX_INFO() << (int)this << " Resized: " << "old(" << oldSize.width() << ", "
+    << oldSize.height() << ") " << "new(" << curSize.width()
+    << ", " << curSize.height() << ")";
+
   //更新最小缩放比例
   if (curSize.width() > 0) {
     float scaleHeight = (float)curSize.height() / mViewRect.height();
@@ -80,6 +86,8 @@ void MyDetailView::resizeEvent(QResizeEvent * event) {
 
     //更新缩放系数
     mScaleFactor = mScaleFactor*ms;
+  } else {
+    mScaleFactor = mMinScale;
   }
 
   if (mScaleFactor < mMinScale)
@@ -89,6 +97,9 @@ void MyDetailView::resizeEvent(QResizeEvent * event) {
 
   QTransform t(mScaleFactor, 0, 0, mScaleFactor, 0, 0);
   setTransform(t);
+
+  LLX_INFO() << "scale: " << mScaleFactor << ", max-scale: "
+    << mMaxScale << ", min-scale: " << mMinScale;
 
   //更新对应的指示矩形
   updateRect();
@@ -307,7 +318,8 @@ void MyDetailView::updateRect() {
 }
 
 //rect对应场景中要显示的矩形区域
-MyCameraView::MyCameraView(QGraphicsScene * parent, QRect rect) :QGraphicsView(parent) {
+MyCameraView::MyCameraView(QGraphicsScene * parent, QRect rect)
+    : QGraphicsView(parent) {
   mZoomView = NULL;
   mScene = parent;
   mViewRect = rect;
