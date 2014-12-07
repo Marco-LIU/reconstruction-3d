@@ -243,5 +243,6 @@
     <ClInclude Include="frame_record.h">
       <Filter>camera</Filter>
     </ClInclude>
+    <ClInclude Include="build_config.h" />
   </ItemGroup>
 </Project>

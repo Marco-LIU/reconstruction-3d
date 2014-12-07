@@ -1,4 +1,5 @@
 #include "camera_pump.h"
+#include "build_config.h"
 
 #include <vector>
 
@@ -110,7 +111,9 @@ DWORD CameraPump::Context::PumpingThread(void* p) {
 void CameraPump::Context::PumpRunLoop() {
   bool start_seq = frame_.frame_seq;
   while (true) {
-    //base::TimeTicks ts = base::TimeTicks::Now();
+#if ENABLE_CAMERA_PUMP_PROFILE
+    base::TimeTicks frame_start = base::TimeTicks::Now();
+#endif
 
     if (NeedStop()) break;
     // 一帧即将开始
@@ -126,12 +129,18 @@ void CameraPump::Context::PumpRunLoop() {
     }
 
     if (NeedStop()) break;
-
+#if ENABLE_CAMERA_PUMP_PROFILE
+    base::Time before_capture = base::Time::Now();
+#endif
     unsigned char* b = const_cast<unsigned char*>(buf->front());
     // 读取数据
     bool succ = camera_->CaptureFrameSync(true, b);
     frame_.time_stamp = base::Time::Now();
-
+#if ENABLE_CAMERA_PUMP_PROFILE
+    base::TimeDelta capture_cost = frame_.time_stamp - before_capture;
+    LLX_INFO() << "Camera " << camera_id_ << " capture a image, cost: "
+        << capture_cost.InMilliseconds();
+#endif
     if (NeedStop()) break;
 
     // 采集了一帧的数据
@@ -148,9 +157,11 @@ void CameraPump::Context::PumpRunLoop() {
     if (delagate_ && !delagate_->AfterFrame(camera_id_)) break;
 
     if (NeedStop()) break;
-
-    // base::TimeDelta td = base::TimeTicks::Now() - ts;
-    // LLX_INFO() << td.InMilliseconds();
+#if ENABLE_CAMERA_PUMP_PROFILE
+    base::TimeDelta frame_cost = base::TimeTicks::Now() - frame_start;
+    LLX_INFO() << "Camera " << camera_id_ << " done a capture pass, cost: "
+        << frame_cost.InMilliseconds();
+#endif
   }
 
   if (delagate_) delagate_->OnDone(camera_id_, frame_.frame_seq - start_seq);
