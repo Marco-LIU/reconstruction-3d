@@ -122,6 +122,8 @@ void MeasureMarkersWindow::updatePixmap(unsigned char* leftBuffer,
 }
 
 void MeasureMarkersWindow::updatePixmap(QImage& li, QImage& ri) {
+  mLastLeft = li;
+  mLastRight = ri;
   mLeftCameraPixmap->setPixmap(QPixmap::fromImage(li));
   mRightCameraPixmap->setPixmap(QPixmap::fromImage(ri));
   //¸üĞÂÍ¼Ïñ

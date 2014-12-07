@@ -98,6 +98,8 @@ void ManualWindow::updatePixmap(unsigned char* leftBuffer, unsigned char* rightB
 }
 
 void ManualWindow::updatePixmap(QImage& li, QImage& ri) {
+  mLeftImg = li;
+  mRightImg = ri;
   mLeftCameraPixmap->setPixmap(QPixmap::fromImage(li));
   mRightCameraPixmap->setPixmap(QPixmap::fromImage(ri));
   //¸üĞÂÍ¼Ïñ

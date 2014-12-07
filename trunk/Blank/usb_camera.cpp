@@ -23,7 +23,6 @@ UsbCamera::~UsbCamera() {
   Paras::getSingletonPtr()->RemoveOb(this);
   if (buffer_) delete[] buffer_;
   Stop();
-  CameraFree(index_);
 }
 
 bool UsbCamera::Init(int resolution_index) {
@@ -45,6 +44,8 @@ bool UsbCamera::Init(int resolution_index) {
   result = CameraSetResolution(index_, resolution_index, &width, &height);
   width_ = width;
   height_ = height;
+
+  ::Sleep(20);
 
   //设置增益32，减少噪声
   CameraSetAGC(index_, false);
@@ -127,6 +128,7 @@ bool UsbCamera::Start() {
 
 void UsbCamera::Stop() {
   CameraStop(index_);
+  CameraFree(index_);
 }
 
 bool UsbCamera::SoftTrigger() {
@@ -144,8 +146,9 @@ bool UsbCamera::CaptureFrameSync(bool use_trigger,
   int len = buffer_length_;
   if (!buffer)
     buffer = buffer_;
+  if (index_ == 0)
+    CameraTriggerShot(index_);
   API_STATUS rc = CameraQueryImage(index_, buffer, &len, opt);
-  CameraTriggerShot(index_);
   return API_OK == rc;
 }
 
