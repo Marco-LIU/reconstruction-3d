@@ -319,6 +319,7 @@ MyCameraView::MyCameraView(QGraphicsScene * parent, QRect rect) :QGraphicsView(p
 MyCameraView::~MyCameraView() {
 
 }
+
 //根据窗口大小调整缩放系数
 void MyCameraView::resizeEvent(QResizeEvent * event) {
   //缩放左摄像机

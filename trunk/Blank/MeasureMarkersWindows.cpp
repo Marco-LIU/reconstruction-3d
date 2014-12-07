@@ -39,6 +39,8 @@
 #include "marker.h"
 #include "paras.h"
 #include "CameraCalibration.h"
+#include "usb_camera_group.h"
+#include "camera_frame.h"
 
 
 MeasureMarkersWindow::MeasureMarkersWindow(QGraphicsScene* scene,
@@ -119,30 +121,30 @@ void MeasureMarkersWindow::updatePixmap(unsigned char* leftBuffer,
   update();
 }
 
+void MeasureMarkersWindow::updatePixmap(QImage& li, QImage& ri) {
+  mLeftCameraPixmap->setPixmap(QPixmap::fromImage(li));
+  mRightCameraPixmap->setPixmap(QPixmap::fromImage(ri));
+  //更新图像
+  update();
+}
+
 //更新一帧场景图像
 void MeasureMarkersWindow::updateOneFrame() {
   static int FrameCount = 0;
   static int StartTime = mProTimer.getMilliseconds();
 
-  if (mCameras->captureTwoFrameSyncSoftControl(0, 1)) {
+  CameraFrames frames;
+  mCameras->GetFrames(frames);
+  if (frames.size() == 2) {
     FrameCount++;
+    updatePixmap(frames[0].ToQImage(), frames[1].ToQImage());
 
-    updatePixmap(mCameras->getBuffer(0), mCameras->getBuffer(1));
-  }
-
-  //每20帧，统计下帧率
-  if (FrameCount == 20) {
-    int endTime = mProTimer.getMilliseconds();
-    float fps = (float)FrameCount * 1000 / (endTime - StartTime);
-
+    float fps = mCameras->FrameRate();
     //更新状态栏显示
     QString show;
+
     show.sprintf("当前的帧率为：%f", fps);
     mStatusBar->showMessage(show);
-
-    //置0
-    FrameCount = 0;
-    StartTime = mProTimer.getMilliseconds();
   }
 }
 
@@ -181,21 +183,22 @@ void MeasureMarkersWindow::setRightDetailView() {
 void MeasureMarkersWindow::preview() {
   //如果没有启动摄像头，启动，并开始预览
   if (mbPlay == false) {
-    mCameras = new UsbCameras("para.config");
+    mCameras = new UsbCameraGroup();
+    bool succ = mCameras->Init("para.json");
 
     //如果启动失败，提示摄像机没有连接好
-    if (mCameras->getCameraCount() != 2) {
-      delete mCameras;
+    if (!succ || mCameras->camera_count() != 2) {
       mCameras = NULL;
       mPlay->setText(QString::fromWCharArray(L"停止"));
       QMessageBox::critical(
         0,							//父窗口
         QString::fromWCharArray(L"找不到可用的摄像头"),		//标题栏
-        QString::fromWCharArray(L"找不到可用的摄像头，请查看摄像头是否已经连接到电脑，如已经连接，请重新插拔USB接口"));		//文本内容
+        QString::fromWCharArray(L"找不到可用的摄像头，请查看摄像头是否"
+                                L"已经连接到电脑，如已经连接，请重新插拔USB接口"));		//文本内容
     }
     //成功启动
     else {
-      mCameras->setTriggerMode(true);
+      mCameras->StartAll();
 
       //切换其它按钮状态
       mbPlay = true;
@@ -204,7 +207,7 @@ void MeasureMarkersWindow::preview() {
       //设置定时触发
       mTimer = new QTimer(this);
       connect(mTimer, SIGNAL(timeout()), this, SLOT(updateOneFrame()));
-      mTimer->start(5);
+      mTimer->start(10);
       mCapture->setEnabled(true);
       mSlider->setDisabled(true);
     }
@@ -217,7 +220,8 @@ void MeasureMarkersWindow::preview() {
       mTimer->stop();
       delete mTimer;
       mTimer = NULL;
-      delete mCameras;
+      mCameras->SetFrameCallback(UsbCameraGroup::FrameCallback());
+      mCameras->StopAll();
       mCameras = NULL;
       mPlay->setText(QString::fromWCharArray(L"预览"));
       mCapture->setDisabled(true);
