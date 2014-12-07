@@ -19,6 +19,8 @@
 #include "StereoReconstructor.h"
 #include "OgreTimer.h"
 
+#include "base/memory/ref_counted.h"
+
 class QGraphicsScene;
 class QGraphicsPixmapItem;
 class QStatusBar;
@@ -33,6 +35,8 @@ class UsbCameras;
 class MyDetailView;
 class MyCameraView;
 class Marker;
+
+class UsbCameraGroup;
 
 /*
   这个类，主要用于手动打标记点，并进行测量
@@ -51,6 +55,7 @@ public:
   QImage convertToQImage(unsigned char* buffer);
   //更新场景图像
   void updatePixmap(unsigned char* leftBuffer, unsigned char* rightBuffer);
+  void updatePixmap(QImage& li, QImage& ri);
 signals:
 
 public slots :
@@ -94,7 +99,7 @@ protected:
   QTimer*		mTimer;		//定时器触发
   Timer		mRecTimer;	//用于录制的定时器
   Timer		mProTimer;	//程序的计时器
-  UsbCameras*	mCameras;	//摄像头
+  scoped_refptr<UsbCameraGroup>   mCameras;   //摄像头
 
   //窗口布局
   QWidget*		mCenterWidget;			//中心窗口(即本窗口,this)
