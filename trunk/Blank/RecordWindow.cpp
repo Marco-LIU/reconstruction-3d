@@ -297,7 +297,8 @@ void RecordWindow::OnRecorderSaveDone() {
   QMessageBox::about(
     0,						//父窗口
     "视频已成功保存",		//标题栏
-    "视频文件成功保存，保存位置为:\n" + imagesFolder.absolutePath());	//文本内容
+    "成功录制:" + QString::number(mRecordCnt) + 
+    "，保存位置为:\n" + imagesFolder.absolutePath());	//文本内容
 
   mStatusBar->showMessage("正在预览");
 }
@@ -349,7 +350,10 @@ void RecordWindow::updateOneFrame() {
     float fps = mCameras->FrameRate();
     //更新状态栏显示
     QString show;
-    show.sprintf("当前的帧率为：%f", fps);
+    if (!mbRecord)
+      show.sprintf("当前的帧率为：%f", fps);
+    else
+      show.sprintf("当前的帧率为：%f，已经录制：%d", fps, mRecordCnt);
     mStatusBar->showMessage(show);
   }
 
@@ -468,7 +472,13 @@ namespace {
                         const base::FilePath& path) {
     base::FilePath p = MakeAbsoluteFilePath(path);
     base::FilePath dir = p.DirName();
+
+    if (!base::PathExists(dir)) {
+      base::CreateDirectoryW(dir);
+    }
+
     base::FilePath list_path = dir.Append(L"0_img_list.txt");
+
     if (!base::PathExists(list_path)) {
       base::WriteFile(list_path, "", 0);
     }
