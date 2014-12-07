@@ -56,9 +56,9 @@ void MyDetailView::resizeEvent(QResizeEvent * event) {
   QSize oldSize = event->oldSize();
   QSize curSize = event->size();
 
-  LLX_INFO() << (int)this << " Resized: " << "old(" << oldSize.width() << ", "
-    << oldSize.height() << ") " << "new(" << curSize.width()
-    << ", " << curSize.height() << ")";
+  //LLX_INFO() << (int)this << " Resized: " << "old(" << oldSize.width() << ", "
+  //  << oldSize.height() << ") " << "new(" << curSize.width()
+  //  << ", " << curSize.height() << ")";
 
   //更新最小缩放比例
   if (curSize.width() > 0) {
@@ -98,8 +98,8 @@ void MyDetailView::resizeEvent(QResizeEvent * event) {
   QTransform t(mScaleFactor, 0, 0, mScaleFactor, 0, 0);
   setTransform(t);
 
-  LLX_INFO() << "scale: " << mScaleFactor << ", max-scale: "
-    << mMaxScale << ", min-scale: " << mMinScale;
+  //LLX_INFO() << "scale: " << mScaleFactor << ", max-scale: "
+  //  << mMaxScale << ", min-scale: " << mMinScale;
 
   //更新对应的指示矩形
   updateRect();
