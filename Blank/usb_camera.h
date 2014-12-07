@@ -4,6 +4,7 @@
 
 #include "base/memory/ref_counted.h"
 
+#include "camera_config.h"
 #include "paras.h"
 
 class UsbCamera
@@ -16,6 +17,8 @@ public:
   ~UsbCamera();
 public:
   bool Init(int resolution_index = 0);
+
+  void SetConfig(const CameraConfig& cfg);
 
   //读写第i个编号摄像头的增益,-1表示失败
   int GetGain() const;
