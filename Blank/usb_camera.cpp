@@ -137,11 +137,12 @@ bool UsbCamera::SetAutoExposure(bool t /* = true */) {
 }
 
 bool UsbCamera::Start() {
-  return API_OK == CameraPlay(index_, NULL, NULL);
+  return true;
+  //return API_OK == CameraPlay(index_, NULL, NULL);
 }
 
 void UsbCamera::Stop() {
-  CameraStop(index_);
+  //CameraStop(index_);
 }
 
 bool UsbCamera::SoftTrigger() {
