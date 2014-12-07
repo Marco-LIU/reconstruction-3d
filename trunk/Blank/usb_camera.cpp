@@ -85,6 +85,21 @@ void UsbCamera::SetId(int id) {
   Paras::getSingletonPtr()->SetExpo(id_, expo, false);
 }
 
+void UsbCamera::SetConfig(const CameraConfig& cfg) {
+  id_ = cfg.id;
+  if (cfg.reso >= 0) {
+    // TODO
+  }
+
+  if ((cfg.gain >= 0) && (API_OK == CameraSetGain(index_, cfg.gain))) {
+    Paras::getSingletonPtr()->SetGain(id_, cfg.gain, false);
+  }
+
+  if ((cfg.expo >= 0) && (API_OK == CameraSetExposure(index_, cfg.expo))) {
+    Paras::getSingletonPtr()->SetExpo(id_, cfg.expo, false);
+  }
+}
+
 int UsbCamera::GetGain() const {
   int gain;
   API_STATUS status = CameraGetGain(index_, &gain);

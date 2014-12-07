@@ -145,6 +145,9 @@
     <ClCompile Include="frame_record.cc">
       <Filter>camera</Filter>
     </ClCompile>
+    <ClCompile Include="camera_config.cc">
+      <Filter>camera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mainwindow.h">
@@ -244,5 +247,8 @@
       <Filter>camera</Filter>
     </ClInclude>
     <ClInclude Include="build_config.h" />
+    <ClInclude Include="camera_config.h">
+      <Filter>camera</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

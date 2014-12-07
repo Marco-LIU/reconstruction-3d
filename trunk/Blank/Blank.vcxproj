@@ -100,6 +100,7 @@
   <ItemGroup>
     <ClCompile Include="calibrateWindow.cpp" />
     <ClCompile Include="CameraCalibration.cpp" />
+    <ClCompile Include="camera_config.cc" />
     <ClCompile Include="camera_frame.cc" />
     <ClCompile Include="camera_group_pump.cc" />
     <ClCompile Include="camera_pump.cc" />
@@ -144,6 +145,7 @@
     <ClInclude Include="build_config.h" />
     <ClInclude Include="calibrateWindow.h" />
     <ClInclude Include="CameraCalibration.h" />
+    <ClInclude Include="camera_config.h" />
     <ClInclude Include="camera_frame.h" />
     <ClInclude Include="camera_group_pump.h" />
     <ClInclude Include="camera_group_pump_delegate.h" />
