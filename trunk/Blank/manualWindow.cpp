@@ -511,12 +511,6 @@ void ManualWindow::showRightMarkers() {
 //计算3d坐标
 //taokelu@gmail.com
 void ManualWindow::calculate3dPoints() {
-  QMessageBox::about(
-    0,				//父窗口
-    QString::fromWCharArray(L"消息框"),		//标题栏
-    QString::fromWCharArray(L"计算3d坐标"));	//文本内容
-
-  
   //把标记点一一对应记录到left.txt和right.txt中，传给reconstructor
   if(mLeftMarkers.size()!=mRightMarkers.size()){
 	QMessageBox::about(
@@ -555,9 +549,47 @@ void ManualWindow::calculate3dPoints() {
   }*/
   //
   std::vector<StereoReconstructor::RestructPoint> ret = restructPoints(left_markers, right_markers);
+  if(ret.size() == 0)
+  {
+	QMessageBox::about(
+		0,
+		QString::fromWCharArray(L"消息框"),
+		QString::fromWCharArray(L"错误：请手动点击左右匹配点！")
+		);
+  }
 
-  double distance = sqrt((ret[0].point.x-ret[1].point.x)*(ret[0].point.x-ret[1].point.x)+(ret[0].point.y-ret[1].point.y)*(ret[0].point.y-ret[1].point.y)+(ret[0].point.z-ret[1].point.z)*(ret[0].point.z-ret[1].point.z));
-  std::cout << distance << std::endl;
+  double distance = sqrt(ret[0].point.x*ret[0].point.x+ret[0].point.y*ret[0].point.y+ret[0].point.z*ret[0].point.z);
+  std::cout << "First point distance:"<<distance << std::endl;
+  QString sd;
+  sd.sprintf("%f",distance);
+
+  if(ret.size()>1)
+  {
+		double length = sqrt((ret[0].point.x-ret[1].point.x)*(ret[0].point.x-ret[1].point.x)+(ret[0].point.y-ret[1].point.y)*(ret[0].point.y-ret[1].point.y)+(ret[0].point.z-ret[1].point.z)*(ret[0].point.z-ret[1].point.z));
+		std::cout << "First and Second points length:"<<length << std::endl;
+		QString sl;
+		sl.sprintf("%f",length);
+
+		QString tShowMessage = QString::fromWCharArray(L"标记点距离左摄像机光心的距离为：")+ sd + QString::fromWCharArray(L"毫米\r\n");
+		tShowMessage +=QString::fromWCharArray(L"1,2标记点之间的距离为：")+ sl + QString::fromWCharArray(L"毫米\r\n");
+		
+		QMessageBox::about(
+			0,
+			QString::fromWCharArray(L"长度测量"),
+			tShowMessage
+			);
+  }
+  else
+  {
+	QMessageBox::about(
+		0,
+		QString::fromWCharArray(L"长度测量"),
+		QString::fromWCharArray(L"标记点距离左摄像机光心的距离为：")+ sd + QString::fromWCharArray(L"毫米")
+		);
+  }
+
+
+
 }
 
 //更新一帧场景图像
