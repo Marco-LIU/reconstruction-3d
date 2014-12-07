@@ -23,6 +23,7 @@ UsbCamera::~UsbCamera() {
   Paras::getSingletonPtr()->RemoveOb(this);
   if (buffer_) delete[] buffer_;
   Stop();
+  CameraFree(index_);
 }
 
 bool UsbCamera::Init(int resolution_index) {
@@ -128,7 +129,6 @@ bool UsbCamera::Start() {
 
 void UsbCamera::Stop() {
   CameraStop(index_);
-  CameraFree(index_);
 }
 
 bool UsbCamera::SoftTrigger() {
