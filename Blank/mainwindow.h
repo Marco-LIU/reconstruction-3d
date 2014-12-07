@@ -29,7 +29,6 @@ class MainWindow : public QMainWindow
 public:
   MainWindow();
   ~MainWindow();
-
 signals:
 
 public slots :
