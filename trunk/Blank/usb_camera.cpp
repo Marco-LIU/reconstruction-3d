@@ -23,10 +23,10 @@ UsbCamera::~UsbCamera() {
   Paras::getSingletonPtr()->RemoveOb(this);
   if (buffer_) delete[] buffer_;
   Stop();
-  CameraFree(index_);
 }
 
 bool UsbCamera::Init(int resolution_index) {
+  CameraFree(index_);
   int result = CameraInit(index_);
   if (API_OK != result) {
     // TODO: report error
@@ -45,8 +45,6 @@ bool UsbCamera::Init(int resolution_index) {
   result = CameraSetResolution(index_, resolution_index, &width, &height);
   width_ = width;
   height_ = height;
-
-  ::Sleep(20);
 
   //设置增益32，减少噪声
   CameraSetAGC(index_, false);

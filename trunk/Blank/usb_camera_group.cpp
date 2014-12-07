@@ -447,7 +447,7 @@ bool UsbCameraGroup::Init(const std::string& config) {
   }
 
   for (int i = 0; i < count; i++) {
-    UsbCamera* c = new UsbCamera(i);
+    scoped_refptr<UsbCamera> c = new UsbCamera(i);
     if (c->Init(resolution_index)) {
       if (sn_to_id) {
         std::string sn = c->sn();
@@ -500,14 +500,14 @@ bool UsbCameraGroup::StartAll() {
 }
 
 void UsbCameraGroup::StopAll() {
+  if (group_pump_.get())
+    group_pump_->StopPumping();
   //StopRecord();
   CameraMap::iterator it = cameras_.begin();
   while (it != cameras_.end()) {
     it->second->Stop();
     ++it;
   }
-  if (group_pump_.get())
-    group_pump_->StopPumping();
 }
 
 unsigned int UsbCameraGroup::camera_count() const {
