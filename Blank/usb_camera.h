@@ -65,6 +65,7 @@ public:
 
   bool async_capturing() const { return async_capturing_ != 0; }
 
+protected:
   virtual void OnGainChanged(int id, int gain) OVERRIDE;
   virtual void OnExposureChanged(int id, int expo) OVERRIDE;
 

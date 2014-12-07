@@ -62,3 +62,35 @@ void Paras::SetRightExpo(int expo) {
     right_expo_ = expo;
   }
 }
+
+void Paras::SetGain(int id, int gain, bool trigger_event) {
+  if (id == 0) {
+    if (trigger_event) {
+      SetLeftGain(gain);
+    } else {
+      left_gain_ = gain;
+    }
+  } else if (id == 1) {
+    if (trigger_event) {
+      SetRightGain(gain);
+    } else {
+      right_gain_ = gain;
+    }
+  }
+}
+
+void Paras::SetExpo(int id, int expo, bool trigger_event /* = true */) {
+  if (id == 0) {
+    if (trigger_event) {
+      SetLeftExpo(expo);
+    } else {
+      left_expo_ = expo;
+    }
+  } else if (id == 1) {
+    if (trigger_event) {
+      SetRightExpo(expo);
+    } else {
+      right_expo_ = expo;
+    }
+  }
+}

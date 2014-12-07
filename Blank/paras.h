@@ -220,6 +220,9 @@ public:
   void SetRightGain(int gain);
   void SetRightExpo(int expo);
 
+  void SetGain(int id, int gain, bool trigger_event = true);
+  void SetExpo(int id, int expo, bool trigger_event = true);
+
 public:
 	static Paras& getSingleton(void);
 	static Paras* getSingletonPtr(void);
