@@ -562,18 +562,22 @@ void ManualWindow::calculate3dPoints() {
 
   double distance = sqrt(ret[0].point.x*ret[0].point.x+ret[0].point.y*ret[0].point.y+ret[0].point.z*ret[0].point.z);
   std::cout << "First point distance:"<<distance << std::endl;
+  int id = distance;
+  distance = id/(float)1000;
   QString sd;
-  sd.sprintf("%f",distance);
+  sd.sprintf("%.3f",distance);
 
   if(ret.size()>1)
   {
 		double length = sqrt((ret[0].point.x-ret[1].point.x)*(ret[0].point.x-ret[1].point.x)+(ret[0].point.y-ret[1].point.y)*(ret[0].point.y-ret[1].point.y)+(ret[0].point.z-ret[1].point.z)*(ret[0].point.z-ret[1].point.z));
 		std::cout << "First and Second points length:"<<length << std::endl;
+		int il = length;
+		length = il/(float)1000;
 		QString sl;
-		sl.sprintf("%f",length);
+		sl.sprintf("%.3f",length);
 
-		QString tShowMessage = QString::fromWCharArray(L"标记点距离左摄像机光心的距离为：")+ sd + QString::fromWCharArray(L"毫米\r\n");
-		tShowMessage +=QString::fromWCharArray(L"1,2标记点之间的距离为：")+ sl + QString::fromWCharArray(L"毫米\r\n");
+		QString tShowMessage = QString::fromWCharArray(L"摄像机距标记点1的距离为：")+ sd + QString::fromWCharArray(L"米\r\n");
+		tShowMessage +=QString::fromWCharArray(L"1,2标记点之间的距离为：")+ sl + QString::fromWCharArray(L"米\r\n");
 		
 		QMessageBox::about(
 			0,
@@ -586,7 +590,7 @@ void ManualWindow::calculate3dPoints() {
 	QMessageBox::about(
 		0,
 		QString::fromWCharArray(L"长度测量"),
-		QString::fromWCharArray(L"标记点距离左摄像机光心的距离为：")+ sd + QString::fromWCharArray(L"毫米")
+		QString::fromWCharArray(L"距标记点1的距离为：")+ sd + QString::fromWCharArray(L"米")
 		);
   }
 
