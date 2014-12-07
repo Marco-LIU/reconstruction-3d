@@ -23,7 +23,7 @@ namespace LLX
 #ifdef _DEBUG
       bool result = true;
 #else
-      bool result = false;
+      bool result = true;
 #endif
 
       CommandLine* cmd_line = CommandLine::ForCurrentProcess();

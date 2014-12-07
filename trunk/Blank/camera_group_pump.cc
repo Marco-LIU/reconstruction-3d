@@ -1,5 +1,7 @@
 #include "camera_group_pump.h"
 
+#include "build_config.h"
+
 #include "base/atomicops.h"
 #include "base/memory/linked_ptr.h"
 #include "base/synchronization/lock.h"
@@ -10,6 +12,7 @@
 #include "camera_group_pump_delegate.h"
 #include "usb_camera_group.h"
 #include "usb_camera.h"
+#include "runtime_context.h"
 
 //------------------------------------------------------------------------------
 class CameraGroupPump::Context
@@ -195,7 +198,7 @@ void CameraGroupPump::Context::PumpRunLoop() {
     //camera_group_->SoftTriggerAll();
     // 同时触发各个camera开始获取图像
     ::ReleaseSemaphore(semaphore_, camera_count_, NULL);
-
+    // LLX_INFO() << "Waiting all camera done...";
     while (true) {
       // 等待各个camera获取图像完成
       if (camera_count_ == base::subtle::NoBarrier_CompareAndSwap(
@@ -208,6 +211,7 @@ void CameraGroupPump::Context::PumpRunLoop() {
       }
       ::Sleep(1);
     }
+    // LLX_INFO() << "All camera done...";
     if (need_stop) break;
     // 到这里完成了一帧的收集
     NotifyNewFrame();
@@ -215,12 +219,21 @@ void CameraGroupPump::Context::PumpRunLoop() {
 }
 //------------------------------------------------------------------------------
 bool CameraGroupPump::Context::BeforeFrame(int id) {
+#if ENABLE_CAMERA_PUMP_PROFILE
+  base::Time tick = base::Time::Now();
+#endif
   while (true) {
     // 等待一帧的开始信号
-    if (WAIT_OBJECT_0 == WaitForSingleObject(semaphore_, 0)) return true;
+    if (WAIT_OBJECT_0 == WaitForSingleObject(semaphore_, 0)) break;
     if (NeedStop()) return false;
     ::Sleep(1);
   }
+#if ENABLE_CAMERA_PUMP_PROFILE
+  base::TimeDelta td = base::Time::Now() - tick;
+  LLX_INFO() << "Camera " << id << " starting a frame, waiting time: "
+      << td.InMilliseconds();
+#endif
+  return true;
 }
 //------------------------------------------------------------------------------
 scoped_refptr<base::RefCountedBytes> CameraGroupPump::Context::WillRead(
@@ -230,13 +243,26 @@ scoped_refptr<base::RefCountedBytes> CameraGroupPump::Context::WillRead(
 }
 //------------------------------------------------------------------------------
 void CameraGroupPump::Context::OnFrame(int id, const CameraFrame& frame) {
+  // LLX_INFO() << "Camera " << id << " capture a frame...";
   // 摄像头获取了一帧，需要对frame_cache_加锁
+#if ENABLE_CAMERA_PUMP_PROFILE
+  base::Time tick = base::Time::Now();
+#endif
   base::AutoLock al(lock_);
   frame_cache_[id] = frame;
+#if ENABLE_CAMERA_PUMP_PROFILE
+  base::TimeDelta td = base::Time::Now() - tick;
+  LLX_INFO() << "Camera " << id << " collecting a frame, lock time: "
+      << td.InMilliseconds();
+#endif
+  // LLX_INFO() << "Camera " << id << " capture a frame done..."
+  //     << frame_cache_.size();
 }
 //------------------------------------------------------------------------------
 bool CameraGroupPump::Context::AfterFrame(int id) {
+  // LLX_INFO() << "Camera " << id << " after a frame...";
   // 表示摄像头空闲
+  ::Sleep(1);
   base::subtle::NoBarrier_AtomicIncrement(&free_cameras_, 1);
   return true;
 }
@@ -268,7 +294,11 @@ void CameraGroupPump::Context::NotifyNewFrame() {
   {
     base::AutoLock al(lock_);
     // 理论上能获为每个摄像头获取一帧
-    DCHECK_EQ(camera_count_, (unsigned int)frame_cache_.size());
+    //DCHECK_EQ(camera_count_, (unsigned int)frame_cache_.size());
+    if (camera_count_ != frame_cache_.size()) {
+      LLX_INFO() << "Error frame count, frame: " << frame_cache_.size()
+        << " cameras: " << camera_count_;
+    }
     frame_cache->swap(frame_cache_);
   }
   CameraFrames::iterator it = frame_cache->begin();

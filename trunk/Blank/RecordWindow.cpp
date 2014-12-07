@@ -335,7 +335,7 @@ void RecordWindow::closeRecordWindow() {
 
 //更新一帧场景图像
 void RecordWindow::updateOneFrame() {
-  if (mbRecord) return;
+  //if (mbRecord) return;
 
   static int FrameCount = 0;
   static int StartTime = mProTimer.getMilliseconds();
