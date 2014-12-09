@@ -21,8 +21,8 @@ bool LoadRecordedFrames(const base::FilePath& dir, RecordedFrames& frames) {
   frames.clear();
   frames[left_id] = FrameRecords();
   frames[right_id] = FrameRecords();
-  base::FilePath left_list = dir.Append(L"left").Append(L"0_img_list.txt");
-  base::FilePath right_list = dir.Append(L"right").Append(L"0_img_list.txt");
+  base::FilePath left_list = dir.Append(L"0_left_image_list.txt");
+  base::FilePath right_list = dir.Append(L"1_right_image_list.txt");
 
   if (!base::PathExists(left_list) || !base::PathExists(right_list))
     return false;
@@ -37,14 +37,12 @@ bool LoadRecordedFrames(const base::FilePath& dir, RecordedFrames& frames) {
     std::istringstream ss(buf);
     FrameRecord r;
     int64 ts1, ts2;
-    ss >> r.frame_seq >> ts1 >> ts2;
+    std::string filename;
+    ss >> r.frame_seq >> ts1 >> ts2 >> filename;
     r.time_stamp = base::Time::FromInternalValue(ts1 * 1000);
     r.sync_stamp = base::Time::FromInternalValue(ts2 * 1000);
 
-    std::string name = base::IntToString(r.frame_seq) + "_" +
-        base::Int64ToString(ts1) + ".jpg";
-
-    r.image_path = dir.Append(L"left").AppendASCII(name);
+    r.image_path = dir.AppendASCII(filename);
 
     if (!base::PathExists(r.image_path))
       return false;
@@ -59,14 +57,12 @@ bool LoadRecordedFrames(const base::FilePath& dir, RecordedFrames& frames) {
     std::istringstream ss(buf);
     FrameRecord r;
     int64 ts1, ts2;
-    ss >> r.frame_seq >> ts1 >> ts2;
+    std::string filename;
+    ss >> r.frame_seq >> ts1 >> ts2 >> filename;
     r.time_stamp = base::Time::FromInternalValue(ts1 * 1000);
     r.sync_stamp = base::Time::FromInternalValue(ts2 * 1000);
 
-    std::string name = base::IntToString(r.frame_seq) + "_" +
-      base::Int64ToString(ts1) + ".jpg";
-
-    r.image_path = dir.Append(L"right").AppendASCII(name);
+    r.image_path = dir.AppendASCII(filename);
 
     if (!base::PathExists(r.image_path))
       return false;
