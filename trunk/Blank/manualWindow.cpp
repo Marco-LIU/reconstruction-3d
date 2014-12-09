@@ -347,7 +347,7 @@ static std::vector<cv::Point2f> circleDetect1(cv::Mat img_gray) {
     std::vector<int> mean;	//圆周的归一化值
     int x = corners[i].x, y = corners[i].y, judge = 1;
 
-    for (int k = 5; k<15 && judge; k++) {
+    for (int k = 5; k<10 && judge; k++) {
       //num：圆周的像素点数，考虑到图像像素数离散的，所以只取了2×R个点，R是直径
       //sum：圆周的像素二值化值加和，255或者0
       //reverse_time：统计圆周像素变换，对角标志的话会变换4次，所以小于4次全都淘汰
@@ -424,7 +424,7 @@ static std::vector<cv::Point2f> circleDetect1(cv::Mat img_gray) {
 		  mean.push_back(sum/num);
     }
 
-    if (judge == 0 || mean.size()<10) {
+    if (judge == 0 || mean.size()<5) {
       mean.clear();
       continue;
     }
@@ -435,7 +435,7 @@ static std::vector<cv::Point2f> circleDetect1(cv::Mat img_gray) {
     avarage /= mean.size();
 
     int threshold_val = 30;
-    for (int j = 0; j<5; j++) {
+    for (int j = 0; j<mean.size(); j++) {
       //std::cout << mean[j] << " ";
       if (abs(mean[j] - mean[0])>threshold_val) {
         judge = 0;
@@ -486,6 +486,46 @@ void ManualWindow::autoDetectMarkers(){
 	QString::fromWCharArray(L"请删除错误的角点，添加正确的角点，注意名称一致"));	//文本内容
 }
 
+void ManualWindow::autoDetectLights(){
+	cv::Mat li = cv::imread((mTempFolder + "left.jpg").toStdString(), 0);
+	cv::Mat ri = cv::imread((mTempFolder + "right.jpg").toStdString(), 0);
+
+	double min_val, max_val;
+	cv::Point min_loc, max_loc1, max_loc2;
+	
+	cv::minMaxLoc(li, &min_val, &max_val, &min_loc, &max_loc1);
+	cv::minMaxLoc(ri, &min_val, &max_val, &min_loc, &max_loc2);
+	
+	int sum_x=0, sum_y=0, sum_val=0;
+	for(int i=-10; i<=10; i++){
+		for(int j=-10; j<=10; j++){
+			int val = li.at<uchar>(max_loc1.y+i, max_loc1.x+j);
+			sum_x += val*(max_loc1.x+j);
+			sum_y += val*(max_loc1.y+i);
+			sum_val += val;
+		}
+	}
+	sum_x /= sum_val;
+	sum_y /= sum_val;
+
+	Marker* plm = new Marker(QPoint(sum_x, sum_y), QString::number(1), mScene);
+	mLeftMarkers.push_back(plm);
+
+	sum_x=0, sum_y=0, sum_val=0;
+	for(int i=-10; i<=10; i++){
+		for(int j=-10; j<=10; j++){
+			int val = ri.at<uchar>(max_loc2.y+i, max_loc2.x+j);
+			sum_x += val*(max_loc2.x+j);
+			sum_y += val*(max_loc2.y+i);
+			sum_val += val;
+		}
+	}
+	sum_x /= sum_val;
+	sum_y /= sum_val;
+
+	Marker* prm = new Marker(QPoint(sum_x+2*Paras::getSingleton().width, sum_y), QString::number(1), mScene);
+	mRightMarkers.push_back(prm);
+}
 //显示左标记点的编辑界面
 void ManualWindow::showLeftMarkers() {
 	mbCapture = true;
@@ -773,6 +813,10 @@ void ManualWindow::createWidget() {
   mPlay->setText(QString::fromWCharArray(L"预览"));
   connect(mPlay, SIGNAL(pressed()), this, SLOT(preview()));
 
+  autoLight = new QPushButton();
+  autoLight->setText(QString::fromWCharArray(L"自动检测信号灯"));
+  connect(autoLight, SIGNAL(pressed()), this, SLOT(autoDetectLights()));
+
   autoDetect = new QPushButton();
   autoDetect->setText(QString::fromWCharArray(L"自动检测"));
   connect(autoDetect, SIGNAL(pressed()), this, SLOT(autoDetectMarkers()));
@@ -794,6 +838,7 @@ void ManualWindow::createWidget() {
   connect(mZoomView, SIGNAL(deleteMarker()), this, SLOT(dealwithDeleteSignal()));
 
   mCtrlLayout->addWidget(mPlay);
+  mCtrlLayout->addWidget(autoLight);
   mCtrlLayout->addWidget(autoDetect);
   mCtrlLayout->addWidget(mLM);
   mCtrlLayout->addWidget(mRM);

@@ -58,6 +58,8 @@ bool UsbCamera::Init(int resolution_index) {
 
   CameraSetSnapMode(index_, CAMERA_SNAP_TRIGGER);
 
+  this->SetExposure(100);
+
   //获取12位的产品序列号
   char id[13];
   CameraReadSerialNumber(index_, id, 12);
