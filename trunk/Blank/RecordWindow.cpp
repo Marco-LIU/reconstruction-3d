@@ -39,6 +39,7 @@
 #include "base/strings/sys_string_conversions.h"
 #include "base/files/file_util.h"
 #include "base/message_loop/message_loop_proxy.h"
+#include "base/time/time.h"
 
 #include "runtime_context.h"
 #include "working_thread.h"
@@ -477,35 +478,52 @@ void RecordWindow::createWidget() {
 namespace {
   static void SaveImage(int index,
                         const CameraFrame& frame,
-                        const base::FilePath& path) {
-    base::FilePath p = MakeAbsoluteFilePath(path);
-    base::FilePath dir = p.DirName();
+                        const base::FilePath& img_path,
+                        const base::FilePath& list_path) {
+    base::FilePath image_path = MakeAbsoluteFilePath(img_path);
+    base::FilePath dir = image_path.DirName();
+
+    base::Time tick0 = base::Time::Now();
 
     if (!base::PathExists(dir)) {
       base::CreateDirectoryW(dir);
     }
 
-    base::FilePath list_path = dir.Append(L"0_img_list.txt");
-
     if (!base::PathExists(list_path)) {
       base::WriteFile(list_path, "", 0);
     }
 
+    base::Time tick1 = base::Time::Now();
+
     std::string base_name = base::IntToString(index) +
       " " + base::Int64ToString(frame.time_stamp.ToInternalValue() / 1000) +
       " " + base::Int64ToString(frame.sync_stamp.ToInternalValue() / 1000) +
+      " " + dir.BaseName().AsUTF8Unsafe() +
+      "\\" + image_path.BaseName().AsUTF8Unsafe() +
       "\r\n";
     bool s = false;
     {
       QImage image = frame.ToQImage();
-      s = image.save(QString::fromWCharArray(p.value().c_str()));
+      s = image.save(QString::fromWCharArray(image_path.value().c_str()));
       frame.Purge();
     }
+    base::Time tick2 = base::Time::Now();
 
     base::AppendToFile(list_path, base_name.c_str(), base_name.length());
 
-    LLX_INFO() << "Save image to " << p.value().c_str()
-      << " " << (s ? "DONE" : "FAIL");
+    base::Time tick3 = base::Time::Now();
+    if (!s) {
+      LLX_INFO() << "Save image to " << image_path.value().c_str()
+        << " " << (s ? "DONE" : "FAIL");
+    }
+#if 0
+    base::TimeDelta t1 = tick1 - tick0;
+    base::TimeDelta t2 = tick2 - tick1;
+    base::TimeDelta t3 = tick3 - tick2;
+
+    LLX_INFO() << index << "    T1: " << t1.InMilliseconds() <<
+        " T2: " << t2.InMilliseconds() << " T3: " << t3.InMilliseconds();
+#endif
   }
 }
 
@@ -514,28 +532,34 @@ void RecordWindow::RecordFrame(CameraFrames& frames) {
 
   base::FilePath dir(Paras::getSingleton().ImagesFoler.toStdWString());
   ++mRecordCnt;
+  unsigned int folder_index = mRecordCnt / 1000;
   CameraFrames::iterator it = frames.begin();
   while(it != frames.end()) {
     base::FilePath d = dir;
-    if (it->first == 1)
-      d = dir.Append(L"right");
-    else if (it->first == 0)
-      d = dir.Append(L"left");
-    else continue;
+    base::FilePath list_path = dir;
+    if (it->first == 1) {
+      d = dir.Append(
+        std::wstring(L"right") + base::UintToString16(folder_index));
+      list_path = dir.Append(L"1_right_image_list.txt");
+    } else if (it->first == 0) {
+      d = dir.Append(
+        std::wstring(L"left") + base::UintToString16(folder_index));
+      list_path = dir.Append(L"0_left_image_list.txt");
+    } else continue;
 
     std::wstring filename = base::UintToString16(mRecordCnt) + L"_"
         + base::Int64ToString16(it->second.time_stamp.ToInternalValue() / 1000)
         + L".jpg";
 
     d = d.Append(filename);
-
     WorkingThread::ID id = WorkingThread::FILE1;
 
     if (it->first == 1)
       id = WorkingThread::FILE2;
 
     WorkingThread::PostTask(id, FROM_HERE,
-                            base::Bind(&SaveImage, mRecordCnt, it->second, d));
+                            base::Bind(&SaveImage, mRecordCnt,
+                                       it->second, d, list_path));
 
     ++it;
   }
