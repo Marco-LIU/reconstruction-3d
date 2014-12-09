@@ -9,3 +9,9 @@ QImage CameraFrame::ToQImage() const {
 	cached_image = FromRawGray(data, width, height);
   return cached_image;
 }
+
+void CameraFrame::Purge() const {
+  if (!cached_image.isNull()) {
+    cached_image.swap(QImage());
+  }
+}

@@ -17,6 +17,7 @@ struct CameraFrame {
   mutable QImage cached_image;
 
   QImage ToQImage() const;
+  void Purge() const;
 };
 
 typedef base::hash_map<int, CameraFrame> CameraFrames;

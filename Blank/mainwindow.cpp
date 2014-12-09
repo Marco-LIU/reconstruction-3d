@@ -34,7 +34,10 @@ MainWindow::MainWindow()
     , mLeftCalibrateWindow(NULL)
     , mRightCalibrateWindow(NULL)
     , mStereoWindow(NULL)
-    , mManualWindow(NULL) {
+    , mManualWindow(NULL)
+    , mMeasureWindow(NULL)
+    , mMarkerDefWindow(NULL)
+    , mTrackingWindow(NULL) {
   //创建场景
   createScene();
 
@@ -114,7 +117,7 @@ void MainWindow::showManualWindow() {
     return;
 
   mManualWindow = new ManualWindow(&mScene, mLeftCameraPixmap,
-                                 mRightCameraPixmap, mStatusBar);
+                                   mRightCameraPixmap, mStatusBar);
   mCurrentWidget = mManualWindow;
   this->setCentralWidget(mManualWindow);
 }
@@ -145,7 +148,7 @@ void MainWindow::showTrackingWindow()
     return;
 
   mTrackingWindow = new TrackingWindow(&mScene, mLeftCameraPixmap,
-                                            mRightCameraPixmap, mStatusBar);
+                                       mRightCameraPixmap, mStatusBar);
   mCurrentWidget = mTrackingWindow;
   this->setCentralWidget(mTrackingWindow);
 }
