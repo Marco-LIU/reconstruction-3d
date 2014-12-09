@@ -9,6 +9,12 @@
 #include "UsbCameras.h"
 #include "paras.h"
 
+#include <tchar.h>
+#include <Windows.h>
+#include <strsafe.h>
+#include <DbgHelp.h>
+#include <Shlobj.h>
+
 #include <QtWidgets\qapplication.h>
 #include <QtWidgets\qmainwindow.h>
 #include "mainwindow.h"
@@ -19,6 +25,55 @@
 
 #include "runtime_context.h"
 #include "working_thread.h"
+
+wchar_t lpPath[MAX_PATH] = { 0 };
+
+void CreateDumpFile(LPCTSTR lpstrDumpFilePathName,
+                    LPEXCEPTION_POINTERS pException) {
+  HANDLE hDumpFile = CreateFile(lpstrDumpFilePathName,
+                                GENERIC_WRITE, 0, NULL,
+                                CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+  MINIDUMP_EXCEPTION_INFORMATION dumpInfo;
+  dumpInfo.ExceptionPointers = pException;
+  dumpInfo.ThreadId = GetCurrentThreadId();
+  dumpInfo.ClientPointers = TRUE;
+
+  MiniDumpWriteDump(GetCurrentProcess(),
+                    GetCurrentProcessId(),
+                    hDumpFile,
+                    MiniDumpNormal,
+                    &dumpInfo, NULL, NULL);
+
+  CloseHandle(hDumpFile);
+}
+
+LONG WINAPI OnCrash(LPEXCEPTION_POINTERS exception) {
+#ifdef _DEBUG
+  MessageBoxA(NULL, "OnCrash", "ERROR", 0);
+#endif
+
+  wchar_t buf[MAX_PATH];
+  SYSTEMTIME st;
+  ::GetLocalTime(&st);
+  swprintf_s(buf, MAX_PATH,
+             L"%s\\sndast_%4d-%02d-%02d_%02d-%02d-%02d-%03d.dmp",
+             lpPath,
+             st.wYear, st.wMonth, st.wDay, st.wHour,
+             st.wMinute, st.wSecond, st.wMilliseconds);
+
+  CreateDumpFile(buf, exception);
+  return EXCEPTION_EXECUTE_HANDLER;
+}
+
+
+void InitCrashReport() {
+  lpPath[0] = L'.';
+  lpPath[1] = L'\0';
+
+  SetUnhandledExceptionFilter(OnCrash);
+}
+
 
 #ifdef _DEBUG
 int main(int argc,char** argv)
@@ -31,6 +86,7 @@ int CALLBACK WinMain(
   )
 #endif
 {
+  InitCrashReport();
   base::AtExitManager at_exit;
   CommandLine::Init(0, NULL);
   LLX_INFO() << "Start";
