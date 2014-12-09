@@ -15,7 +15,8 @@ namespace LLX {
 class WorkingThread {
  public:
   enum ID {
-    FILE,
+    FILE1,
+    FILE2,
     IO,
     ID_COUNT
   };
@@ -65,7 +66,7 @@ class WorkingThread {
 
 
   struct DeleteOnIOThread : public DeleteOnThread<IO> {};
-  struct DeleteOnFileThread : public DeleteOnThread<FILE> {};
+  struct DeleteOnFileThread : public DeleteOnThread<FILE1> {};
 
 #ifdef _DEBUG
   static void SetThreadManagerForTesting(ThreadManager* thread_manager);

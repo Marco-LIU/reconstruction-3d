@@ -22,6 +22,9 @@
     <Filter Include="camera">
       <UniqueIdentifier>{afcae492-85a9-4202-bbbe-a6e15291d1ab}</UniqueIdentifier>
     </Filter>
+    <Filter Include="tracking">
+      <UniqueIdentifier>{7b51c5f5-4af3-460e-8a65-4acf7f5edef1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -148,6 +151,9 @@
     <ClCompile Include="camera_config.cc">
       <Filter>camera</Filter>
     </ClCompile>
+    <ClCompile Include="tracking_point.cc">
+      <Filter>tracking</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mainwindow.h">
@@ -249,6 +255,9 @@
     <ClInclude Include="build_config.h" />
     <ClInclude Include="camera_config.h">
       <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="tracking_point.h">
+      <Filter>tracking</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

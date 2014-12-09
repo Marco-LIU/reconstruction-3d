@@ -115,6 +115,7 @@ protected:
   QStatusBar*				mStatusBar;			//×´Ì¬À¸
   QGraphicsScene*			mScene;				//³¡¾°Ö¸Õë
 
+  unsigned int stop_record_waiting_threads_;
   base::WeakPtrFactory<RecordWindow> weak_factory_;
 };
 

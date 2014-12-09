@@ -46,6 +46,8 @@ bool UsbCamera::Init(int resolution_index) {
   width_ = width;
   height_ = height;
 
+  ::Sleep(20);
+
   //设置增益32，减少噪声
   CameraSetAGC(index_, false);
   CameraSetGain(index_, 32);
@@ -157,7 +159,7 @@ bool UsbCamera::CaptureFrameSync(bool use_trigger,
   if (!buffer_ || !buffer) return false;
   int opt = CAMERA_IMAGE_RAW8;
   if (use_trigger) {
-    opt = CAMERA_IMAGE_GRAY8 | CAMERA_IMAGE_TRIG;
+    opt = CAMERA_IMAGE_GRAY8;
   }
   int len = buffer_length_;
   if (!buffer)

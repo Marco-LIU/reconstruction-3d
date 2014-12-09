@@ -287,6 +287,8 @@ namespace
 }
 
 void RecordWindow::OnRecorderSaveDone() {
+  if (--stop_record_waiting_threads_) return;
+
   mRecord->setText("录制");
   mRecord->setEnabled(true);
   mPlay->setEnabled(true);
@@ -311,14 +313,20 @@ void RecordWindow::stopRecordVedio() {
   mStop->setDisabled(true);
   mRecord->setDisabled(true);
 
+  stop_record_waiting_threads_ = 2;
+
   base::Closure callback = base::Bind(&RecordWindow::OnRecorderSaveDone,
                                       weak_factory_.GetWeakPtr());
 
-  WorkingThread::PostTask(WorkingThread::FILE, FROM_HERE,
+  WorkingThread::PostTask(WorkingThread::FILE1, FROM_HERE,
                           base::Bind(&RunInFileThread,
                                      base::MessageLoopProxy::current(),
                                      callback));
-  
+
+  WorkingThread::PostTask(WorkingThread::FILE2, FROM_HERE,
+                          base::Bind(&RunInFileThread,
+                                     base::MessageLoopProxy::current(),
+                                     callback));
   //mCameras->StopRecord();
 }
 //关闭视频录制界面
@@ -487,11 +495,15 @@ namespace {
       " " + base::Int64ToString(frame.time_stamp.ToInternalValue() / 1000) +
       " " + base::Int64ToString(frame.sync_stamp.ToInternalValue() / 1000) +
       "\r\n";
+    bool s = false;
+    {
+      QImage image = frame.ToQImage();
+      s = image.save(QString::fromWCharArray(p.value().c_str()));
+      frame.Purge();
+    }
 
     base::AppendToFile(list_path, base_name.c_str(), base_name.length());
 
-    QImage image = frame.ToQImage();
-    bool s = image.save(QString::fromWCharArray(p.value().c_str()));
     LLX_INFO() << "Save image to " << p.value().c_str()
       << " " << (s ? "DONE" : "FAIL");
   }
@@ -517,7 +529,12 @@ void RecordWindow::RecordFrame(CameraFrames& frames) {
 
     d = d.Append(filename);
 
-    WorkingThread::PostTask(LLX::WorkingThread::FILE, FROM_HERE,
+    WorkingThread::ID id = WorkingThread::FILE1;
+
+    if (it->first == 1)
+      id = WorkingThread::FILE2;
+
+    WorkingThread::PostTask(id, FROM_HERE,
                             base::Bind(&SaveImage, mRecordCnt, it->second, d));
 
     ++it;
