@@ -51,7 +51,7 @@ UsbCameras::UsbCameras(std::string config)
   g_buffer0 = new unsigned char[mBufferLength];
   g_buffer1 = new unsigned char[mBufferLength];
 
-  mBufferLength = mBufferLength;
+  g_bufferLength = mBufferLength;
 }
 UsbCameras::~UsbCameras()
 {
@@ -150,8 +150,10 @@ std::vector<CameraInfos> UsbCameras::iniCameraInfos(std::string config)
 
     //following modified by taokelu
     //从配置文件中读取分辨率
+
     int resolution_index = (int) fs["Resolution"];
-    for(int i=0; i<g_allCameras.size(); i++){
+	//std::cout << resolution_index << std::endl;
+    for(int i=0; i<count; i++){
         int width,height;
         CameraGetResolution(i, resolution_index, &width, &height);
         CameraSetResolution(i, resolution_index, &width, &height);
@@ -167,6 +169,7 @@ std::vector<CameraInfos> UsbCameras::iniCameraInfos(std::string config)
   int length = 0;
   CameraGetImageBufferSize(0,&length,CAMERA_IMAGE_RAW8);
   mBufferLength = length;
+  //std::cout << mBufferLength << std::endl;
 
   return g_allCameras;
 }
