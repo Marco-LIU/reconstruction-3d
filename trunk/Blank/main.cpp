@@ -100,10 +100,16 @@ int CALLBACK WinMain(
   //创建程序和窗口
   QApplication a(argc, argv);
 
+  //读取全局配置文件
+  cv::FileStorage fs("para.config",cv::FileStorage::READ);
+  int resX = (int) fs["ResX"];
+  int resY = (int) fs["ResY"];
+  fs.release();
+
   //初始化程序参数
   new Paras();
-  Paras::getSingleton().width = 1280;
-  Paras::getSingleton().height = 1024;
+  Paras::getSingleton().width = resX;
+  Paras::getSingleton().height = resY;
   Paras::getSingleton().LeftImagesFoler = "./save/left/";
   Paras::getSingleton().RightImagesFoler ="./save/right/";
   Paras::getSingleton().ImagesFoler = "./save/";
