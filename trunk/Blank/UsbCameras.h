@@ -31,23 +31,22 @@ class UsbCameras
 //这些数据只为多线程同步捕获
 public:
 	static int g_result1,g_result2;
+	static int g_bufferLength;
 	static unsigned char* g_buffer0;
 	static unsigned char* g_buffer1;
 	static DWORD WINAPI CaptureThread1(LPVOID n)
 	{
 		int index = *((int*)n);
-		int mBufferLength = 1280*1024;
 		//gt11 = gTimer.getMicroseconds();
-		g_result1= CameraQueryImage(index,g_buffer0,&mBufferLength,CAMERA_IMAGE_RAW8);
+		g_result1= CameraQueryImage(index,g_buffer0,&g_bufferLength,CAMERA_IMAGE_RAW8);
 		//gt12 = gTimer.getMicroseconds();
 		return g_result1;
 	}
 	static DWORD WINAPI CaptureThread2(LPVOID n)
 	{
 		int index = *((int*)n);
-		int mBufferLength = 1280*1024;
 		//gt21 = gTimer.getMicroseconds();
-		g_result2= CameraQueryImage(index,g_buffer1,&mBufferLength,CAMERA_IMAGE_RAW8);
+		g_result2= CameraQueryImage(index,g_buffer1,&g_bufferLength,CAMERA_IMAGE_RAW8);
 		//gt22 = gTimer.getMicroseconds();
 		return g_result2;
 	}

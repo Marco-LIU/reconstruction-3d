@@ -2,6 +2,7 @@
 
 int UsbCameras::g_result1 = 1;
 int UsbCameras::g_result2 = 1;
+int UsbCameras::g_bufferLength = 1;
 unsigned char* UsbCameras::g_buffer0 = NULL;
 unsigned char* UsbCameras::g_buffer1 = NULL;
 
@@ -28,6 +29,8 @@ UsbCameras::UsbCameras()
   g_result2 = 1;
   g_buffer0 = new unsigned char[mBufferLength];
   g_buffer1 = new unsigned char[mBufferLength];
+
+  g_bufferLength = mBufferLength;
 }
 UsbCameras::UsbCameras(std::string config)
 {
@@ -47,6 +50,8 @@ UsbCameras::UsbCameras(std::string config)
   g_result2 = 1;
   g_buffer0 = new unsigned char[mBufferLength];
   g_buffer1 = new unsigned char[mBufferLength];
+
+  mBufferLength = mBufferLength;
 }
 UsbCameras::~UsbCameras()
 {
@@ -90,7 +95,7 @@ std::vector<CameraInfos> UsbCameras::iniCameraInfos(std::string config)
     CameraSetHighspeed(i,true);
 
     //设置为高电平触发
-    CameraSetTriggerPolarity(i,true);
+    //CameraSetTriggerPolarity(i,true);
 
 
     //taokelu@gmail.com: 分辨率设置放到配置文件中
@@ -142,6 +147,7 @@ std::vector<CameraInfos> UsbCameras::iniCameraInfos(std::string config)
         }
       }
     }
+
     //following modified by taokelu
     //从配置文件中读取分辨率
     int resolution_index = (int) fs["Resolution"];

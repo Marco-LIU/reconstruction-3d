@@ -59,7 +59,7 @@ CalibrateWindow::CalibrateWindow(QGraphicsScene* scene,
   mbPlay = false;
   mXCorners = 9;
   mYCorners = 9;
-  mSquareLength = 100;
+  mSquareLength = 91;
   mImgFolders = imgFolder;
 
   //创建布局
