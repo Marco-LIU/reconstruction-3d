@@ -552,10 +552,11 @@ void RecordWindow::RecordFrame(CameraFrames& frames) {
         + L".jpg";
 
     d = d.Append(filename);
-    WorkingThread::ID id = WorkingThread::FILE1;
+    WorkingThread::ID id =
+        (WorkingThread::ID)(WorkingThread::FILE1 + (mRecordCnt & 1));
 
     if (it->first == 1)
-      id = WorkingThread::FILE2;
+      id = (WorkingThread::ID)(WorkingThread::FILE3 + (mRecordCnt & 1));
 
     WorkingThread::PostTask(id, FROM_HERE,
                             base::Bind(&SaveImage, mRecordCnt,
