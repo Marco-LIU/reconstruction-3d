@@ -14,6 +14,8 @@ struct CameraConfig {
   int reso;
   int id;
   std::string sn;
+  bool x_revert;
+  bool y_revert;
 
   static bool ParseFromDict(base::DictionaryValue* dict, CameraConfig& config);
 };

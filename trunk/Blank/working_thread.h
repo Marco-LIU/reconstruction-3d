@@ -17,6 +17,8 @@ class WorkingThread {
   enum ID {
     FILE1,
     FILE2,
+    FILE3,
+    FILE4,
     IO,
     ID_COUNT
   };

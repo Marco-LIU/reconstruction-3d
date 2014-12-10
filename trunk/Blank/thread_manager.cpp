@@ -10,11 +10,15 @@ namespace LLX
   static const char* g_working_thread_names[WorkingThread::ID_COUNT] = {
     "LLX::FileThread1",
     "LLX::FileThread2",
+    "LLX::FileThread3",
+    "LLX::FileThread4",
     "LLX::IOThread",
   };
 
   static base::MessageLoop::Type g_working_thread_type[WorkingThread::ID_COUNT]
     = {
+    base::MessageLoop::TYPE_DEFAULT,
+    base::MessageLoop::TYPE_DEFAULT,
     base::MessageLoop::TYPE_DEFAULT,
     base::MessageLoop::TYPE_DEFAULT,
     base::MessageLoop::TYPE_IO,

@@ -33,10 +33,6 @@ bool UsbCamera::Init(int resolution_index) {
     return false;
   }
 
-  //TO MODIFY 工人把摄像头装反了
-  CameraSetMirrorX(index_,true);
-  CameraSetMirrorY(index_,true);
-
   //设置为高速模式
   CameraSetHighspeed(index_, true);
 
@@ -95,6 +91,12 @@ void UsbCamera::SetId(int id) {
 
 void UsbCamera::SetConfig(const CameraConfig& cfg) {
   id_ = cfg.id;
+
+  if (cfg.x_revert)
+    CameraSetMirrorX(index_, true);
+  if (cfg.y_revert)
+    CameraSetMirrorY(index_, true);
+
   if (cfg.reso >= 0) {
     // TODO
   }
