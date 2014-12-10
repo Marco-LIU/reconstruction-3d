@@ -92,6 +92,7 @@ std::vector<CameraInfos> UsbCameras::iniCameraInfos(std::string config)
     //设置为高电平触发
     CameraSetTriggerPolarity(i,true);
 
+
     //taokelu@gmail.com: 分辨率设置放到配置文件中
     /*
     //设置为最大分辨率，1280x1024
