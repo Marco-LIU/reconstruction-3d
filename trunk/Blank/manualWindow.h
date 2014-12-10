@@ -61,7 +61,9 @@ signals:
 public slots :
   //预览视频拍摄的画面
   void preview();
-  //用于自动检查信号灯
+  //用于自动检测一个信号灯
+  void autoDetectOneLight();
+  //用于自动检查多个信号灯
   void autoDetectLights();
   //用于自动检测标记点
   void autoDetectMarkers();
@@ -120,6 +122,7 @@ protected:
   QPushButton*			mPlay;			//预览画面,播放暂停按钮
   bool					mbPlay;			//true表示正在预览
   QPushButton*			autoLight;		//自动检测灯
+  QPushButton*      autoLights;   //自动检测多个灯
   QPushButton*			autoDetect;		//点击用于自动检测标记点
   QPushButton*			mLM;			//点击用于选择，或批量删除左标记点
   QPushButton*			mRM;			//点击用于选择，或批量删除右标记点
