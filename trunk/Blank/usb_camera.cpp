@@ -33,11 +33,15 @@ bool UsbCamera::Init(int resolution_index) {
     return false;
   }
 
+  //TO MODIFY 工人把摄像头装反了
+  CameraSetMirrorX(index_,true);
+  CameraSetMirrorY(index_,true);
+
   //设置为高速模式
   CameraSetHighspeed(index_, true);
 
   //设置为高电平触发
-  CameraSetTriggerPolarity(index_, true);
+  //CameraSetTriggerPolarity(index_, true);
 
   //设置为最大分辨率，1280x1024
   int width = 640, height = 480;
