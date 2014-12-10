@@ -51,7 +51,7 @@ UsbCameras::UsbCameras(std::string config)
   g_buffer0 = new unsigned char[mBufferLength];
   g_buffer1 = new unsigned char[mBufferLength];
 
-  mBufferLength = mBufferLength;
+  g_bufferLength = mBufferLength;
 }
 UsbCameras::~UsbCameras()
 {
