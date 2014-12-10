@@ -5,13 +5,17 @@
 			"sn" : "289901382063",
 			"id" : 0,
 			"gain"	: 128,
-			"expo"	: 100
+			"expo"	: 100,
+			"x_revert" : true,
+			"y_revert" : true
 		},
 		{
 			"sn" : "289901382062",
 			"id" : 1,
 			"gain"	: 128,
-			"expo"	: 100
+			"expo"	: 100,
+			"x_revert" : true,
+			"y_revert" : true
 		}
 	],
 	"resolution" : 2
