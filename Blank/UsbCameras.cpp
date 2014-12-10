@@ -51,7 +51,7 @@ UsbCameras::UsbCameras(std::string config)
   g_buffer0 = new unsigned char[mBufferLength];
   g_buffer1 = new unsigned char[mBufferLength];
 
-  g_bufferLength = mBufferLength;
+  mBufferLength = mBufferLength;
 }
 UsbCameras::~UsbCameras()
 {
@@ -150,18 +150,23 @@ std::vector<CameraInfos> UsbCameras::iniCameraInfos(std::string config)
 
     //following modified by taokelu
     //从配置文件中读取分辨率
-
     int resolution_index = (int) fs["Resolution"];
-	//std::cout << resolution_index << std::endl;
-    for(int i=0; i<count; i++){
+	//从配置文件中读取是否翻转图像
+	int bMirror = (int) fs["Mirror"];
+    for(int i=0; i<g_allCameras.size(); i++){
         int width,height;
         CameraGetResolution(i, resolution_index, &width, &height);
         CameraSetResolution(i, resolution_index, &width, &height);
         mWidth = width;
         mHeight = height;
+		if(bMirror==1)
+		{
+		  CameraSetMirrorX(i,true);
+		  CameraSetMirrorY(i,true);
+		}
     }
+
     //modifying END
-  
     fs.release();
   }
   
@@ -169,7 +174,6 @@ std::vector<CameraInfos> UsbCameras::iniCameraInfos(std::string config)
   int length = 0;
   CameraGetImageBufferSize(0,&length,CAMERA_IMAGE_RAW8);
   mBufferLength = length;
-  //std::cout << mBufferLength << std::endl;
 
   return g_allCameras;
 }
