@@ -486,7 +486,7 @@ void ManualWindow::autoDetectMarkers(){
 	QString::fromWCharArray(L"请删除错误的角点，添加正确的角点，注意名称一致"));	//文本内容
 }
 
-void ManualWindow::autoDetectLights(){
+void ManualWindow::autoDetectOneLight(){
 	cv::Mat li = cv::imread((mTempFolder + "left.jpg").toStdString(), 0);
 	cv::Mat ri = cv::imread((mTempFolder + "right.jpg").toStdString(), 0);
 
@@ -526,6 +526,133 @@ void ManualWindow::autoDetectLights(){
 	Marker* prm = new Marker(QPoint(sum_x+2*Paras::getSingleton().width, sum_y), QString::number(1), mScene);
 	mRightMarkers.push_back(prm);
 }
+
+//自动检测多个信号灯
+void ManualWindow::autoDetectLights(){
+    cv::Mat li = cv::imread((mTempFolder + "left.jpg").toStdString(), 0);
+    cv::Mat ri = cv::imread((mTempFolder + "right.jpg").toStdString(), 0);
+
+    cv::Mat li_binary, ri_binary;
+    cv::threshold(li, li_binary, 200, 255, cv::THRESH_BINARY);
+    cv::threshold(ri, ri_binary, 200, 255, cv::THRESH_BINARY);
+
+    std::vector<cv::Point> li_lights, ri_lights;
+    for(int i=0; i<li_binary.cols; i++){
+        for(int j=0; j<li_binary.rows; j++){
+            if(li_binary.at<uchar>(j,i)==255){
+                li_lights.push_back(cv::Point(i,j));
+            }
+        }
+    }
+    for(int i=0; i<ri_binary.cols; i++){
+        for(int j=0; j<ri_binary.rows; j++){
+            if(ri_binary.at<uchar>(j,i)==255){
+                ri_lights.push_back(cv::Point(i,j));
+            }
+        }
+    }
+
+    //将所有255的点进行聚类
+    std::vector<std::vector<cv::Point> > li_group, ri_group;
+    for(size_t i=0; i!=li_lights.size(); ++i){
+        for(size_t j=0; j!=li_group.size(); ++j){
+            if((li_lights[i].x-li_group[j][0].x)*(li_lights[i].x-li_group[j][0].x)+(li_lights[i].y-li_group[j][0].y)*(li_lights[i].y-li_group[j][0].y)<=400){
+                li_group[j].push_back(li_lights[i]);
+            }else{
+                std::vector<cv::Point> tmp;
+                tmp.push_back(li_lights[i]);
+                li_group.push_back(tmp);
+            }
+        }
+    }
+    for(size_t i=0; i!=ri_lights.size(); ++i){
+        for(size_t j=0; j!=ri_group.size(); ++j){
+            if((ri_lights[i].x-ri_group[j][0].x)*(ri_lights[i].x-ri_group[j][0].x)+(ri_lights[i].y-ri_group[j][0].y)*(ri_lights[i].y-ri_group[j][0].y)<=400){
+                ri_group[j].push_back(ri_lights[i]);
+            }else{
+                std::vector<cv::Point> tmp;
+                tmp.push_back(ri_lights[i]);
+                ri_group.push_back(tmp);
+            }
+        }
+    }
+    //如果一组的白点个数小于min_num,则认为是噪声点
+    int min_num = 10;
+    std::vector<std::vector<cv::Point> >::iterator iter = li_group.begin();
+    while(iter != li_group.end()){
+        if((*iter).size()<min_num){
+            li_group.erase(iter);
+        }else{
+            iter++;
+        }
+    }
+    iter = ri_group.begin();
+    while(iter != ri_group.end()){
+        if((*iter).size()<min_num){
+            ri_group.erase(iter);
+        }else{
+            iter++;
+        }
+    }
+
+    //求各个组的中心点
+    li_lights.clear();
+    ri_lights.clear();
+
+    for(size_t i=0; i!=li_group.size(); ++i){
+        int x=0,y=0;
+        for(size_t j=0; j!=li_group[i].size(); ++j){
+            x += li_group[i][j].x;
+            y += li_group[i][j].y;
+        }
+        x /= li_group[i].size();
+        y /= ri_group[i].size();
+
+        li_lights.push_back(cv::Point(x,y));
+    }
+    for(size_t i=0; i!=ri_group.size(); ++i){
+        int x=0,y=0;
+        for(size_t j=0; j!=ri_group[i].size(); ++j){
+            x += ri_group[i][j].x;
+            y += ri_group[i][j].y;
+        }
+        x /= ri_group[i].size();
+        y /= ri_group[i].size();
+
+        ri_lights.push_back(cv::Point(x,y));
+    }
+
+    //对于左图像的点求右极线方程，求匹配点
+    for(size_t i=0; i!=li_lights.size(); ++i){
+        std::vector<cv::Point2f> pts;
+        pts.push_back(cv::Point2f(li_lights[i].x, li_lights[i].y));
+
+        cv::Mat F(3,3,CV_32F);
+        Utilities::importMat("./reconstruct/F.txt", F);
+
+        std::vector<cv::Point3f> line;
+        cv::computeCorrespondEpilines(pts,1,F, line);
+        
+        double a=line[0].x, b=line[0].y, c=line[0].z;
+        double distance = abs(a*ri_lights[0].x+b*ri_lights[0].y+c);
+        int pos=0;
+
+        for(size_t j=1; j!=ri_lights.size(); ++j){
+            if(abs(a*ri_lights[j].x+b*ri_lights[j].y+c)<distance){
+                distance = abs(a*ri_lights[j].x+b*ri_lights[j].y+c);
+                pos = j;
+            }
+        }
+
+        Marker* plm = new Marker(QPoint(li_lights[i].x, li_lights[i].y), QString::number(i+1), mScene);
+        mLeftMarkers.push_back(plm);
+
+        Marker* prm = new Marker(QPoint(ri_lights[pos].x+2*Paras::getSingleton().width, li_lights[i].y), QString::number(i+1), mScene);
+        mRightMarkers.push_back(prm);
+    }
+}
+
+
 //显示左标记点的编辑界面
 void ManualWindow::showLeftMarkers() {
 	mbCapture = true;
@@ -534,10 +661,6 @@ void ManualWindow::showLeftMarkers() {
     0,				//父窗口
     QString::fromWCharArray(L"消息框"),		//标题栏
     QString::fromWCharArray(L"选择，或批量删除左标记点"));	//文本内容
-
-  
-
-
 }
 void ManualWindow::showRightMarkers() {
 	mbCapture = true;
@@ -815,7 +938,11 @@ void ManualWindow::createWidget() {
 
   autoLight = new QPushButton();
   autoLight->setText(QString::fromWCharArray(L"自动检测信号灯"));
-  connect(autoLight, SIGNAL(pressed()), this, SLOT(autoDetectLights()));
+  connect(autoLight, SIGNAL(pressed()), this, SLOT(autoDetectOneLight()));
+
+  autoLights = new QPushButton();
+  autoLights->setText(QString::fromWCharArray(L"自动检测信号灯"));
+  connect(autoLights, SIGNAL(pressed()), this, SLOT(autoDetectLights()));
 
   autoDetect = new QPushButton();
   autoDetect->setText(QString::fromWCharArray(L"自动检测"));
@@ -839,6 +966,7 @@ void ManualWindow::createWidget() {
 
   mCtrlLayout->addWidget(mPlay);
   mCtrlLayout->addWidget(autoLight);
+  mCtrlLayout->addWidget(autoLights);
   mCtrlLayout->addWidget(autoDetect);
   mCtrlLayout->addWidget(mLM);
   mCtrlLayout->addWidget(mRM);

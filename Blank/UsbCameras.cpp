@@ -92,12 +92,15 @@ std::vector<CameraInfos> UsbCameras::iniCameraInfos(std::string config)
     //设置为高电平触发
     CameraSetTriggerPolarity(i,true);
 
+    //taokelu@gmail.com: 分辨率设置放到配置文件中
+    /*
     //设置为最大分辨率，1280x1024
     int width,height;
     CameraGetResolutionMax(i,&width,&height);
     result = CameraSetResolution(i,0,&width,&height);
     mWidth = width;
     mHeight = height;
+    */
 
     //设置增益32，减少噪声
     CameraSetAGC(i,false);
@@ -138,6 +141,18 @@ std::vector<CameraInfos> UsbCameras::iniCameraInfos(std::string config)
         }
       }
     }
+    //following modified by taokelu
+    //从配置文件中读取分辨率
+    int resolution_index = (int) fs["Resolution"];
+    for(int i=0; i<g_allCameras.size(); i++){
+        int width,height;
+        CameraGetResolution(i, resolution_index, &width, &height);
+        CameraSetResolution(i, resolution_index, &width, &height);
+        mWidth = width;
+        mHeight = height;
+    }
+    //modifying END
+  
     fs.release();
   }
   
