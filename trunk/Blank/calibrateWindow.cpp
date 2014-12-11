@@ -131,7 +131,7 @@ void CalibrateWindow::updateOneFrame() {
   }
 
   //每20帧，统计下帧率
-  if (FrameCount == 20) {
+  /*if (FrameCount == 20) {
     int endTime = mProTimer.getMilliseconds();
     float fps = (float)FrameCount * 1000 / (endTime - StartTime);
 
@@ -143,7 +143,7 @@ void CalibrateWindow::updateOneFrame() {
     //置0
     FrameCount = 0;
     StartTime = mProTimer.getMilliseconds();
-  }
+  }*/
 }
 //设置详细视图为左视图
 void CalibrateWindow::setLeftDetailView() {
