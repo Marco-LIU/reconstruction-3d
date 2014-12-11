@@ -120,6 +120,8 @@ void StereoCalibrationWindow::updatePixmap(unsigned char* leftBuffer,
 }
 
 void StereoCalibrationWindow::updatePixmap(QImage& li, QImage& ri) {
+  mLastLeft = li;
+  mLastRight = ri;
   mLeftCameraPixmap->setPixmap(QPixmap::fromImage(li));
   mRightCameraPixmap->setPixmap(QPixmap::fromImage(ri));
   //¸üĞÂÍ¼Ïñ
