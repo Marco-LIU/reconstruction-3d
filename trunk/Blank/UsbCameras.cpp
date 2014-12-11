@@ -153,6 +153,8 @@ std::vector<CameraInfos> UsbCameras::iniCameraInfos(std::string config)
     int resolution_index = (int) fs["Resolution"];
 	//从配置文件中读取是否翻转图像
 	int bMirror = (int) fs["Mirror"];
+	int gain = (int) fs["Gain"];
+	int expo = (int) fs["Expo"];
     for(int i=0; i<g_allCameras.size(); i++){
         int width,height;
         CameraGetResolution(i, resolution_index, &width, &height);
@@ -164,6 +166,8 @@ std::vector<CameraInfos> UsbCameras::iniCameraInfos(std::string config)
 		  CameraSetMirrorX(i,true);
 		  CameraSetMirrorY(i,true);
 		}
+		CameraSetGain(i,gain);
+		CameraSetExposure(i,expo);
     }
 
     //modifying END
