@@ -349,7 +349,11 @@ void StereoCalibrationWindow::deleteImg() {
     mImgs.erase(mImgs.begin() + index - 1);
 
     updateButtonState();
-    updateCurrent(index);
+	  if(index>1)
+		updateCurrent(index-1);
+	  else
+		updateCurrent(index);
+	  }
   }
 }
 
