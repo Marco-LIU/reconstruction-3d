@@ -513,17 +513,17 @@ namespace {
     if (!image.isNull()) {
       base::FilePath path = img_path.AddExtension(L".jpg");
       if (image.save(QString::fromWCharArray(path.value().c_str()))) {
-        base::DeleteFile(img_path, false);
-        std::string img_data = data + ".jpg";
-        base::AppendToFile(list_path, img_data.c_str(), img_data.length());
-
         base::Time tick2 = base::Time::Now();
-
+        base::DeleteFile(img_path, false);
+        std::string img_data = data + ".jpg\r\n";
+        base::AppendToFile(list_path, img_data.c_str(), img_data.length());
+        base::Time tick3 = base::Time::Now();
 #ifdef NDEBUG
         base::TimeDelta t1 = tick1 - tick0;
         base::TimeDelta t2 = tick2 - tick1;
+        base::TimeDelta t3 = tick3 - tick2;
         LLX_INFO() << "Convert JPG, T1: " << t1.InMilliseconds()
-          << " T2: " << t2.InMilliseconds();
+          << " T2: " << t2.InMilliseconds() << " T3: " << t3.InMilliseconds();
 #endif
       }
     }
@@ -554,8 +554,7 @@ namespace {
       " " + base::Int64ToString(frame.time_stamp.ToInternalValue() / 1000) +
       " " + base::Int64ToString(frame.sync_stamp.ToInternalValue() / 1000) +
       " " + dir.BaseName().AsUTF8Unsafe() +
-      "\\" + image_path.BaseName().AsUTF8Unsafe() +
-      "\r\n";
+      "\\" + image_path.BaseName().AsUTF8Unsafe();
     bool s = false;
     {
       int x = base::WriteFile(image_path,
