@@ -516,7 +516,7 @@ namespace {
       LLX_INFO() << "Save image to " << image_path.value().c_str()
         << " " << (s ? "DONE" : "FAIL");
     }
-#if 0
+#ifdef NDEBUG
     base::TimeDelta t1 = tick1 - tick0;
     base::TimeDelta t2 = tick2 - tick1;
     base::TimeDelta t3 = tick3 - tick2;

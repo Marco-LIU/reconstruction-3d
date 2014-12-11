@@ -11,17 +11,15 @@ Timer UsbCameras::gTimer;
 std::vector<int> UsbCameras::gAllTimes;;
 int UsbCameras::gt11,UsbCameras::gt12,UsbCameras::gt21,UsbCameras::gt22;
 
-UsbCameras::UsbCameras()
-{
+UsbCameras::UsbCameras() {
   //初始化所有设备
   mCamInfo = iniCameraInfos();
 
   //分配帧缓存
   buffers.resize(mCamNum);
-  for(int i=0;i<mCamNum;i++)
-  {
+  for (int i = 0; i < mCamNum; i++) {
     buffers[i] = new unsigned char[mBufferLength];
-    memset(buffers[i],0,mBufferLength);
+    memset(buffers[i], 0, mBufferLength);
   }
 
   //初始化全局变量
@@ -32,17 +30,15 @@ UsbCameras::UsbCameras()
 
   g_bufferLength = mBufferLength;
 }
-UsbCameras::UsbCameras(std::string config)
-{
+UsbCameras::UsbCameras(std::string config) {
   //初始化所有设备
   mCamInfo = iniCameraInfos(config);
 
   //分配帧缓存
   buffers.resize(mCamNum);
-  for(int i=0;i<mCamNum;i++)
-  {
+  for (int i = 0; i < mCamNum; i++) {
     buffers[i] = new unsigned char[mBufferLength];
-    memset(buffers[i],0,mBufferLength);
+    memset(buffers[i], 0, mBufferLength);
   }
 
   //初始化全局变量
@@ -53,20 +49,17 @@ UsbCameras::UsbCameras(std::string config)
 
   g_bufferLength = mBufferLength;
 }
-UsbCameras::~UsbCameras()
-{
-  for(int i=0;i<mCamNum;i++)
-  {
+UsbCameras::~UsbCameras() {
+  for (int i = 0; i < mCamNum; i++) {
     stopCamera(i);
   }
 
-  for(int i=0;i<mCamNum;i++)
-  {
-    delete [] buffers[i];
+  for (int i = 0; i < mCamNum; i++) {
+    delete[] buffers[i];
   }
 
-  delete [] g_buffer0;
-  delete [] g_buffer1;
+  delete[] g_buffer0;
+  delete[] g_buffer1;
 }
 
 //初始化所有的摄像机
@@ -81,18 +74,16 @@ std::vector<CameraInfos> UsbCameras::iniCameraInfos(std::string config)
   std::vector<CameraInfos> g_allCameras(count);
 
   //初始化所有摄像头
-  for(int i=0;i<count;i++)
-  {
+  for (int i = 0; i < count; i++) {
     //初始化相机
     int result = CameraInit(i);
-    if(result!=API_OK)
-    {
+    if (result != API_OK) {
       //todo 错误处理
-      std::cout<<"摄像机"<<i<<"初始化错误"<<std::endl;
+      std::cout << "摄像机" << i << "初始化错误" << std::endl;
     }
 
     //设置为高速模式
-    CameraSetHighspeed(i,true);
+    CameraSetHighspeed(i, true);
 
     //设置为高电平触发
     //CameraSetTriggerPolarity(i,true);
@@ -109,21 +100,21 @@ std::vector<CameraInfos> UsbCameras::iniCameraInfos(std::string config)
     */
 
     //设置增益32，减少噪声
-    CameraSetAGC(i,false);
-    CameraSetGain(i,32);
+    CameraSetAGC(i, false);
+    CameraSetGain(i, 32);
 
     //压缩暗部，增加激光条纹的亮度范围
-    CameraSetGamma(i,1.61);
+    CameraSetGamma(i, 1.61);
 
     //不使用自动曝光
-    CameraSetAEC(i,false);
+    CameraSetAEC(i, false);
 
     //获取12位的产品序列号
     char id[12];
-    CameraReadSerialNumber(i,id,12);
-    
+    CameraReadSerialNumber(i, id, 12);
+
     //记录到全局变量中
-    g_allCameras[i].sn =std::string(id,12);
+    g_allCameras[i].sn = std::string(id, 12);
     g_allCameras[i].id = -1;
     g_allCameras[i].index = i;
   }
@@ -133,16 +124,13 @@ std::vector<CameraInfos> UsbCameras::iniCameraInfos(std::string config)
   {
     //从配置文件中读取摄像头序列号
     cv::FileStorage fs(config,cv::FileStorage::READ);
-    for(cv::FileNodeIterator i =fs["Camera"].begin();i!=fs["Camera"].end();i++)
-    {							
+    for (cv::FileNodeIterator i = fs["Camera"].begin(); i != fs["Camera"].end(); i++) {
       std::string nodeName = (*i).name();
       int id = int(*i);
 
       //遍历所有的摄像头，匹配sn和索引
-      for(int j=0;j<g_allCameras.size();j++)
-      {
-        if(g_allCameras[j].sn == nodeName)
-        {
+      for (int j = 0; j < g_allCameras.size(); j++) {
+        if (g_allCameras[j].sn == nodeName) {
           g_allCameras[j].id = id;
         }
       }
@@ -151,23 +139,22 @@ std::vector<CameraInfos> UsbCameras::iniCameraInfos(std::string config)
     //following modified by taokelu
     //从配置文件中读取分辨率
     int resolution_index = (int) fs["Resolution"];
-	//从配置文件中读取是否翻转图像
-	int bMirror = (int) fs["Mirror"];
-	int gain = (int) fs["Gain"];
-	int expo = (int) fs["Expo"];
-    for(int i=0; i<g_allCameras.size(); i++){
-        int width,height;
-        CameraGetResolution(i, resolution_index, &width, &height);
-        CameraSetResolution(i, resolution_index, &width, &height);
-        mWidth = width;
-        mHeight = height;
-		if(bMirror==1)
-		{
-		  CameraSetMirrorX(i,true);
-		  CameraSetMirrorY(i,true);
-		}
-		CameraSetGain(i,gain);
-		CameraSetExposure(i,expo);
+    //从配置文件中读取是否翻转图像
+    int bMirror = (int) fs["Mirror"];
+    int gain = (int) fs["Gain"];
+    int expo = (int) fs["Expo"];
+    for (int i = 0; i < g_allCameras.size(); i++) {
+      int width, height;
+      CameraGetResolution(i, resolution_index, &width, &height);
+      CameraSetResolution(i, resolution_index, &width, &height);
+      mWidth = width;
+      mHeight = height;
+      if (bMirror == 1) {
+        CameraSetMirrorX(i, true);
+        CameraSetMirrorY(i, true);
+      }
+      CameraSetGain(i, gain);
+      CameraSetExposure(i, expo);
     }
 
     //modifying END

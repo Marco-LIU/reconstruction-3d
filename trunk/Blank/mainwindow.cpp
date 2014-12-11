@@ -132,8 +132,7 @@ void MainWindow::showAutoMeasureWindow() {
   this->setCentralWidget(mMeasureWindow);
 }
 
-void MainWindow::showMarkerDefineWindow()
-{
+void MainWindow::showMarkerDefineWindow() {
   if (mCurrentWidget && mCurrentWidget == mMarkerDefWindow)
     return;
 
@@ -142,8 +141,7 @@ void MainWindow::showMarkerDefineWindow()
   this->setCentralWidget(mMarkerDefWindow);
 }
 
-void MainWindow::showTrackingWindow()
-{
+void MainWindow::showTrackingWindow() {
   if (mCurrentWidget && mCurrentWidget == mTrackingWindow)
     return;
 
@@ -156,100 +154,88 @@ void MainWindow::showTrackingWindow()
 /*
 void MainWindow::setGainExpo()
 {
-	//todo 有空再写界面吧
-	QWidget* sw = new QWidget();
-	QVBoxLayout* layout = new QVBoxLayout();
-	sw->setLayout(layout);
+//todo 有空再写界面吧
+QWidget* sw = new QWidget();
+QVBoxLayout* layout = new QVBoxLayout();
+sw->setLayout(layout);
 
-	QLabel* lg = new QLabel();
-	lg->setText(QString::fromWCharArray(L"左摄像头增益"));
-	QLabel* le = new QLabel();
-	le->setText(QString::fromWCharArray(L"左摄像头曝光"));
+QLabel* lg = new QLabel();
+lg->setText(QString::fromWCharArray(L"左摄像头增益"));
+QLabel* le = new QLabel();
+le->setText(QString::fromWCharArray(L"左摄像头曝光"));
 
-	QLabel* rg = new QLabel();
-	rg->setText(QString::fromWCharArray(L"右摄像头增益"));
-	QLabel* re = new QLabel();
-	re->setText(QString::fromWCharArray(L"右摄像头曝光"));
+QLabel* rg = new QLabel();
+rg->setText(QString::fromWCharArray(L"右摄像头增益"));
+QLabel* re = new QLabel();
+re->setText(QString::fromWCharArray(L"右摄像头曝光"));
 
-	layout->addWidget(lg);
-	layout->addWidget(le);
-	layout->addWidget(rg);
-	layout->addWidget(re);
+layout->addWidget(lg);
+layout->addWidget(le);
+layout->addWidget(rg);
+layout->addWidget(re);
 
-	sw->setWindowModality(Qt::WindowModal);
-	sw->show();
+sw->setWindowModality(Qt::WindowModal);
+sw->show();
 }
 */
 
-void MainWindow::setLeftCameraGain()
-{
-	//显示当前值，刘浏加上
-	int cur = Paras::getSingletonPtr()->left_gain_;
+void MainWindow::setLeftCameraGain() {
+  int cur = Paras::getSingletonPtr()->left_gain_;
 
-	//设置新值
-	int nv = QInputDialog::getInt(
-		0,
-		QString::fromWCharArray(L"设置左摄像头增益"),
-		QString::fromWCharArray(L"设置左摄像头增益："),
-		cur,
-		0,
-		255);
+  //设置新值
+  int nv = QInputDialog::getInt(
+    0,
+    QString::fromWCharArray(L"设置左摄像头增益"),
+    QString::fromWCharArray(L"设置左摄像头增益："),
+    cur,
+    0,
+    255);
 
-	//设置左摄像机为新值，刘浏加上
   Paras::getSingletonPtr()->SetLeftGain(nv);
 }
 
-void MainWindow::setLeftCameraExpo()
-{
-	//显示当前值，刘浏加上
+void MainWindow::setLeftCameraExpo() {
   int cur = Paras::getSingletonPtr()->left_expo_;
 
-	//设置新值
-	int nv = QInputDialog::getInt(
-		0,
-		QString::fromWCharArray(L"设置左摄像头曝光"),
-		QString::fromWCharArray(L"设置左摄像头曝光："),
-		cur,
-		0,
-		4000);
+  //设置新值
+  int nv = QInputDialog::getInt(
+    0,
+    QString::fromWCharArray(L"设置左摄像头曝光"),
+    QString::fromWCharArray(L"设置左摄像头曝光："),
+    cur,
+    0,
+    4000);
 
-	//设置左摄像机为新值，刘浏加上
   Paras::getSingletonPtr()->SetLeftExpo(nv);
 }
 
-void MainWindow::setRightCameraGain()
-{
-	//显示当前值，刘浏加上
+void MainWindow::setRightCameraGain() {
   int cur = Paras::getSingletonPtr()->right_gain_;
 
-	//设置新值
-	int nv = QInputDialog::getInt(
-		0,
-		QString::fromWCharArray(L"设置右摄像头增益"),
-		QString::fromWCharArray(L"设置右摄像头增益："),
-		cur,
-		0,
-		255);
+  //设置新值
+  int nv = QInputDialog::getInt(
+    0,
+    QString::fromWCharArray(L"设置右摄像头增益"),
+    QString::fromWCharArray(L"设置右摄像头增益："),
+    cur,
+    0,
+    255);
 
-	//设置左摄像机为新值，刘浏加上
   Paras::getSingletonPtr()->SetRightGain(nv);
 }
 
-void MainWindow::setRightCameraExpo()
-{
-	//显示当前值，刘浏加上
+void MainWindow::setRightCameraExpo() {
   int cur = Paras::getSingletonPtr()->right_expo_;
 
-	//设置新值
-	int nv = QInputDialog::getInt(
-		0,
-		QString::fromWCharArray(L"设置右摄像头曝光"),
-		QString::fromWCharArray(L"设置右摄像头曝光："),
-		cur,
-		0,
-		4000);
+  //设置新值
+  int nv = QInputDialog::getInt(
+    0,
+    QString::fromWCharArray(L"设置右摄像头曝光"),
+    QString::fromWCharArray(L"设置右摄像头曝光："),
+    cur,
+    0,
+    4000);
 
-	//设置左摄像机为新值，刘浏加上
   Paras::getSingletonPtr()->SetRightExpo(nv);
 }
 void MainWindow::iniParas() {
@@ -264,12 +250,12 @@ void MainWindow::createAction() {
   maLG = new QAction(QString::fromWCharArray(L"设置左摄像头增益"), this);
   connect(maLG, SIGNAL(triggered()), this, SLOT(setLeftCameraGain()));
   maLE = new QAction(QString::fromWCharArray(L"设置左摄像头曝光"), this);
-  connect(maLE, SIGNAL(triggered()), this, SLOT(setLeftCameraExpo()));	
+  connect(maLE, SIGNAL(triggered()), this, SLOT(setLeftCameraExpo()));
   maRG = new QAction(QString::fromWCharArray(L"设置右摄像头增益"), this);
-  connect(maRG, SIGNAL(triggered()), this, SLOT(setRightCameraGain()));	
+  connect(maRG, SIGNAL(triggered()), this, SLOT(setRightCameraGain()));
   maRE = new QAction(QString::fromWCharArray(L"设置右摄像头曝光"), this);
-  connect(maRE, SIGNAL(triggered()), this, SLOT(setRightCameraExpo()));	
- 
+  connect(maRE, SIGNAL(triggered()), this, SLOT(setRightCameraExpo()));
+
   //录播
   maRecord = new QAction(QString::fromWCharArray(L"录像"), this);
   connect(maRecord, SIGNAL(triggered()), this, SLOT(showRecordWindow()));
@@ -289,7 +275,7 @@ void MainWindow::createAction() {
   connect(maManual, SIGNAL(triggered()), this, SLOT(showManualWindow()));
   maMeasure = new QAction(QString::fromWCharArray(L"自动测量"), this);
   connect(maMeasure, SIGNAL(triggered()), this, SLOT(showAutoMeasureWindow()));
-  
+
   //跟踪
   maDefaultSpec = new QAction(QString::fromWCharArray(L"设置跟踪点"), this);
   connect(maDefaultSpec, SIGNAL(triggered()), this, SLOT(showMarkerDefineWindow()));
@@ -297,7 +283,7 @@ void MainWindow::createAction() {
   connect(maTrack, SIGNAL(triggered()), this, SLOT(showTrackingWindow()));
   ma3DShow = new QAction(QString::fromWCharArray(L"二维显示"), this);
   ma2DShow = new QAction(QString::fromWCharArray(L"三维显示"), this);
-  
+
   //todo
   maTodo = new QAction(QString::fromWCharArray(L"todo"), this);
 }
@@ -359,28 +345,26 @@ void MainWindow::closeEvent(QCloseEvent* event) {
     base::MessageLoop::current()->Quit();
 }
 
-void MainWindow::setAsDefault(){
-	QString destPath("reconstruct\\");
-	QString srcPath("defaultRT\\");
-	QDir curDir(destPath);
+void MainWindow::setAsDefault() {
+  QString destPath("reconstruct\\");
+  QString srcPath("defaultRT\\");
+  QDir curDir(destPath);
 
-	//删除reconstruct文件夹下的所有文件
-	QFileInfoList allFileInfos = curDir.entryInfoList();
-	for(int i=0;i<allFileInfos.size();i++)
-	{
-		QFile::remove(destPath + allFileInfos[i].fileName());
-	}
-	//从default拷贝
-	curDir = srcPath;
-	allFileInfos = curDir.entryInfoList();
-	for(int i=0;i<allFileInfos.size();i++)
-	{
-		QFile::copy(srcPath + allFileInfos[i].fileName(), destPath + allFileInfos[i].fileName());
-	}
+  //删除reconstruct文件夹下的所有文件
+  QFileInfoList allFileInfos = curDir.entryInfoList();
+  for (int i = 0; i < allFileInfos.size(); i++) {
+    QFile::remove(destPath + allFileInfos[i].fileName());
+  }
+  //从default拷贝
+  curDir = srcPath;
+  allFileInfos = curDir.entryInfoList();
+  for (int i = 0; i < allFileInfos.size(); i++) {
+    QFile::copy(srcPath + allFileInfos[i].fileName(),
+                destPath + allFileInfos[i].fileName());
+  }
 
-	QMessageBox::about(
-		0,
-		QString::fromWCharArray(L"消息框"),
-		QString::fromWCharArray(L"已将外参数设置成默认参数！")
-	);
+  QMessageBox::about(
+    0,
+    QString::fromWCharArray(L"消息框"),
+    QString::fromWCharArray(L"已将外参数设置成默认参数！"));
 }
