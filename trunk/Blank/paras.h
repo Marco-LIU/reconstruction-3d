@@ -10,108 +10,108 @@
 #include<assert.h>
 using namespace std;
 
-template<typename T> 
+template<typename T>
 class Singleton
 {
 protected:
-    static T* ms_Singleton;	//指向某种类的一个静态对象
+static T* ms_Singleton;	//指向某种类的一个静态对象
 public:
-	//构造函数，设置私有变量ms_Singleton指向某种类的一个静态对象
-    Singleton( void )
-    {
-        assert( !ms_Singleton );
-		ms_Singleton = static_cast< T* >( this );
-    }
-    ~Singleton( void )
-    {  
-		assert( ms_Singleton );  
-		ms_Singleton = 0;  
-	}
-    
-	//返回单件类中保存的对象的引用
-	static T& getSingleton( void )
-	{	
-		assert( ms_Singleton );  
-		return ( *ms_Singleton ); 
-	}
-    //返回单件类中保存的对象的指针
-	static T* getSingletonPtr( void )
-	{ 
-		return ms_Singleton; 
-	}
+//构造函数，设置私有变量ms_Singleton指向某种类的一个静态对象
+Singleton( void )
+{
+assert( !ms_Singleton );
+ms_Singleton = static_cast< T* >( this );
+}
+~Singleton( void )
+{
+assert( ms_Singleton );
+ms_Singleton = 0;
+}
+
+//返回单件类中保存的对象的引用
+static T& getSingleton( void )
+{
+assert( ms_Singleton );
+return ( *ms_Singleton );
+}
+//返回单件类中保存的对象的指针
+static T* getSingletonPtr( void )
+{
+return ms_Singleton;
+}
 };
 class test:public Singleton<test>
 {
 public:
-	void show()
-	{
-		cout<<"show"<<endl;
-	}
+void show()
+{
+cout<<"show"<<endl;
+}
 
-	static test& getSingleton(void);
+static test& getSingleton(void);
 
-	static test* getSingletonPtr(void);
+static test* getSingletonPtr(void);
 };
 
 template<> test* Singleton<test>::ms_Singleton = 0;
 test* test::getSingletonPtr(void)
 {
-    return ms_Singleton;
+return ms_Singleton;
 }
 test& test::getSingleton(void)
-{  
-    assert( ms_Singleton );  return ( *ms_Singleton );  
+{
+assert( ms_Singleton );  return ( *ms_Singleton );
 }
 int main(int argc, char ** argv)
-{	
-	test::getSingletonPtr()->show();
-	int orz;
-	cin>>orz;
-    return 0;
+{
+test::getSingletonPtr()->show();
+int orz;
+cin>>orz;
+return 0;
 }
 上面的定义采用的是本工程中的定义
 
 2、按我的理解可以把它按逻辑顺序分为下面的三个部分：
 A、定义一个通用的模板单件类
-template<typename T> 
+template<typename T>
 class Singleton
 {
 protected:
-    static T* ms_Singleton;	//指向某种类的一个静态对象
+static T* ms_Singleton;	//指向某种类的一个静态对象
 public:
-	//构造函数，设置私有变量ms_Singleton指向某种类的一个静态对象
-    Singleton( void )
-    {
-        assert( !ms_Singleton );
-		ms_Singleton = static_cast< T* >( this );
-    }
-    ~Singleton( void )
-    {  
-		assert( ms_Singleton );  
-		ms_Singleton = 0;  
-	}
-    
-	//返回单件类中保存的对象的引用
-	static T& getSingleton( void )
-	{	
-		assert( ms_Singleton );  
-		return ( *ms_Singleton ); 
-	}
-    //返回单件类中保存的对象的指针
-	static T* getSingletonPtr( void )
-	{ 
-		return ms_Singleton; 
-	}
+//构造函数，设置私有变量ms_Singleton指向某种类的一个静态对象
+Singleton( void )
+{
+assert( !ms_Singleton );
+ms_Singleton = static_cast< T* >( this );
+}
+~Singleton( void )
+{
+assert( ms_Singleton );
+ms_Singleton = 0;
+}
+
+//返回单件类中保存的对象的引用
+static T& getSingleton( void )
+{
+assert( ms_Singleton );
+return ( *ms_Singleton );
+}
+//返回单件类中保存的对象的指针
+static T* getSingletonPtr( void )
+{
+return ms_Singleton;
+}
 };
 
 B、定义一个使用单件模式的类
 class test
 {
 public:
-	void show()
-	{
-		cout<<"show"<<endl;
-	}
+void show()
+{
+cout<<"show"<<endl;
+}
 };
 
 template<> test* Singleton<test>::ms_Singleton = 0;
@@ -119,13 +119,13 @@ template<> test* Singleton<test>::ms_Singleton = 0;
 template<>
 test* Singleton<test>::getSingletonPtr(void)
 {
-    return ms_Singleton;
+return ms_Singleton;
 }
 
 template<>
 test& Singleton<test>::getSingleton(void)
-{  
-    assert( ms_Singleton );  return ( *ms_Singleton );  
+{
+assert( ms_Singleton );  return ( *ms_Singleton );
 }
 
 class Test:public Singleton<test>
@@ -136,10 +136,10 @@ B1、特例化这个类型的单件类
 class test
 {
 public:
-	void show()
-	{
-		cout<<"show"<<endl;
-	}
+void show()
+{
+cout<<"show"<<endl;
+}
 };
 
 template<> test* Singleton<test>::ms_Singleton = 0;
@@ -147,13 +147,13 @@ template<> test* Singleton<test>::ms_Singleton = 0;
 template<>
 test* Singleton<test>::getSingletonPtr(void)
 {
-    return ms_Singleton;
+return ms_Singleton;
 }
 
 template<>
 test& Singleton<test>::getSingleton(void)
-{  
-    assert( ms_Singleton );  return ( *ms_Singleton );  
+{
+assert( ms_Singleton );  return ( *ms_Singleton );
 }
 
 B2、派生一个单件类
@@ -168,51 +168,63 @@ Test::getSingletonPtr()->show();
 #include <QtCore\qstring.h>
 #include <QtGui\qpixmap.h>
 #include <set>
+#include <map>
+#include "camera_config.h"
+#include <string>
 
 //定义一个单件类
-template<typename T> 
+template<typename T>
 class Singleton
 {
 protected:
-	//静态变量必须定义，这里只是进行了声明
-    static T* ms_Singleton;	//指向某种类的一个静态对象
+  //静态变量必须定义，这里只是进行了声明
+  static T* ms_Singleton;	//指向某种类的一个静态对象
 public:
-	//构造函数，设置私有变量ms_Singleton指向某种类的一个静态对象
-    Singleton( void )
-    {
-        assert( !ms_Singleton );
+  //构造函数，设置私有变量ms_Singleton指向某种类的一个静态对象
+  Singleton(void) {
+    assert(!ms_Singleton);
 
-		ms_Singleton = static_cast< T* >( this );
-    }
-    ~Singleton( void )
-        {  assert( ms_Singleton );  ms_Singleton = 0;  }
-    
-	//返回单件类中保存的对象的引用
-	static T& getSingleton( void )
-	{	assert( ms_Singleton );  return ( *ms_Singleton ); }
-    //返回单件类中保存的对象的指针
-	static T* getSingletonPtr( void )
-	{ return ms_Singleton; }
+    ms_Singleton = static_cast<T*>(this);
+  }
+  ~Singleton(void) {
+    assert(ms_Singleton);  ms_Singleton = 0;
+  }
+
+  //返回单件类中保存的对象的引用
+  static T& getSingleton(void) {
+    assert(ms_Singleton);  return (*ms_Singleton);
+  }
+  //返回单件类中保存的对象的指针
+  static T* getSingletonPtr(void) {
+    return ms_Singleton;
+  }
 };
 
 class ParaObserver;
 
 //这个类保存了程序中所有要使用的参数
-class Paras : public Singleton<Paras>
+class Paras : public Singleton < Paras >
 {
 public:
-	int			width;				//图像宽度
-	int			height;				//图像高度
-	QString		LeftImagesFoler;	//左图像保存的位置
-	QString		RightImagesFoler;	//右图像保存的位置
-	QString		ImagesFoler;		//总文件夹
-	QPixmap		LeftBlankImg;		//左空白图像
-	QPixmap		RightBlankImg;		//右空白图像
+  void Load(const std::string& config_file);
+public:
+  int			width;				//图像宽度
+  int			height;				//图像高度
+  QString		LeftImagesFoler;	//左图像保存的位置
+  QString		RightImagesFoler;	//右图像保存的位置
+  QString		ImagesFoler;		//总文件夹
+  QPixmap		LeftBlankImg;		//左空白图像
+  QPixmap		RightBlankImg;		//右空白图像
 
   int left_gain_;
   int right_gain_;
   int left_expo_;
   int right_expo_;
+
+  typedef std::map<std::string, CameraConfig> CameraConfigs;
+  CameraConfigs camera_configs_;
+
+  int resolution;
 
 public:
   void SetLeftGain(int gain);
@@ -224,8 +236,8 @@ public:
   void SetExpo(int id, int expo, bool trigger_event = true);
 
 public:
-	static Paras& getSingleton(void);
-	static Paras* getSingletonPtr(void);
+  static Paras& getSingleton(void);
+  static Paras* getSingletonPtr(void);
 
 public:
   void AddOb(ParaObserver* ob);
