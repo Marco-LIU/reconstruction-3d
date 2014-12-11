@@ -243,7 +243,7 @@ void CalibrateWindow::capture() {
   std::string imgname = mImgFolders.toStdString() + name.toStdString() + ".jpg";
   cv::Mat ti = cv::imread(imgname);
   cv::Mat clrImg = ti.clone();
-  //cv::cvtColor(ti, ti, cv::COLOR_BGR2GRAY);
+  cv::cvtColor(ti, ti, cv::COLOR_BGR2GRAY);
 
   cv::vector<cv::Point2f> corners = CameraCalibration::findCorners(ti, mXCorners, mYCorners);
 
