@@ -112,16 +112,16 @@ void CalibrateWindow::updatePixmap(QImage& li) {
 
 //更新一帧场景图像
 void CalibrateWindow::updateOneFrame() {
-  static int FrameCount = 0;
-  static int StartTime = mProTimer.getMilliseconds();
+  //static int FrameCount = 0;
+  //static int StartTime = mProTimer.getMilliseconds();
 
   CameraFrames frames;
   mCameras->GetFrames(frames);
   if (frames.size() == 2) {
-    FrameCount++;
+    //FrameCount++;
+    //FrameCount++;
 
-    FrameCount++;
-    updatePixmap(frames[0].ToQImage());
+    updatePixmap(frames[mCameraId].ToQImage());
 
     float fps = mCameras->FrameRate();
     //更新状态栏显示
@@ -241,7 +241,7 @@ void CalibrateWindow::capture() {
 
   //读取图像，计算角点
   std::string imgname = mImgFolders.toStdString() + name.toStdString() + ".jpg";
-  cv::Mat ti = cv::imread(imgname, CV_LOAD_IMAGE_UNCHANGED);
+  cv::Mat ti = cv::imread(imgname);
   cv::Mat clrImg = ti.clone();
   //cv::cvtColor(ti, ti, cv::COLOR_BGR2GRAY);
 
