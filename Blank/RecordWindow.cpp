@@ -251,12 +251,12 @@ void RecordWindow::recordVedio() {
     mRecordStart = mProTimer.getMilliseconds();
 
     //todo 如果有文件需不需要提示覆盖文件
-    if (QFile::exists(Paras::getSingleton().ImagesFoler + "info.txt")) {
-      QFile::remove(Paras::getSingleton().ImagesFoler + "info.txt");
+    if (QFile::exists(Paras::getSingleton().ImagesFoler + "/info.txt")) {
+      QFile::remove(Paras::getSingleton().ImagesFoler + "/info.txt");
     }
 
     //创建文件
-    QFile file(Paras::getSingleton().ImagesFoler + "info.txt");
+    QFile file(Paras::getSingleton().ImagesFoler + "/info.txt");
     file.open(QIODevice::ReadWrite);
     file.write("/left/0_img_list.txt\r\n");
     file.write("/right/0_img_list.txt\r\n");
