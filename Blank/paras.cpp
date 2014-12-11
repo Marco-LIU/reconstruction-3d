@@ -1,5 +1,9 @@
 #include "paras.h"
 #include<assert.h>
+#include "base/files/file_path.h"
+#include "base/files/file_util.h"
+#include "base/values.h"
+#include "base/json/json_reader.h"
 
 template<> Paras* Singleton<Paras>::ms_Singleton = 0;
 Paras* Paras::getSingletonPtr(void)
@@ -9,6 +13,50 @@ Paras* Paras::getSingletonPtr(void)
 Paras& Paras::getSingleton(void)
 {  
     assert( ms_Singleton );  return ( *ms_Singleton );  
+}
+
+void Paras::Load(const std::string& config_file) {
+  base::FilePath data_path(L"./");
+  data_path = data_path.AppendASCII(config_file);
+  std::string data;
+  if (base::ReadFileToString(data_path, &data)) {
+    scoped_ptr<base::Value> v(base::JSONReader::Read(data));
+    base::DictionaryValue* dict = NULL;
+
+    if (v.get() && v->GetAsDictionary(&dict)) {
+      if (dict->HasKey("ver")) {
+        int ver = 0;
+        bool g_reso = true;
+        if (dict->GetInteger("ver", &ver) && ver == 1) {
+          if (!dict->GetInteger("resolution", &resolution)) {
+            g_reso = false;
+            resolution = 0;
+          }
+          if (!dict->GetInteger("width", &width)) {
+            width = 1280;
+          }
+          if (!dict->GetInteger("height", &height)) {
+            height = 1024;
+          }
+
+          base::ListValue* cam_list = NULL;
+          if (dict->GetList("cameras", &cam_list) && cam_list) {
+            int count = cam_list->GetSize();
+            for (int i = 0; i < count; ++i) {
+              base::DictionaryValue* cam = NULL;
+              if (cam_list->GetDictionary(i, &cam) && cam) {
+                CameraConfig ccfg;
+                if (CameraConfig::ParseFromDict(cam, ccfg)) {
+                  if (g_reso) ccfg.reso = resolution;
+                  camera_configs_[ccfg.sn] = ccfg;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 void Paras::AddOb(ParaObserver* ob) {

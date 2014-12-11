@@ -17,6 +17,7 @@
 #include "camera_frame.h"
 #include "runtime_context.h"
 #include "camera_config.h"
+#include "paras.h"
 
 /*#define IO_THREAD_PER_CAMERA 2
 
@@ -396,8 +397,8 @@ bool UsbCameraGroup::Init(const std::string& config) {
   bool succ = true;
 
   std::map<std::string, int>* sn_to_id = NULL;
-  std::map<std::string, CameraConfig>* sn_to_cfg = NULL;
-  int resolution_index = 0;
+  //std::map<std::string, CameraConfig>* sn_to_cfg = NULL;
+  /*int resolution_index = 0;
 
   if (config == "para.config") {
     sn_to_id = new std::map<std::string, int>();
@@ -444,52 +445,65 @@ bool UsbCameraGroup::Init(const std::string& config) {
         }
       }
     }
-  }
+  }*/
 
   for (int i = 0; i < count; i++) {
     scoped_refptr<UsbCamera> c = new UsbCamera(i);
-    if (c->Init(resolution_index)) {
-      if (sn_to_id || sn_to_cfg) {
+    if (c->Init(Paras::getSingletonPtr()->resolution)) {
+      std::string sn = c->sn();
+      std::map<std::string, CameraConfig>::iterator it =
+        Paras::getSingletonPtr()->camera_configs_.find(sn);
+
+      if (it != Paras::getSingletonPtr()->camera_configs_.end()) {
+        cameras_[it->second.id] = c;
+        c->SetConfig(it->second);
+        unsigned char* buf = new unsigned char[c->buffer_length()];
+        memset(buf, 0, c->buffer_length());
+        buffers_[it->second.id] = buf;
+      }
+
+      /*if (sn_to_id || sn_to_cfg) {
         std::string sn = c->sn();
 
         if (sn_to_id) {
-          std::map<std::string, int>::iterator it = sn_to_id->find(sn);
-          if (it != sn_to_id->end()) {
-            cameras_[it->second] = c;
-            c->SetId(it->second);
-            unsigned char* buf = new unsigned char[c->buffer_length()];
-            memset(buf, 0, c->buffer_length());
-            buffers_[it->second] = buf;
-          }
-        } else if (sn_to_cfg) {
-          std::map<std::string, CameraConfig>::iterator it =
-              sn_to_cfg->find(sn);
-          if (it != sn_to_cfg->end()) {
-            cameras_[it->second.id] = c;
-            c->SetConfig(it->second);
-            unsigned char* buf = new unsigned char[c->buffer_length()];
-            memset(buf, 0, c->buffer_length());
-            buffers_[it->second.id] = buf;
-          }
-        } else {
-          succ = false;
-          break;
+        std::map<std::string, int>::iterator it = sn_to_id->find(sn);
+        if (it != sn_to_id->end()) {
+        cameras_[it->second] = c;
+        c->SetId(it->second);
+        unsigned char* buf = new unsigned char[c->buffer_length()];
+        memset(buf, 0, c->buffer_length());
+        buffers_[it->second] = buf;
         }
-      } else {
+        } else if (sn_to_cfg) {
+        std::map<std::string, CameraConfig>::iterator it =
+        sn_to_cfg->find(sn);
+        if (it != sn_to_cfg->end()) {
+        cameras_[it->second.id] = c;
+        c->SetConfig(it->second);
+        unsigned char* buf = new unsigned char[c->buffer_length()];
+        memset(buf, 0, c->buffer_length());
+        buffers_[it->second.id] = buf;
+        }
+        } else {
+        succ = false;
+        break;
+        }
+        } else {
         cameras_[i] = c;
         c->SetId(i);
         unsigned char* buf = new unsigned char[c->buffer_length()];
         memset(buf, 0, c->buffer_length());
         buffers_[i] = buf;
-      }
-    } else {
-      succ = false;
-      break;
+        }
+        } else {
+        succ = false;
+        break;
+        }*/
     }
   }
 
   if (sn_to_id) delete sn_to_id;
-  if (sn_to_cfg) delete sn_to_cfg;
+  //if (sn_to_cfg) delete sn_to_cfg;
 
   return succ;
 }
