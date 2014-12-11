@@ -10,6 +10,7 @@
 #include "QtWidgets/qwidget.h"
 
 #include "opencv2/core/core.hpp"
+#include "base/memory/ref_counted.h"
 
 #include "OgreTimer.h"
 
@@ -25,7 +26,8 @@ class QLabel;
 
 class MyCameraView;
 class MyDetailView;
-class UsbCameras;
+// class UsbCameras;
+class UsbCameraGroup;
 
 class CalibrateWindow : public QWidget
 {
@@ -38,6 +40,7 @@ public:
   QImage convertToQImage(unsigned char* buffer);
   //更新场景图像
   void updatePixmap(unsigned char* buffer);
+  void updatePixmap(QImage& li);
 signals:
 
 public slots:
@@ -91,7 +94,7 @@ protected:
   MyDetailView*   mZoomView;            //缩放视图
 
   QTimer*			mTimer;					//定时器触发
-  UsbCameras*		mCameras;				//摄像头
+  scoped_refptr<UsbCameraGroup>   mCameras;     //摄像头
   int				mCameraId;				//0表示左摄像头，1表示右摄像头
   bool			mbLeftFocused;			//true表示左摄像头屏幕获得焦点
   Timer			mProTimer;				//程序的计时器

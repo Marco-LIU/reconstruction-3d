@@ -41,6 +41,8 @@
 #include "marker.h"
 #include "paras.h"
 #include "CameraCalibration.h"
+#include "usb_camera_group.h"
+#include "camera_frame.h"
 
 CalibrateWindow::CalibrateWindow(QGraphicsScene* scene,
                                  QGraphicsPixmapItem* left,
@@ -101,15 +103,31 @@ void CalibrateWindow::updatePixmap(unsigned char* buffer) {
   update();
 }
 
+void CalibrateWindow::updatePixmap(QImage& li) {
+  mLastCaptureImg = li;
+  mLeftCameraPixmap->setPixmap(QPixmap::fromImage(li));
+  //更新图像
+  update();
+}
+
 //更新一帧场景图像
 void CalibrateWindow::updateOneFrame() {
   static int FrameCount = 0;
   static int StartTime = mProTimer.getMilliseconds();
 
-  if (mCameras->captureOneFrameWithTrigger(mCameraId)) {
+  CameraFrames frames;
+  mCameras->GetFrames(frames);
+  if (frames.size() == 2) {
     FrameCount++;
 
-    updatePixmap(mCameras->getBuffer(mCameraId));
+    FrameCount++;
+    updatePixmap(frames[0].ToQImage());
+
+    float fps = mCameras->FrameRate();
+    //更新状态栏显示
+    QString show;
+    show.sprintf("当前的帧率为：%f", fps);
+    mStatusBar->showMessage(show);
   }
 
   //每20帧，统计下帧率
@@ -162,13 +180,13 @@ void CalibrateWindow::setRightDetailView() {
 void CalibrateWindow::preview() {
   //如果没有启动摄像头，启动，并开始预览
   if (mbPlay == false) {
-    mCameras = new UsbCameras("para.config");
+    mCameras = new UsbCameraGroup();
+    bool succ = mCameras->Init("para.json");
 
     //如果启动失败，提示摄像机没有连接好
-    if (mCameras->getCameraIndex(mCameraId) == -1) {
-      delete mCameras;
+    if (!succ || mCameras->camera_count() != 2) {
       mCameras = NULL;
-      mPlay->setText(QString::fromWCharArray(L"停止"));
+      mPlay->setText("未连接");
     
       QMessageBox::critical(
         0,							//父窗口
@@ -178,8 +196,7 @@ void CalibrateWindow::preview() {
     }
     //成功启动
     else {
-      mCameras->setTriggerMode(true);
-
+      mCameras->StartAll();
       //切换其它按钮状态
       mbPlay = true;
       mPlay->setText(QString::fromWCharArray(L"停止"));
@@ -199,7 +216,7 @@ void CalibrateWindow::preview() {
       mTimer->stop();
       delete mTimer;
       mTimer = NULL;
-      delete mCameras;
+      mCameras->StopAll();
       mCameras = NULL;
       mPlay->setText(QString::fromWCharArray(L"预览"));
       mCapture->setDisabled(true);

@@ -49,6 +49,7 @@
 #include "marker.h"
 #include "paras.h"
 #include "frame_record.h"
+#include "qt_utils.h"
 
 using LLX::WorkingThread;
 
@@ -281,9 +282,16 @@ void RecordWindow::recordVedio() {
 
 namespace
 {
-  void RunInFileThread(scoped_refptr<base::MessageLoopProxy> ml,
-                       base::Closure cb) {
+  void RunInFileThread2(scoped_refptr<base::MessageLoopProxy> ml,
+                        base::Closure cb) {
     ml->PostTask(FROM_HERE, cb);
+  }
+
+  void RunInFileThread(WorkingThread::ID id,
+                       scoped_refptr<base::MessageLoopProxy> ml,
+                       base::Closure cb) {
+    WorkingThread::PostTask((WorkingThread::ID)(id + 2), FROM_HERE,
+                            base::Bind(&RunInFileThread2, ml, cb));
   }
 }
 
@@ -321,11 +329,13 @@ void RecordWindow::stopRecordVedio() {
 
   WorkingThread::PostTask(WorkingThread::FILE1, FROM_HERE,
                           base::Bind(&RunInFileThread,
+                                     WorkingThread::FILE1,
                                      base::MessageLoopProxy::current(),
                                      callback));
 
   WorkingThread::PostTask(WorkingThread::FILE2, FROM_HERE,
                           base::Bind(&RunInFileThread,
+                                     WorkingThread::FILE2,
                                      base::MessageLoopProxy::current(),
                                      callback));
   //mCameras->StopRecord();
@@ -476,7 +486,52 @@ void RecordWindow::createWidget() {
 }
 
 namespace {
+  static void SaveListFile(int id,
+                           unsigned int w,
+                           unsigned int h,
+                           const base::FilePath& img_path,
+                           const base::FilePath& list_path,
+                           const std::string& data) {
+    int64 file_size = 0;
+    if (!base::PathExists(img_path) || !base::GetFileSize(img_path, &file_size))
+      return;
+
+    base::Time tick0 = base::Time::Now();
+
+    char* buf = new char[file_size];
+
+    if (!file_size) return;
+
+    if (file_size != base::ReadFile(img_path, buf, file_size)) {
+      delete[] buf;
+      return;
+    }
+    base::Time tick1 = base::Time::Now();
+
+    QImage image = FromRawGray(buf, w, h);
+
+    if (!image.isNull()) {
+      base::FilePath path = img_path.AddExtension(L".jpg");
+      if (image.save(QString::fromWCharArray(path.value().c_str()))) {
+        base::DeleteFile(img_path, false);
+        base::AppendToFile(list_path, data.c_str(), data.length());
+
+        base::Time tick2 = base::Time::Now();
+
+#ifdef NDEBUG
+        base::TimeDelta t1 = tick1 - tick0;
+        base::TimeDelta t2 = tick2 - tick1;
+        LLX_INFO() << "Convert JPG, T1: " << t1.InMilliseconds()
+          << " T2: " << t2.InMilliseconds();
+#endif
+      }
+    }
+
+    delete[] buf;
+  }
+
   static void SaveImage(int index,
+                        int id,
                         const CameraFrame& frame,
                         const base::FilePath& img_path,
                         const base::FilePath& list_path) {
@@ -492,7 +547,6 @@ namespace {
     if (!base::PathExists(list_path)) {
       base::WriteFile(list_path, "", 0);
     }
-
     base::Time tick1 = base::Time::Now();
 
     std::string base_name = base::IntToString(index) +
@@ -503,26 +557,30 @@ namespace {
       "\r\n";
     bool s = false;
     {
-      QImage image = frame.ToQImage();
-      s = image.save(QString::fromWCharArray(image_path.value().c_str()));
-      frame.Purge();
+      int x = base::WriteFile(image_path,
+                              (const char*)frame.data->front(),
+                              frame.data->size());
+
+      s = (x == frame.data->size());
     }
+
     base::Time tick2 = base::Time::Now();
 
-    base::AppendToFile(list_path, base_name.c_str(), base_name.length());
-
-    base::Time tick3 = base::Time::Now();
-    if (!s) {
+    if (s) {
+      WorkingThread::PostTask((WorkingThread::ID)(id + 2), FROM_HERE,
+                              base::Bind(&SaveListFile, id, 
+                                         frame.width, frame.height, image_path,
+                                         list_path, base_name));
+    } else {
       LLX_INFO() << "Save image to " << image_path.value().c_str()
         << " " << (s ? "DONE" : "FAIL");
     }
+
 #ifdef NDEBUG
     base::TimeDelta t1 = tick1 - tick0;
     base::TimeDelta t2 = tick2 - tick1;
-    base::TimeDelta t3 = tick3 - tick2;
-
-    LLX_INFO() << index << "    T1: " << t1.InMilliseconds() <<
-        " T2: " << t2.InMilliseconds() << " T3: " << t3.InMilliseconds();
+    LLX_INFO() << "Save Raw Image, T1: " << t1.InMilliseconds()
+        << " T2: " << t2.InMilliseconds();
 #endif
   }
 }
@@ -548,18 +606,16 @@ void RecordWindow::RecordFrame(CameraFrames& frames) {
     } else continue;
 
     std::wstring filename = base::UintToString16(mRecordCnt) + L"_"
-        + base::Int64ToString16(it->second.time_stamp.ToInternalValue() / 1000)
-        + L".jpg";
+        + base::Int64ToString16(it->second.time_stamp.ToInternalValue() / 1000);
 
     d = d.Append(filename);
-    WorkingThread::ID id =
-        (WorkingThread::ID)(WorkingThread::FILE1 + (mRecordCnt & 1));
+    WorkingThread::ID id = WorkingThread::FILE1;
 
     if (it->first == 1)
-      id = (WorkingThread::ID)(WorkingThread::FILE3 + (mRecordCnt & 1));
+      id = WorkingThread::FILE2;
 
     WorkingThread::PostTask(id, FROM_HERE,
-                            base::Bind(&SaveImage, mRecordCnt,
+                            base::Bind(&SaveImage, mRecordCnt, (int)id,
                                        it->second, d, list_path));
 
     ++it;
