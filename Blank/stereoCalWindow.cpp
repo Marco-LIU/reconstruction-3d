@@ -261,9 +261,9 @@ void StereoCalibrationWindow::capture() {
   //读取图像，计算角点
   cv::Mat li = cv::imread(leftname.toStdString() + ".jpg", CV_LOAD_IMAGE_UNCHANGED);
   cv::Mat ri = cv::imread(rightname.toStdString() + ".jpg", CV_LOAD_IMAGE_UNCHANGED);
-  cv::Mat liGrey, riGrey;
-  cv::cvtColor(li, liGrey, cv::COLOR_BGR2GRAY);
-  cv::cvtColor(ri, riGrey, cv::COLOR_BGR2GRAY);
+  cv::Mat liGrey = li.clone(), riGrey = ri.clone();
+  //cv::cvtColor(li, liGrey, cv::COLOR_BGR2GRAY);
+  //cv::cvtColor(ri, riGrey, cv::COLOR_BGR2GRAY);
   cv::vector<cv::Point2f> leftcorners = CameraCalibration::findCorners(liGrey, mXCorners, mYCorners);
   cv::vector<cv::Point2f> rightcorners = CameraCalibration::findCorners(riGrey, mXCorners, mYCorners);
   //如果都找到了角点
