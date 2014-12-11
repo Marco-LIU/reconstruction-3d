@@ -50,3 +50,13 @@ QImage FromRawGray(scoped_refptr<base::RefCountedBytes> buffer,
   image.setColorTable(colorTable);
   return image;
 }
+
+QImage FromRawGray(char* buffer, unsigned int w, unsigned int h) {
+  unsigned char* pd = (unsigned char*)buffer;
+  QImage image(pd, w, h, QImage::Format_Indexed8);
+  QVector<QRgb> colorTable;
+  for (int i = 0; i < 256; ++i)
+    colorTable << qRgb(i, i, i);
+  image.setColorTable(colorTable);
+  return image;
+}

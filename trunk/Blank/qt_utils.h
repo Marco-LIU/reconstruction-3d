@@ -18,3 +18,5 @@ QWidget* LoadUIFile(const base::FilePath& ui_file, QWidget* parent = NULL);
 
 QImage FromRawGray(scoped_refptr<base::RefCountedBytes> buffer,
                    unsigned int w, unsigned int h);
+
+QImage FromRawGray(char* buffer, unsigned int w, unsigned int h);
