@@ -169,12 +169,12 @@ void CalibrateWindow::preview() {
       delete mCameras;
       mCameras = NULL;
       mPlay->setText(QString::fromWCharArray(L"停止"));
-	  
+    
       QMessageBox::critical(
         0,							//父窗口
         QString::fromWCharArray(L"找不到可用的摄像头"),		//标题栏
         QString::fromWCharArray(L"找不到可用的摄像头，请查看摄像头是否已经连接到电脑，如已经连接，请重新插拔USB接口"));		//文本内容
-	  
+    
     }
     //成功启动
     else {
@@ -303,10 +303,10 @@ void CalibrateWindow::deleteImg() {
     mImgs.erase(mImgs.begin() + index - 1);
 
     updateButtonState();
-	if(index>1)
-		updateCurrent(index-1);
-	else
-		updateCurrent(index);
+  if(index>1)
+    updateCurrent(index-1);
+  else
+    updateCurrent(index);
   }
 }
 //设置x方向的角点个数
@@ -452,7 +452,7 @@ void CalibrateWindow::calibrate() {
       0,				//父窗口
       QString::fromWCharArray(L"标定内参"),		//标题栏
       QString::fromWCharArray(L"内参标定完成，平均像素误差为：") + msg	//文本内容
-	  );
+    );
   }
 }
 //滑动滑块更新当前选择的
@@ -461,10 +461,10 @@ void CalibrateWindow::updateCurrent(int cs) {
   int all = mImgs.size();
   if(all == 0)
   {
-	  QString ta;
-	  ta.sprintf(" %d/%d", 0, 0);
-	  mCaps->setText(ta);
-	  return;
+    QString ta;
+    ta.sprintf(" %d/%d", 0, 0);
+    mCaps->setText(ta);
+    return;
   }
   QString ta;
   ta.sprintf(" %d/%d", cs, all);
@@ -684,8 +684,8 @@ void CalibrateWindow::updateButtonState() {
 
   if(mImgs.size()!=0)
   {
-	mSlider->setMinimum(1);
-	mSlider->setMaximum(mImgs.size());
+  mSlider->setMinimum(1);
+  mSlider->setMaximum(mImgs.size());
   }
   //更新标定按钮状态
   //始终可以，提示>5时，才能标定
