@@ -514,7 +514,8 @@ namespace {
       base::FilePath path = img_path.AddExtension(L".jpg");
       if (image.save(QString::fromWCharArray(path.value().c_str()))) {
         base::DeleteFile(img_path, false);
-        base::AppendToFile(list_path, data.c_str(), data.length());
+        std::string img_data = data + ".jpg";
+        base::AppendToFile(list_path, img_data.c_str(), img_data.length());
 
         base::Time tick2 = base::Time::Now();
 

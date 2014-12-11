@@ -44,8 +44,10 @@ bool LoadRecordedFrames(const base::FilePath& dir, RecordedFrames& frames) {
 
     r.image_path = dir.AppendASCII(filename);
 
-    if (!base::PathExists(r.image_path))
-      return false;
+    if (!base::PathExists(r.image_path)) {
+      r.image_path = dir.AppendASCII(filename).AddExtension(L".jpg");
+      if (!base::PathExists(r.image_path)) return false;
+    }
 
     frames[left_id].push_back(r);
   }
@@ -64,8 +66,10 @@ bool LoadRecordedFrames(const base::FilePath& dir, RecordedFrames& frames) {
 
     r.image_path = dir.AppendASCII(filename);
 
-    if (!base::PathExists(r.image_path))
-      return false;
+    if (!base::PathExists(r.image_path)) {
+      r.image_path = dir.AppendASCII(filename).AddExtension(L".jpg");
+      if (!base::PathExists(r.image_path)) return false;
+    }
 
     frames[right_id].push_back(r);
   }
