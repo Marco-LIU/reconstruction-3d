@@ -39,6 +39,10 @@ void Paras::Load(const std::string& config_file) {
             height = 1024;
           }
 
+          if (!dict->GetDouble("replay_speed", &replay_speed_)) {
+            replay_speed_ = 1.0;
+          }
+
           base::ListValue* cam_list = NULL;
           if (dict->GetList("cameras", &cam_list) && cam_list) {
             int count = cam_list->GetSize();

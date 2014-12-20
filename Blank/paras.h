@@ -208,18 +208,20 @@ class Paras : public Singleton < Paras >
 public:
   void Load(const std::string& config_file);
 public:
-  int			width;				//图像宽度
-  int			height;				//图像高度
-  QString		LeftImagesFoler;	//左图像保存的位置
-  QString		RightImagesFoler;	//右图像保存的位置
-  QString		ImagesFoler;		//总文件夹
-  QPixmap		LeftBlankImg;		//左空白图像
-  QPixmap		RightBlankImg;		//右空白图像
+  int         width;              //图像宽度
+  int         height;             //图像高度
+  QString     LeftImagesFoler;    //左图像保存的位置
+  QString     RightImagesFoler;   //右图像保存的位置
+  QString     ImagesFoler;        //总文件夹
+  QPixmap     LeftBlankImg;       //左空白图像
+  QPixmap     RightBlankImg;      //右空白图像
 
   int left_gain_;
   int right_gain_;
   int left_expo_;
   int right_expo_;
+
+  double replay_speed_;
 
   typedef std::map<std::string, CameraConfig> CameraConfigs;
   CameraConfigs camera_configs_;

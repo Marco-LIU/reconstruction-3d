@@ -57,7 +57,7 @@ LONG WINAPI OnCrash(LPEXCEPTION_POINTERS exception) {
   SYSTEMTIME st;
   ::GetLocalTime(&st);
   swprintf_s(buf, MAX_PATH,
-             L"%s\\sndast_%4d-%02d-%02d_%02d-%02d-%02d-%03d.dmp",
+             L"%s\\crash_dump_%4d-%02d-%02d_%02d-%02d-%02d-%03d.dmp",
              lpPath,
              st.wYear, st.wMonth, st.wDay, st.wHour,
              st.wMinute, st.wSecond, st.wMilliseconds);
@@ -107,7 +107,7 @@ int CALLBACK WinMain(
   //fs.release();
 
   //初始化程序参数
-  new Paras();
+  Paras p;
   Paras::getSingleton().Load("para.json");
   //Paras::getSingleton().width = resX;
   //Paras::getSingleton().height = resY;

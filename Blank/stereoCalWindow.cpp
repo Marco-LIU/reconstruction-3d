@@ -43,8 +43,8 @@
 #include "camera_frame.h"
 
 StereoCalibrationWindow::StereoCalibrationWindow(
-    QGraphicsScene* scene, QGraphicsPixmapItem* left, QGraphicsPixmapItem* right,
-    QStatusBar* status, QString imgFolder, QString lc, QString rc) {
+  QGraphicsScene* scene, QGraphicsPixmapItem* left, QGraphicsPixmapItem* right,
+  QStatusBar* status, QString imgFolder, QString lc, QString rc) {
   mLeftCameraPixmap = left;
   mRightCameraPixmap = right;
   mStatusBar = status;
@@ -159,7 +159,7 @@ void StereoCalibrationWindow::updateOneFrame() {
     //ÖÃ0
     FrameCount = 0;
     StartTime = mProTimer.getMilliseconds();
-  }*/
+    }*/
 }
 //ÉèÖÃÏêÏ¸ÊÓÍ¼Îª×óÊÓÍ¼
 void StereoCalibrationWindow::setLeftDetailView() {
@@ -349,10 +349,10 @@ void StereoCalibrationWindow::deleteImg() {
     mImgs.erase(mImgs.begin() + index - 1);
 
     updateButtonState();
-	if(index>1)
-    updateCurrent(index-1);
-	else
-    updateCurrent(index);
+    if (index > 1)
+      updateCurrent(index - 1);
+    else
+      updateCurrent(index);
   }
 }
 
