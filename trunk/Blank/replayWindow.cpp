@@ -154,6 +154,7 @@ void ReplayWindow::open() {
       mSlider->setValue(mStartIndex);
       mSlider->setTickInterval((mEndIndex - mStartIndex) / 10);
       mSlider->setEnabled(true);
+      mReplayCursor = mStartIndex;
       loadImage(mStartIndex);
 
       //todo 是否缓存图像
@@ -210,19 +211,27 @@ void ReplayWindow::play() {
 }
 //上一帧
 void ReplayWindow::next() {
-  int cv = mSlider->value();
-  cv = cv + 1;
-  if (cv > mEndIndex)
-    cv = mStartIndex;
-  mSlider->setValue(cv);
+  mReplayCursor += Paras::getSingletonPtr()->replay_speed_;
+  if (mReplayCursor > mEndIndex)
+    mReplayCursor = mStartIndex;
+  mSlider->setValue((int)mReplayCursor);
+  //int cv = mSlider->value();
+  //cv = cv + 1;
+  //if (cv > mEndIndex)
+  //  cv = mStartIndex;
+  //mSlider->setValue(cv);
 }
 //下一帧
 void ReplayWindow::before() {
-  int cv = mSlider->value();
-  cv = cv - 1;
-  if (cv < mStartIndex)
-    cv = mEndIndex;
-  mSlider->setValue(cv);
+  mReplayCursor -= Paras::getSingletonPtr()->replay_speed_;
+  if (mReplayCursor < mStartIndex)
+    mReplayCursor = mEndIndex;
+  mSlider->setValue((int)mReplayCursor);
+  //int cv = mSlider->value();
+  //cv = cv - 1;
+  //if (cv < mStartIndex)
+  //  cv = mEndIndex;
+  //mSlider->setValue(cv);
 }
 //载入索引所指的图像
 void ReplayWindow::loadImage(int i) {

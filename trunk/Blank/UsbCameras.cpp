@@ -82,8 +82,7 @@ std::vector<CameraInfos> UsbCameras::iniCameraInfos(std::string config)
       std::cout << "摄像机" << i << "初始化错误" << std::endl;
     }
 
-    //设置为高速模式
-    CameraSetHighspeed(i, true);
+    
 
     //设置为高电平触发
     //CameraSetTriggerPolarity(i,true);
@@ -100,14 +99,14 @@ std::vector<CameraInfos> UsbCameras::iniCameraInfos(std::string config)
     */
 
     //设置增益32，减少噪声
-    CameraSetAGC(i, false);
-    CameraSetGain(i, 32);
+    //CameraSetAGC(i, false);
+    //CameraSetGain(i, 32);
 
     //压缩暗部，增加激光条纹的亮度范围
-    CameraSetGamma(i, 1.61);
+    //CameraSetGamma(i, 1.61);
 
     //不使用自动曝光
-    CameraSetAEC(i, false);
+    //CameraSetAEC(i, false);
 
     //获取12位的产品序列号
     char id[12];
@@ -149,9 +148,11 @@ std::vector<CameraInfos> UsbCameras::iniCameraInfos(std::string config)
       CameraSetResolution(i, resolution_index, &width, &height);
       mWidth = width;
       mHeight = height;
+      ::Sleep(20);
+      API_STATUS s = API_ERROR;
       if (bMirror == 1) {
-        CameraSetMirrorX(i, true);
-        CameraSetMirrorY(i, true);
+        s = CameraSetMirrorX(i, true);
+        s = CameraSetMirrorY(i, true);
       }
       CameraSetGain(i, gain);
       CameraSetExposure(i, expo);
@@ -213,7 +214,7 @@ int UsbCameras::getCameraCount()
 //停止摄像机
 void UsbCameras::stopCamera(int index)
 {
-  CameraStop(index);	//停止相机
+  //CameraStop(index);	//停止相机
   CameraFree(index);	//释放相机
 }
 
@@ -338,16 +339,16 @@ void UsbCameras::stopOneCamera(int id)
 //启动摄像机
 void UsbCameras::startAllCamera()
 {
-  for(int i=0;i<mCamNum;i++)
-  {
-    CameraPlay(i,NULL,NULL);
-  }
+  //for(int i=0;i<mCamNum;i++)
+  //{
+    //CameraPlay(i,NULL,NULL);
+  //}
 }
 void UsbCameras::startOneCamera(int id)
 {
-  int index = getCameraIndex(id);
-  if(index !=-1)
-    CameraPlay(index,NULL,NULL);
+  //int index = getCameraIndex(id);
+  //if(index !=-1)
+    //CameraPlay(index,NULL,NULL);
 }
 
 /*******************************************************捕获函数*******************************************/
