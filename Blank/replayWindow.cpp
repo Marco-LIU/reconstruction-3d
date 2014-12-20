@@ -214,6 +214,7 @@ void ReplayWindow::next() {
   mReplayCursor += Paras::getSingletonPtr()->replay_speed_;
   if (mReplayCursor > mEndIndex)
     mReplayCursor = mStartIndex;
+  // 设置这个后会自动读取对应的图片
   mSlider->setValue((int)mReplayCursor);
   //int cv = mSlider->value();
   //cv = cv + 1;
@@ -226,6 +227,7 @@ void ReplayWindow::before() {
   mReplayCursor -= Paras::getSingletonPtr()->replay_speed_;
   if (mReplayCursor < mStartIndex)
     mReplayCursor = mEndIndex;
+  // 设置这个后会自动读取对应的图片
   mSlider->setValue((int)mReplayCursor);
   //int cv = mSlider->value();
   //cv = cv - 1;
